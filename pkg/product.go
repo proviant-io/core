@@ -17,6 +17,17 @@ type Product struct {
 	Barcode string `json:"barcode"`
 }
 
+type ProductDTO struct {
+	Id int `json:"id"`
+	Title string `json:"title"`
+	Description string `json:"description"`
+	Link string `json:"link"`
+	Image string `json:"image"`
+	Barcode string `json:"barcode"`
+	Categories []int `json:"categories"`
+	ListId int `json:"list_id"`
+}
+
 type Repository struct {
 	db *gorm.DB
 }
@@ -29,6 +40,19 @@ func (r *Repository) Get(id int) *Product{
 	r.db.First(p, "id = ?", id)
 
 	return p
+}
+
+func (r *Repository) Create(dto ProductDTO){
+
+	p := Product{
+		Title: dto.Title,
+		Description: dto.Description,
+		Link: dto.Link,
+		Image: dto.Image,
+		Barcode: dto.Barcode,
+	}
+
+	r.db.Create(p)
 }
 
 func (r *Repository) Migrate() error{
