@@ -1,4 +1,4 @@
-package pkg
+package product
 
 import (
 	"fmt"
@@ -17,7 +17,7 @@ type Product struct {
 	Barcode string `json:"barcode"`
 }
 
-type ProductDTO struct {
+type DTO struct {
 	Id int `json:"id"`
 	Title string `json:"title"`
 	Description string `json:"description"`
@@ -50,7 +50,7 @@ func (r *Repository) Delete(id int){
 	r.db.Delete(&Product{}, id)
 }
 
-func (r *Repository) Create(dto ProductDTO){
+func (r *Repository) Create(dto DTO){
 
 	p := Product{
 		Title: dto.Title,
@@ -63,7 +63,7 @@ func (r *Repository) Create(dto ProductDTO){
 	r.db.Create(&p)
 }
 
-func (r *Repository) Update(id int, dto ProductDTO){
+func (r *Repository) Update(id int, dto DTO){
 
 	p := Product{
 		Title: dto.Title,

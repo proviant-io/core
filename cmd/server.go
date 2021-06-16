@@ -2,20 +2,31 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"gitlab.com/behind-the-fridge/product/pkg"
+	"gitlab.com/behind-the-fridge/product/pkg/product"
+	"gitlab.com/behind-the-fridge/product/pkg/stock"
 	"strconv"
 )
 
 
 func main() {
 
-	productRepo, err := pkg.Setup()
+	productRepo, err := product.Setup()
+
+	if err != nil{
+		panic(err)
+	}
+
+
+	stockRepo, err := stock.Setup()
 
 	if err != nil{
 		panic(err)
 	}
 
 	r := gin.Default()
+
+	// product
+
 	r.GET("/product/:id", func(c *gin.Context) {
 		idString := c.Param("id")
 		id, err := strconv.Atoi(idString)
@@ -50,7 +61,7 @@ func main() {
 
 	r.POST("/product/", func(c *gin.Context) {
 
-		dto := pkg.ProductDTO{}
+		dto := product.DTO{}
 
 		err := c.BindJSON(&dto)
 
@@ -79,7 +90,7 @@ func main() {
 			})
 		}
 
-		dto := pkg.ProductDTO{}
+		dto := product.DTO{}
 
 		err = c.BindJSON(&dto)
 
@@ -94,6 +105,22 @@ func main() {
 		c.JSON(200, gin.H{
 			"ok": true,
 		})
+	})
+
+	// stock
+	r.GET("/product/:id/stock/", func(c *gin.Context) {
+		idString := c.Param("id")
+		id, err := strconv.Atoi(idString)
+
+		if err != nil {
+			c.JSON(200, gin.H{
+				"err": err,
+			})
+		}
+
+		s := stockRepo.GetAllByProductId(id)
+
+		c.JSON(200, s)
 	})
 
 	r.Run("0.0.0.0:8080") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
