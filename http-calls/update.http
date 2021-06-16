@@ -1,0 +1,4 @@
+POST http://localhost:8080/product/1/
+Content-Type: application/json
+
+{"title":"Milk Pack 1L", "description":  "Milk desc", "link":  "https://test.com/test", "image":  "https://inage.com/1.jpg", "barcode":  "1234567890Z"}

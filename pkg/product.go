@@ -42,6 +42,14 @@ func (r *Repository) Get(id int) *Product{
 	return p
 }
 
+func (r *Repository) Delete(id int){
+
+	log.Printf("delete id: %d\n", id)
+
+	//db.Unscoped().Delete(&order) to delete permanently
+	r.db.Delete(&Product{}, id)
+}
+
 func (r *Repository) Create(dto ProductDTO){
 
 	p := Product{
@@ -52,8 +60,22 @@ func (r *Repository) Create(dto ProductDTO){
 		Barcode: dto.Barcode,
 	}
 
-	r.db.Create(p)
+	r.db.Create(&p)
 }
+
+func (r *Repository) Update(id int, dto ProductDTO){
+
+	p := Product{
+		Title: dto.Title,
+		Description: dto.Description,
+		Link: dto.Link,
+		Image: dto.Image,
+		Barcode: dto.Barcode,
+	}
+
+	r.db.Model(&Product{Id: id}).Updates(p)
+}
+
 
 func (r *Repository) Migrate() error{
 	// Migrate the schema

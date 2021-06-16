@@ -31,6 +31,22 @@ func main() {
 		c.JSON(200, p)
 	})
 
+	r.DELETE("/product/:id", func(c *gin.Context) {
+		idString := c.Param("id")
+		id, err := strconv.Atoi(idString)
+
+		if err != nil {
+			c.JSON(200, gin.H{
+				"err": err,
+			})
+		}
+
+		productRepo.Delete(id)
+
+		c.JSON(200, gin.H{
+			"ok": true,
+		})
+	})
 
 	r.POST("/product/", func(c *gin.Context) {
 
@@ -45,6 +61,35 @@ func main() {
 		}
 
 		productRepo.Create(dto)
+
+		c.JSON(200, gin.H{
+			"ok": true,
+		})
+	})
+
+
+	r.POST("/product/:id", func(c *gin.Context) {
+
+		idString := c.Param("id")
+		id, err := strconv.Atoi(idString)
+
+		if err != nil {
+			c.JSON(200, gin.H{
+				"err": err,
+			})
+		}
+
+		dto := pkg.ProductDTO{}
+
+		err = c.BindJSON(&dto)
+
+		if err != nil {
+			c.JSON(200, gin.H{
+				"err": err,
+			})
+		}
+
+		productRepo.Update(id, dto)
 
 		c.JSON(200, gin.H{
 			"ok": true,
