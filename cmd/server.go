@@ -39,7 +39,7 @@ func main() {
 
 		p := productRepo.Get(id)
 
-		c.JSON(200, p)
+		c.JSON(200, product.ModelToDTO(p))
 	})
 
 	r.DELETE("/product/:id", func(c *gin.Context) {
@@ -77,7 +77,6 @@ func main() {
 			"ok": true,
 		})
 	})
-
 
 	r.POST("/product/:id", func(c *gin.Context) {
 
@@ -120,7 +119,71 @@ func main() {
 
 		s := stockRepo.GetAllByProductId(id)
 
-		c.JSON(200, s)
+		var response []stock.DTO
+
+		for _, model := range s{
+			response = append(response, stock.ModelToDTO(model))
+		}
+
+		c.JSON(200, response)
+	})
+
+	r.POST("/product/:id/add/", func(c *gin.Context) {
+		idString := c.Param("id")
+		id, err := strconv.Atoi(idString)
+
+		if err != nil {
+			c.JSON(200, gin.H{
+				"err": err,
+			})
+		}
+
+		dto := stock.DTO{}
+
+		err = c.BindJSON(&dto)
+
+		if err != nil {
+			c.JSON(200, gin.H{
+				"err": err,
+			})
+		}
+
+		dto.ProductId = id
+
+		stockRepo.Add(dto)
+
+		c.JSON(200, gin.H{
+			"ok": true,
+		})
+	})
+
+	r.POST("/product/:id/consume/", func(c *gin.Context) {
+		idString := c.Param("id")
+		id, err := strconv.Atoi(idString)
+
+		if err != nil {
+			c.JSON(200, gin.H{
+				"err": err,
+			})
+		}
+
+		dto := stock.DTO{}
+
+		err = c.BindJSON(&dto)
+
+		if err != nil {
+			c.JSON(200, gin.H{
+				"err": err,
+			})
+		}
+
+		dto.ProductId = id
+
+		stockRepo.Consume(dto)
+
+		c.JSON(200, gin.H{
+			"ok": true,
+		})
 	})
 
 	r.Run("0.0.0.0:8080") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")

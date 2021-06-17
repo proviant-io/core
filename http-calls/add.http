@@ -1,0 +1,4 @@
+POST http://localhost:8080/product/1/add/
+Content-Type: application/json
+
+{"quantity":  4, "expire":  123123123}

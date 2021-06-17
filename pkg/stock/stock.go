@@ -15,6 +15,7 @@ type Stock struct {
 }
 
 type DTO struct {
+	Id int `json:"id"`
 	ProductId int `json:"product_id"`
 	Quantity int `json:"quantity"`
 	Expire int `json:"expire"`
@@ -46,6 +47,14 @@ func (r *Repository) Delete(id int){
 	r.db.Delete(&Stock{}, id)
 }
 
+func (r *Repository) Consume(dto DTO){
+	// do something smart here
+}
+
+func (r *Repository) Add(dto DTO){
+	r.Create(dto)
+}
+
 func (r *Repository) Create(dto DTO){
 
 	s := Stock{
@@ -75,6 +84,15 @@ func (r *Repository) Migrate() error{
 		return fmt.Errorf("migration of Stock table failed: %v", err)
 	}
 	return nil
+}
+
+func ModelToDTO(m Stock) DTO {
+	return DTO{
+		Id: m.Id,
+		Quantity: m.Quantity,
+		ProductId: m.ProductId,
+		Expire: m.Expire,
+	}
 }
 
 func Setup() (*Repository, error){

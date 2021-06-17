@@ -32,14 +32,14 @@ type Repository struct {
 	db *gorm.DB
 }
 
-func (r *Repository) Get(id int) *Product{
+func (r *Repository) Get(id int) Product{
 
 	log.Printf("id: %d\n", id)
 
 	p := &Product{}
 	r.db.First(p, "id = ?", id)
 
-	return p
+	return *p
 }
 
 func (r *Repository) Delete(id int){
@@ -74,6 +74,17 @@ func (r *Repository) Update(id int, dto DTO){
 	}
 
 	r.db.Model(&Product{Id: id}).Updates(p)
+}
+
+func ModelToDTO(m Product) DTO {
+	return DTO{
+		Id: m.Id,
+		Title: m.Title,
+		Description: m.Description,
+		Link: m.Link,
+		Image: m.Image,
+		Barcode: m.Barcode,
+	}
 }
 
 
