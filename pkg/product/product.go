@@ -42,6 +42,14 @@ func (r *Repository) Get(id int) Product{
 	return *p
 }
 
+func (r *Repository) GetAll() []Product{
+
+	var products []Product
+	r.db.Find(&products)
+
+	return products
+}
+
 func (r *Repository) Delete(id int){
 
 	log.Printf("delete id: %d\n", id)

@@ -1,4 +1,4 @@
-POST http://localhost:8080/product/1/
+POST http://localhost:8080/product/3/
 Content-Type: application/json
 
-{"title":"Milk Pack 1L", "description":  "Milk desc", "link":  "https://test.com/test", "image":  "https://inage.com/1.jpg", "barcode":  "1234567890Z"}
+{"title":"Milk Pack 4L", "description":  "Milk 4 desc", "link":  "https://test.com/test", "image":  "https://inage.com/1.jpg", "barcode":  "1234567890Z"}

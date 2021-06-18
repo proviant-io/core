@@ -27,7 +27,7 @@ func main() {
 
 	// product
 
-	r.GET("/product/:id", func(c *gin.Context) {
+	r.GET("/product/:id/", func(c *gin.Context) {
 		idString := c.Param("id")
 		id, err := strconv.Atoi(idString)
 
@@ -42,7 +42,20 @@ func main() {
 		c.JSON(200, product.ModelToDTO(p))
 	})
 
-	r.DELETE("/product/:id", func(c *gin.Context) {
+	r.GET("/product/", func(c *gin.Context) {
+
+		p := productRepo.GetAll()
+
+		var response []product.DTO
+
+		for _, model := range p{
+			response = append(response, product.ModelToDTO(model))
+		}
+
+		c.JSON(200, response)
+	})
+
+	r.DELETE("/product/:id/", func(c *gin.Context) {
 		idString := c.Param("id")
 		id, err := strconv.Atoi(idString)
 
@@ -78,7 +91,7 @@ func main() {
 		})
 	})
 
-	r.POST("/product/:id", func(c *gin.Context) {
+	r.POST("/product/:id/", func(c *gin.Context) {
 
 		idString := c.Param("id")
 		id, err := strconv.Atoi(idString)
