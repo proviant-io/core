@@ -1,4 +1,4 @@
-POST http://localhost:8080/product/
+POST http://localhost:8080/api/v1/product/
 Content-Type: application/json
 
 {"title":"Milk Pack 2L", "description":  "Milk desc 2", "link":  "https://test.com/test", "image":  "https://inage.com/1.jpg", "barcode":  "1234567890Z"}

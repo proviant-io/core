@@ -2,7 +2,7 @@ package product
 
 import (
 	"fmt"
-	"gorm.io/driver/mysql"
+	"gitlab.com/behind-the-fridge/product/internal/db"
 	"gorm.io/gorm"
 	"log"
 )
@@ -29,7 +29,7 @@ type DTO struct {
 }
 
 type Repository struct {
-	db *gorm.DB
+	db db.DB
 }
 
 func (r *Repository) Get(id int) Product{
@@ -37,7 +37,8 @@ func (r *Repository) Get(id int) Product{
 	log.Printf("id: %d\n", id)
 
 	p := &Product{}
-	r.db.First(p, "id = ?", id)
+
+	r.db.Connection().First(p, "id = ?", id)
 
 	return *p
 }
@@ -45,7 +46,7 @@ func (r *Repository) Get(id int) Product{
 func (r *Repository) GetAll() []Product{
 
 	var products []Product
-	r.db.Find(&products)
+	r.db.Connection().Find(&products)
 
 	return products
 }
@@ -55,7 +56,7 @@ func (r *Repository) Delete(id int){
 	log.Printf("delete id: %d\n", id)
 
 	//db.Unscoped().Delete(&order) to delete permanently
-	r.db.Delete(&Product{}, id)
+	r.db.Connection().Delete(&Product{}, id)
 }
 
 func (r *Repository) Create(dto DTO){
@@ -68,7 +69,7 @@ func (r *Repository) Create(dto DTO){
 		Barcode: dto.Barcode,
 	}
 
-	r.db.Create(&p)
+	r.db.Connection().Create(&p)
 }
 
 func (r *Repository) Update(id int, dto DTO){
@@ -81,7 +82,7 @@ func (r *Repository) Update(id int, dto DTO){
 		Barcode: dto.Barcode,
 	}
 
-	r.db.Model(&Product{Id: id}).Updates(p)
+	r.db.Connection().Model(&Product{Id: id}).Updates(p)
 }
 
 func ModelToDTO(m Product) DTO {
@@ -98,26 +99,20 @@ func ModelToDTO(m Product) DTO {
 
 func (r *Repository) Migrate() error{
 	// Migrate the schema
-	err := r.db.AutoMigrate(&Product{})
+	err := r.db.Connection().AutoMigrate(&Product{})
 	if err != nil{
 		return fmt.Errorf("migration of Product table failed: %v", err)
 	}
 	return nil
 }
 
-func Setup() (*Repository, error){
+func Setup(d db.DB) (*Repository, error) {
 
 	repo := &Repository{}
 
-	dsn := "root:product@tcp(127.0.0.1:7777)/product?multiStatements=true&parseTime=true"
+	repo.db = d
 
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		return nil, err
-	}
-
-	repo.db = db
-	err = repo.Migrate()
+	err := repo.Migrate()
 	if err != nil{
 		return nil, err
 	}

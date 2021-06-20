@@ -1,4 +1,0 @@
-POST http://localhost:8080/product/1/consume/
-Content-Type: application/json
-
-{"quantity":  2}
