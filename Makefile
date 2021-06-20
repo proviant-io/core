@@ -1,8 +1,3 @@
-.PHONY: up-db
-up-db:
-#	@mkdir ./mariadb
-	@docker-compose -f docker-compose.dev.yml up -d
-
 .PHONY: docker/compile
 docker/compile:
 	CGO_ENABLED=1 go build -ldflags="-X 'main.SqliteLocation=/app/db/pantry.db'" -o app ./cmd
