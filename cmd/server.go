@@ -51,7 +51,7 @@ func main() {
 		panic(err)
 	}
 
-	productService := service.NewProductService(productRepo, listRepo, categoryRepo)
+	relationService := service.NewRelationService(productRepo, listRepo, categoryRepo)
 
 	r := gin.Default()
 
@@ -71,7 +71,7 @@ func main() {
 			return
 		}
 
-		p, err := productService.GetProduct(id)
+		p, err := relationService.GetProduct(id)
 
 		if err != nil {
 
@@ -124,7 +124,17 @@ func main() {
 			return
 		}
 
-		productRepo.Delete(id)
+		err = productRepo.Delete(id)
+
+		if err != nil {
+			response := Response{
+				Status: 404,
+				Error:  err.Error(),
+			}
+
+			c.JSON(response.Status, response)
+			return
+		}
 
 		response := Response{
 			Status: 200,
@@ -187,7 +197,17 @@ func main() {
 			return
 		}
 
-		productRepo.Update(id, dto)
+		err = productRepo.Update(id, dto)
+
+		if err != nil {
+			response := Response{
+				Status: 404,
+				Error:  err.Error(),
+			}
+
+			c.JSON(response.Status, response)
+			return
+		}
 
 		response := Response{
 			Status: 200,
@@ -375,7 +395,17 @@ func main() {
 			return
 		}
 
-		categoryRepo.Delete(id)
+		err = categoryRepo.Delete(id)
+
+		if err != nil {
+			response := Response{
+				Status: 404,
+				Error:  err.Error(),
+			}
+
+			c.JSON(response.Status, response)
+			return
+		}
 
 		response := Response{
 			Status: 200,
@@ -438,7 +468,17 @@ func main() {
 			return
 		}
 
-		categoryRepo.Update(id, dto)
+		err = categoryRepo.Update(id, dto)
+
+		if err != nil {
+			response := Response{
+				Status: 404,
+				Error:  err.Error(),
+			}
+
+			c.JSON(response.Status, response)
+			return
+		}
 
 		response := Response{
 			Status: 200,
@@ -517,7 +557,17 @@ func main() {
 			return
 		}
 
-		listRepo.Delete(id)
+		err = listRepo.Delete(id)
+
+		if err != nil {
+			response := Response{
+				Status: 404,
+				Error:  err.Error(),
+			}
+
+			c.JSON(response.Status, response)
+			return
+		}
 
 		response := Response{
 			Status: 200,
@@ -580,7 +630,17 @@ func main() {
 			return
 		}
 
-		listRepo.Update(id, dto)
+		err = listRepo.Update(id, dto)
+
+		if err != nil {
+			response := Response{
+				Status: 404,
+				Error:  err.Error(),
+			}
+
+			c.JSON(response.Status, response)
+			return
+		}
 
 		response := Response{
 			Status: 200,

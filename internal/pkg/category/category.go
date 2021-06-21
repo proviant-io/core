@@ -8,12 +8,12 @@ import (
 
 type Category struct {
 	gorm.Model
-	Id int `json:"id"`
+	Id    int    `json:"id"`
 	Title string `json:"title"`
 }
 
 type DTO struct {
-	Id int `json:"id"`
+	Id    int    `json:"id"`
 	Title string `json:"title"`
 }
 
@@ -21,7 +21,7 @@ type Repository struct {
 	db db.DB
 }
 
-func (r *Repository) Get(id int) (Category, error){
+func (r *Repository) Get(id int) (Category, error) {
 
 	model := &Category{}
 
@@ -34,7 +34,7 @@ func (r *Repository) Get(id int) (Category, error){
 	return *model, nil
 }
 
-func (r *Repository) GetAll() []Category{
+func (r *Repository) GetAll() []Category {
 
 	var categories []Category
 	r.db.Connection().Find(&categories)
@@ -42,13 +42,20 @@ func (r *Repository) GetAll() []Category{
 	return categories
 }
 
-func (r *Repository) Delete(id int){
+func (r *Repository) Delete(id int) error {
+
+	model, err := r.Get(id)
+
+	if err != nil {
+		return err
+	}
 
 	//db.Unscoped().Delete(&order) to delete permanently
-	r.db.Connection().Delete(&Category{}, id)
+	r.db.Connection().Delete(model, id)
+	return nil
 }
 
-func (r *Repository) Create(dto DTO){
+func (r *Repository) Create(dto DTO) {
 
 	model := Category{
 		Title: dto.Title,
@@ -57,27 +64,31 @@ func (r *Repository) Create(dto DTO){
 	r.db.Connection().Create(&model)
 }
 
-func (r *Repository) Update(id int, dto DTO){
+func (r *Repository) Update(id int, dto DTO) error {
 
-	model := Category{
-		Title: dto.Title,
+	model, err := r.Get(id)
+
+	if err != nil {
+		return err
 	}
 
+	model.Title = dto.Title
+
 	r.db.Connection().Model(&Category{Id: id}).Updates(model)
+	return nil
 }
 
 func ModelToDTO(m Category) DTO {
 	return DTO{
-		Id: m.Id,
+		Id:    m.Id,
 		Title: m.Title,
 	}
 }
 
-
-func (r *Repository) Migrate() error{
+func (r *Repository) Migrate() error {
 	// Migrate the schema
 	err := r.db.Connection().AutoMigrate(&Category{})
-	if err != nil{
+	if err != nil {
 		return fmt.Errorf("migration of Product table failed: %v", err)
 	}
 	return nil
@@ -90,7 +101,7 @@ func Setup(d db.DB) (*Repository, error) {
 	repo.db = d
 
 	err := repo.Migrate()
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 

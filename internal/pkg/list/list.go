@@ -8,12 +8,12 @@ import (
 
 type List struct {
 	gorm.Model
-	Id int `json:"id"`
+	Id    int    `json:"id"`
 	Title string `json:"title"`
 }
 
 type DTO struct {
-	Id int `json:"id"`
+	Id    int    `json:"id"`
 	Title string `json:"title"`
 }
 
@@ -21,7 +21,7 @@ type Repository struct {
 	db db.DB
 }
 
-func (r *Repository) Get(id int) (List, error){
+func (r *Repository) Get(id int) (List, error) {
 
 	model := &List{}
 
@@ -34,7 +34,7 @@ func (r *Repository) Get(id int) (List, error){
 	return *model, nil
 }
 
-func (r *Repository) GetAll() []List{
+func (r *Repository) GetAll() []List {
 
 	var models []List
 	r.db.Connection().Find(&models)
@@ -42,13 +42,20 @@ func (r *Repository) GetAll() []List{
 	return models
 }
 
-func (r *Repository) Delete(id int){
+func (r *Repository) Delete(id int) error {
+
+	model, err := r.Get(id)
+
+	if err != nil {
+		return err
+	}
 
 	//db.Unscoped().Delete(&order) to delete permanently
-	r.db.Connection().Delete(&List{}, id)
+	r.db.Connection().Delete(model, id)
+	return nil
 }
 
-func (r *Repository) Create(dto DTO){
+func (r *Repository) Create(dto DTO) {
 
 	model := List{
 		Title: dto.Title,
@@ -57,27 +64,31 @@ func (r *Repository) Create(dto DTO){
 	r.db.Connection().Create(&model)
 }
 
-func (r *Repository) Update(id int, dto DTO){
+func (r *Repository) Update(id int, dto DTO) error {
 
-	model := List{
-		Title: dto.Title,
+	model, err := r.Get(id)
+
+	if err != nil {
+		return err
 	}
 
+	model.Title = dto.Title
+
 	r.db.Connection().Model(&List{Id: id}).Updates(model)
+	return nil
 }
 
 func ModelToDTO(m List) DTO {
 	return DTO{
-		Id: m.Id,
+		Id:    m.Id,
 		Title: m.Title,
 	}
 }
 
-
-func (r *Repository) Migrate() error{
+func (r *Repository) Migrate() error {
 	// Migrate the schema
 	err := r.db.Connection().AutoMigrate(&List{})
-	if err != nil{
+	if err != nil {
 		return fmt.Errorf("migration of Product table failed: %v", err)
 	}
 	return nil
@@ -90,7 +101,7 @@ func Setup(d db.DB) (*Repository, error) {
 	repo.db = d
 
 	err := repo.Migrate()
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 

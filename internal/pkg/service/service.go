@@ -7,13 +7,13 @@ import (
 )
 
 
-type ProductService struct {
+type RelationService struct {
 	productRepository *product.Repository
 	listRepository *list.Repository
 	categoryRepository *category.Repository
 }
 
-func (ps *ProductService) GetProduct(id int) (product.DTO, error){
+func (ps *RelationService) GetProduct(id int) (product.DTO, error){
 
 	p, err :=  ps.productRepository.Get(id)
 
@@ -34,8 +34,8 @@ func (ps *ProductService) GetProduct(id int) (product.DTO, error){
 	return productDTO, nil
 }
 
-func NewProductService(productRepository *product.Repository, listRepository *list.Repository, categoryRepository *category.Repository) *ProductService {
-	return &ProductService{
+func NewRelationService(productRepository *product.Repository, listRepository *list.Repository, categoryRepository *category.Repository) *RelationService {
+	return &RelationService{
 		productRepository: productRepository,
 		listRepository: listRepository,
 		categoryRepository: categoryRepository,
