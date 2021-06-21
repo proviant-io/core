@@ -25,12 +25,16 @@ type Repository struct {
 	db db.DB
 }
 
-func (r *Repository) Get(id int) *Stock{
+func (r *Repository) Get(id int) (*Stock, error){
 
-	s := &Stock{}
-	r.db.Connection().First(s, "id = ?", id)
+	model := &Stock{}
+	r.db.Connection().First(model, "id = ?", id)
 
-	return s
+	if (*model).Id == 0 {
+		return &Stock{}, fmt.Errorf("stock with id %d not found", id)
+	}
+
+	return model, nil
 }
 
 func (r *Repository) GetAllByProductId(id int) []Stock{
@@ -41,10 +45,17 @@ func (r *Repository) GetAllByProductId(id int) []Stock{
 	return s
 }
 
-func (r *Repository) Delete(id int){
+func (r *Repository) Delete(id int) error{
+
+	model, err := r.Get(id)
+
+	if err != nil {
+		return err
+	}
 
 	//db.Unscoped().Delete(&order) to delete permanently
-	r.db.Connection().Delete(&Stock{}, id)
+	r.db.Connection().Delete(model, id)
+	return nil
 }
 
 func (r *Repository) Consume(dto DTO){
@@ -66,15 +77,19 @@ func (r *Repository) Create(dto DTO){
 	r.db.Connection().Create(&s)
 }
 
-func (r *Repository) Update(id int, dto DTO){
+func (r *Repository) Update(id int, dto DTO) error{
 
-	s := Stock{
-		Quantity: dto.Quantity,
-		ProductId: dto.ProductId,
-		Expire: dto.Expire,
+	model, err := r.Get(id)
+
+	if err != nil {
+		return err
 	}
 
-	r.db.Connection().Model(&Stock{Id: id}).Updates(s)
+	model.Quantity = dto.Quantity
+	model.Expire = dto.Expire
+
+	r.db.Connection().Model(&Stock{Id: id}).Updates(model)
+	return nil
 }
 
 func (r *Repository) Migrate() error{

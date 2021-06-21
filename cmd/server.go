@@ -51,7 +51,7 @@ func main() {
 		panic(err)
 	}
 
-	relationService := service.NewRelationService(productRepo, listRepo, categoryRepo)
+	relationService := service.NewRelationService(productRepo, listRepo, categoryRepo, stockRepo)
 
 	r := gin.Default()
 
@@ -159,7 +159,17 @@ func main() {
 			return
 		}
 
-		productRepo.Create(dto)
+		err = relationService.CreateProduct(dto)
+
+		if err != nil {
+			response := Response{
+				Status: 404,
+				Error:  err.Error(),
+			}
+
+			c.JSON(response.Status, response)
+			return
+		}
 
 		response := Response{
 			Status: 200,
@@ -277,7 +287,17 @@ func main() {
 
 		dto.ProductId = id
 
-		stockRepo.Add(dto)
+		err = relationService.AddStock(dto)
+
+		if err != nil {
+			response := Response{
+				Status: 404,
+				Error:  err.Error(),
+			}
+
+			c.JSON(response.Status, response)
+			return
+		}
 
 		response := Response{
 			Status: 200,
@@ -316,7 +336,17 @@ func main() {
 
 		dto.ProductId = id
 
-		stockRepo.Consume(dto)
+		err = relationService.ConsumeStock(dto)
+
+		if err != nil {
+			response := Response{
+				Status: 404,
+				Error:  err.Error(),
+			}
+
+			c.JSON(response.Status, response)
+			return
+		}
 
 		response := Response{
 			Status: 200,
