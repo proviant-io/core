@@ -21,13 +21,17 @@ type Repository struct {
 	db db.DB
 }
 
-func (r *Repository) Get(id int) Category{
+func (r *Repository) Get(id int) (Category, error){
 
-	p := &Category{}
+	model := &Category{}
 
-	r.db.Connection().First(p, "id = ?", id)
+	r.db.Connection().First(model, "id = ?", id)
 
-	return *p
+	if (*model).Id == 0 {
+		return Category{}, fmt.Errorf("category with id %d not found", id)
+	}
+
+	return *model, nil
 }
 
 func (r *Repository) GetAll() []Category{

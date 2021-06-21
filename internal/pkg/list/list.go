@@ -21,13 +21,17 @@ type Repository struct {
 	db db.DB
 }
 
-func (r *Repository) Get(id int) List{
+func (r *Repository) Get(id int) (List, error){
 
 	model := &List{}
 
 	r.db.Connection().First(model, "id = ?", id)
 
-	return *model
+	if (*model).Id == 0 {
+		return List{}, fmt.Errorf("list with id %d not found", id)
+	}
+
+	return *model, nil
 }
 
 func (r *Repository) GetAll() []List{

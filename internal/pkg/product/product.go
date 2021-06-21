@@ -15,6 +15,7 @@ type Product struct {
 	Link string `json:"link"`
 	Image string `json:"image"`
 	Barcode string `json:"barcode"`
+	ListId int `json:"list_id"`
 }
 
 type DTO struct {
@@ -24,15 +25,17 @@ type DTO struct {
 	Link string `json:"link"`
 	Image string `json:"image"`
 	Barcode string `json:"barcode"`
-	Categories []int `json:"categories"`
+	CategoryIds []int `json:"category_ids"`
+	Categories []interface{} `json:"categories"`
 	ListId int `json:"list_id"`
+	List interface{} `json:"list"`
 }
 
 type Repository struct {
 	db db.DB
 }
 
-func (r *Repository) Get(id int) Product{
+func (r *Repository) Get(id int) (Product, error){
 
 	log.Printf("id: %d\n", id)
 
@@ -40,7 +43,11 @@ func (r *Repository) Get(id int) Product{
 
 	r.db.Connection().First(p, "id = ?", id)
 
-	return *p
+	if (*p).Id == 0{
+		return Product{}, fmt.Errorf("product with id %d not found", id)
+	}
+
+	return *p, nil
 }
 
 func (r *Repository) GetAll() []Product{
@@ -67,6 +74,7 @@ func (r *Repository) Create(dto DTO){
 		Link: dto.Link,
 		Image: dto.Image,
 		Barcode: dto.Barcode,
+		ListId: dto.ListId,
 	}
 
 	r.db.Connection().Create(&p)
@@ -80,6 +88,7 @@ func (r *Repository) Update(id int, dto DTO){
 		Link: dto.Link,
 		Image: dto.Image,
 		Barcode: dto.Barcode,
+		ListId: dto.ListId,
 	}
 
 	r.db.Connection().Model(&Product{Id: id}).Updates(p)
@@ -93,6 +102,7 @@ func ModelToDTO(m Product) DTO {
 		Link: m.Link,
 		Image: m.Image,
 		Barcode: m.Barcode,
+		ListId: m.ListId,
 	}
 }
 

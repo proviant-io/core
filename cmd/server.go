@@ -6,6 +6,7 @@ import (
 	"gitlab.com/behind-the-fridge/product/internal/pkg/category"
 	"gitlab.com/behind-the-fridge/product/internal/pkg/list"
 	"gitlab.com/behind-the-fridge/product/internal/pkg/product"
+	"gitlab.com/behind-the-fridge/product/internal/pkg/service"
 	"gitlab.com/behind-the-fridge/product/internal/pkg/stock"
 	"strconv"
 )
@@ -50,6 +51,8 @@ func main() {
 		panic(err)
 	}
 
+	productService := service.NewProductService(productRepo, listRepo, categoryRepo)
+
 	r := gin.Default()
 
 	// product
@@ -64,17 +67,29 @@ func main() {
 				Error:  err.Error(),
 			}
 
-			c.JSON(500, response)
+			c.JSON(response.Status, response)
+			return
 		}
 
-		p := productRepo.Get(id)
+		p, err := productService.GetProduct(id)
+
+		if err != nil {
+
+			response := Response{
+				Status: 404,
+				Error:  err.Error(),
+			}
+
+			c.JSON(response.Status, response)
+			return
+		}
 
 		response := Response{
 			Status: 200,
-			Data:   product.ModelToDTO(p),
+			Data:   p,
 		}
 
-		c.JSON(200, response)
+		c.JSON(response.Status, response)
 	})
 
 	r.GET("/api/v1/product/", func(c *gin.Context) {
@@ -92,7 +107,7 @@ func main() {
 			Data:   models,
 		}
 
-		c.JSON(200, response)
+		c.JSON(response.Status, response)
 	})
 
 	r.DELETE("/api/v1/product/:id/", func(c *gin.Context) {
@@ -105,7 +120,8 @@ func main() {
 				Error:  err.Error(),
 			}
 
-			c.JSON(500, response)
+			c.JSON(response.Status, response)
+			return
 		}
 
 		productRepo.Delete(id)
@@ -114,7 +130,7 @@ func main() {
 			Status: 200,
 		}
 
-		c.JSON(200, response)
+		c.JSON(response.Status, response)
 	})
 
 	r.POST("/api/v1/product/", func(c *gin.Context) {
@@ -129,7 +145,8 @@ func main() {
 				Error:  err.Error(),
 			}
 
-			c.JSON(500, response)
+			c.JSON(response.Status, response)
+			return
 		}
 
 		productRepo.Create(dto)
@@ -138,7 +155,7 @@ func main() {
 			Status: 200,
 		}
 
-		c.JSON(200, response)
+		c.JSON(response.Status, response)
 	})
 
 	r.POST("/api/v1/product/:id/", func(c *gin.Context) {
@@ -152,7 +169,8 @@ func main() {
 				Error:  err.Error(),
 			}
 
-			c.JSON(500, response)
+			c.JSON(response.Status, response)
+			return
 		}
 
 		dto := product.DTO{}
@@ -165,7 +183,8 @@ func main() {
 				Error:  err.Error(),
 			}
 
-			c.JSON(500, response)
+			c.JSON(response.Status, response)
+			return
 		}
 
 		productRepo.Update(id, dto)
@@ -174,7 +193,7 @@ func main() {
 			Status: 200,
 		}
 
-		c.JSON(200, response)
+		c.JSON(response.Status, response)
 	})
 
 	// stock
@@ -188,7 +207,8 @@ func main() {
 				Error:  err.Error(),
 			}
 
-			c.JSON(500, response)
+			c.JSON(response.Status, response)
+			return
 		}
 
 		s := stockRepo.GetAllByProductId(id)
@@ -204,7 +224,7 @@ func main() {
 			Data:   models,
 		}
 
-		c.JSON(200, response)
+		c.JSON(response.Status, response)
 	})
 
 	r.POST("/api/v1/product/:id/add/", func(c *gin.Context) {
@@ -217,7 +237,8 @@ func main() {
 				Error:  err.Error(),
 			}
 
-			c.JSON(500, response)
+			c.JSON(response.Status, response)
+			return
 		}
 
 		dto := stock.DTO{}
@@ -230,7 +251,8 @@ func main() {
 				Error:  err.Error(),
 			}
 
-			c.JSON(500, response)
+			c.JSON(response.Status, response)
+			return
 		}
 
 		dto.ProductId = id
@@ -241,7 +263,7 @@ func main() {
 			Status: 200,
 		}
 
-		c.JSON(200, response)
+		c.JSON(response.Status, response)
 	})
 
 	r.POST("/api/v1/product/:id/consume/", func(c *gin.Context) {
@@ -254,7 +276,8 @@ func main() {
 				Error:  err.Error(),
 			}
 
-			c.JSON(500, response)
+			c.JSON(response.Status, response)
+			return
 		}
 
 		dto := stock.DTO{}
@@ -267,7 +290,8 @@ func main() {
 				Error:  err.Error(),
 			}
 
-			c.JSON(500, response)
+			c.JSON(response.Status, response)
+			return
 		}
 
 		dto.ProductId = id
@@ -278,7 +302,7 @@ func main() {
 			Status: 200,
 		}
 
-		c.JSON(200, response)
+		c.JSON(response.Status, response)
 	})
 
 	// category
@@ -293,17 +317,28 @@ func main() {
 				Error:  err.Error(),
 			}
 
-			c.JSON(500, response)
+			c.JSON(response.Status, response)
+			return
 		}
 
-		model := categoryRepo.Get(id)
+		model, err := categoryRepo.Get(id)
+
+		if err != nil {
+			response := Response{
+				Status: 404,
+				Error:  err.Error(),
+			}
+
+			c.JSON(response.Status, response)
+			return
+		}
 
 		response := Response{
 			Status: 200,
 			Data:   category.ModelToDTO(model),
 		}
 
-		c.JSON(200, response)
+		c.JSON(response.Status, response)
 
 	})
 
@@ -322,7 +357,7 @@ func main() {
 			Data:   models,
 		}
 
-		c.JSON(200, response)
+		c.JSON(response.Status, response)
 
 	})
 
@@ -336,7 +371,8 @@ func main() {
 				Error:  err.Error(),
 			}
 
-			c.JSON(500, response)
+			c.JSON(response.Status, response)
+			return
 		}
 
 		categoryRepo.Delete(id)
@@ -345,7 +381,7 @@ func main() {
 			Status: 200,
 		}
 
-		c.JSON(200, response)
+		c.JSON(response.Status, response)
 	})
 
 	r.POST("/api/v1/category/", func(c *gin.Context) {
@@ -360,7 +396,8 @@ func main() {
 				Error:  err.Error(),
 			}
 
-			c.JSON(500, response)
+			c.JSON(response.Status, response)
+			return
 		}
 
 		categoryRepo.Create(dto)
@@ -369,7 +406,7 @@ func main() {
 			Status: 200,
 		}
 
-		c.JSON(200, response)
+		c.JSON(response.Status, response)
 	})
 
 	r.POST("/api/v1/category/:id/", func(c *gin.Context) {
@@ -383,7 +420,8 @@ func main() {
 				Error:  err.Error(),
 			}
 
-			c.JSON(500, response)
+			c.JSON(response.Status, response)
+			return
 		}
 
 		dto := category.DTO{}
@@ -396,7 +434,8 @@ func main() {
 				Error:  err.Error(),
 			}
 
-			c.JSON(500, response)
+			c.JSON(response.Status, response)
+			return
 		}
 
 		categoryRepo.Update(id, dto)
@@ -405,7 +444,7 @@ func main() {
 			Status: 200,
 		}
 
-		c.JSON(200, response)
+		c.JSON(response.Status, response)
 	})
 
 	// list
@@ -420,17 +459,29 @@ func main() {
 				Error:  err.Error(),
 			}
 
-			c.JSON(500, response)
+			c.JSON(response.Status, response)
+			return
 		}
 
-		model := listRepo.Get(id)
+		model, err := listRepo.Get(id)
+
+		if err != nil {
+
+			response := Response{
+				Status: 404,
+				Error:  err.Error(),
+			}
+
+			c.JSON(response.Status, response)
+			return
+		}
 
 		response := Response{
 			Status: 200,
 			Data:   list.ModelToDTO(model),
 		}
 
-		c.JSON(200, response)
+		c.JSON(response.Status, response)
 	})
 
 	r.GET("/api/v1/list/", func(c *gin.Context) {
@@ -448,7 +499,7 @@ func main() {
 			Data:   models,
 		}
 
-		c.JSON(200, response)
+		c.JSON(response.Status, response)
 
 	})
 
@@ -462,7 +513,8 @@ func main() {
 				Error:  err.Error(),
 			}
 
-			c.JSON(500, response)
+			c.JSON(response.Status, response)
+			return
 		}
 
 		listRepo.Delete(id)
@@ -471,7 +523,7 @@ func main() {
 			Status: 200,
 		}
 
-		c.JSON(200, response)
+		c.JSON(response.Status, response)
 	})
 
 	r.POST("/api/v1/list/", func(c *gin.Context) {
@@ -486,7 +538,8 @@ func main() {
 				Error:  err.Error(),
 			}
 
-			c.JSON(500, response)
+			c.JSON(response.Status, response)
+			return
 		}
 
 		listRepo.Create(dto)
@@ -495,7 +548,7 @@ func main() {
 			Status: 200,
 		}
 
-		c.JSON(200, response)
+		c.JSON(response.Status, response)
 	})
 
 	r.POST("/api/v1/list/:id/", func(c *gin.Context) {
@@ -509,7 +562,8 @@ func main() {
 				Error:  err.Error(),
 			}
 
-			c.JSON(500, response)
+			c.JSON(response.Status, response)
+			return
 		}
 
 		dto := list.DTO{}
@@ -522,7 +576,8 @@ func main() {
 				Error:  err.Error(),
 			}
 
-			c.JSON(500, response)
+			c.JSON(response.Status, response)
+			return
 		}
 
 		listRepo.Update(id, dto)
@@ -531,7 +586,7 @@ func main() {
 			Status: 200,
 		}
 
-		c.JSON(200, response)
+		c.JSON(response.Status, response)
 	})
 
 	r.Run("0.0.0.0:80")
