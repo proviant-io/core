@@ -1,11 +1,9 @@
-# Pantry
+# Proviant
 
 
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
-
-This is yet another pantry organisation system, created with simplicity and automations in mind.
+This is yet another pantry organisation system, created with simplicity and automation in mind.
 Here's why:
 * We are tired if expired food in the pantry
 * We are tired of manual ordering food
