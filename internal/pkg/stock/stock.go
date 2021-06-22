@@ -45,7 +45,7 @@ func (r *Repository) Get(id int) (*Stock, error){
 func (r *Repository) GetAllByProductId(id int) []Stock{
 
 	var s []Stock
-	r.db.Connection().Where("product_id = ?", id).Order("expire DESC").Find(&s)
+	r.db.Connection().Where("product_id = ?", id).Order("expire ASC").Find(&s)
 
 	return s
 }
