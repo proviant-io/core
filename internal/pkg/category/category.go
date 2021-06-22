@@ -34,6 +34,14 @@ func (r *Repository) Get(id int) (Category, error) {
 	return *model, nil
 }
 
+func (r *Repository) GetByIds(ids []int) []Category {
+
+	var categories []Category
+	r.db.Connection().Where("id IN (?)", ids).Find(&categories)
+
+	return categories
+}
+
 func (r *Repository) GetAll() []Category {
 
 	var categories []Category

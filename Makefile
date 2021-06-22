@@ -10,4 +10,4 @@ docker/build:
 
 .PHONY: docker/run
 docker/run: docker/build
-	docker run --rm -t --name "pantry" -p8080:80 pantry:latest
+	docker run --rm -t --name "proviant" -p8080:80 pantry:latest

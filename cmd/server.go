@@ -6,6 +6,7 @@ import (
 	"gitlab.com/behind-the-fridge/product/internal/pkg/category"
 	"gitlab.com/behind-the-fridge/product/internal/pkg/list"
 	"gitlab.com/behind-the-fridge/product/internal/pkg/product"
+	"gitlab.com/behind-the-fridge/product/internal/pkg/product_category"
 	"gitlab.com/behind-the-fridge/product/internal/pkg/service"
 	"gitlab.com/behind-the-fridge/product/internal/pkg/stock"
 	"strconv"
@@ -51,7 +52,13 @@ func main() {
 		panic(err)
 	}
 
-	relationService := service.NewRelationService(productRepo, listRepo, categoryRepo, stockRepo)
+	productCategoryRepo, err := product_category.Setup(d)
+
+	if err != nil {
+		panic(err)
+	}
+
+	relationService := service.NewRelationService(productRepo, listRepo, categoryRepo, stockRepo, productCategoryRepo)
 
 	r := gin.Default()
 
@@ -94,17 +101,11 @@ func main() {
 
 	r.GET("/api/v1/product/", func(c *gin.Context) {
 
-		p := productRepo.GetAll()
-
-		var models []product.DTO
-
-		for _, model := range p {
-			models = append(models, product.ModelToDTO(model))
-		}
+		dtos := relationService.GetAllProducts()
 
 		response := Response{
 			Status: 200,
-			Data:   models,
+			Data:   dtos,
 		}
 
 		c.JSON(response.Status, response)
@@ -207,7 +208,9 @@ func main() {
 			return
 		}
 
-		err = productRepo.Update(id, dto)
+		dto.Id = id
+
+		err = relationService.UpdateProduct(dto)
 
 		if err != nil {
 			response := Response{
@@ -320,7 +323,7 @@ func main() {
 			return
 		}
 
-		dto := stock.DTO{}
+		dto := stock.ConsumeDTO{}
 
 		err = c.BindJSON(&dto)
 

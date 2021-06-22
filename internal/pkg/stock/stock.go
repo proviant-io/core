@@ -21,6 +21,11 @@ type DTO struct {
 	Expire int `json:"expire"`
 }
 
+type ConsumeDTO struct {
+	ProductId int `json:"product_id"`
+	Quantity int `json:"quantity"`
+}
+
 type Repository struct {
 	db db.DB
 }
@@ -40,7 +45,7 @@ func (r *Repository) Get(id int) (*Stock, error){
 func (r *Repository) GetAllByProductId(id int) []Stock{
 
 	var s []Stock
-	r.db.Connection().Where("product_id = ?", id).Find(&s)
+	r.db.Connection().Where("product_id = ?", id).Order("expire DESC").Find(&s)
 
 	return s
 }
@@ -58,8 +63,31 @@ func (r *Repository) Delete(id int) error{
 	return nil
 }
 
-func (r *Repository) Consume(dto DTO){
+func (r *Repository) Consume(dto ConsumeDTO){
 	// do something smart here
+
+	quantityLeftToConsume := dto.Quantity
+
+	models := r.GetAllByProductId(dto.ProductId)
+
+	for _, model := range models {
+		if model.Quantity < quantityLeftToConsume{
+			quantityLeftToConsume -= model.Quantity
+			r.Delete(model.Id)
+		}else{
+			model.Quantity -= quantityLeftToConsume
+			r.Update(model.Id, DTO{
+				ProductId: model.ProductId,
+				Quantity:model.Quantity,
+				Expire: model.Expire,
+			})
+			quantityLeftToConsume = 0
+		}
+
+		if quantityLeftToConsume == 0 {
+			break
+		}
+	}
 }
 
 func (r *Repository) Add(dto DTO){

@@ -26,7 +26,7 @@ type DTO struct {
 	Image       string        `json:"image"`
 	Barcode     string        `json:"barcode"`
 	CategoryIds []int         `json:"category_ids"`
-	Categories  []interface{} `json:"categories"`
+	Categories  interface{} `json:"categories"`
 	ListId      int           `json:"list_id"`
 	List        interface{}   `json:"list"`
 }
@@ -71,9 +71,9 @@ func (r *Repository) Delete(id int) error {
 	return nil
 }
 
-func (r *Repository) Create(dto DTO) {
+func (r *Repository) Create(dto DTO) Product {
 
-	p := Product{
+	p := &Product{
 		Title:       dto.Title,
 		Description: dto.Description,
 		Link:        dto.Link,
@@ -82,15 +82,16 @@ func (r *Repository) Create(dto DTO) {
 		ListId:      dto.ListId,
 	}
 
-	r.db.Connection().Create(&p)
+	r.db.Connection().Create(p)
+	return *p
 }
 
-func (r *Repository) Update(id int, dto DTO) error {
+func (r *Repository) Update(dto DTO) (Product, error) {
 
-	model, err := r.Get(id)
+	model, err := r.Get(dto.Id)
 
 	if err != nil {
-		return err
+		return Product{}, err
 	}
 
 	model.Title = dto.Title
@@ -100,8 +101,8 @@ func (r *Repository) Update(id int, dto DTO) error {
 	model.Barcode = dto.Barcode
 	model.ListId = dto.ListId
 
-	r.db.Connection().Model(&Product{Id: id}).Updates(model)
-	return nil
+	r.db.Connection().Model(&Product{Id: dto.Id}).Updates(model)
+	return model, nil
 }
 
 func ModelToDTO(m Product) DTO {
