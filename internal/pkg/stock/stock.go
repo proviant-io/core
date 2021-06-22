@@ -30,13 +30,13 @@ type Repository struct {
 	db db.DB
 }
 
-func (r *Repository) Get(id int) (*Stock, error){
+func (r *Repository) Get(id int) (Stock, error){
 
-	model := &Stock{}
-	r.db.Connection().First(model, "id = ?", id)
+	model := Stock{}
+	r.db.Connection().First(&model, "id = ?", id)
 
-	if (*model).Id == 0 {
-		return &Stock{}, fmt.Errorf("stock with id %d not found", id)
+	if (model).Id == 0 {
+		return Stock{}, fmt.Errorf("stock with id %d not found", id)
 	}
 
 	return model, nil
@@ -94,30 +94,32 @@ func (r *Repository) Add(dto DTO){
 	r.Create(dto)
 }
 
-func (r *Repository) Create(dto DTO){
+func (r *Repository) Create(dto DTO) Stock{
 
-	s := Stock{
+	model := Stock{
 		Quantity: dto.Quantity,
 		ProductId: dto.ProductId,
 		Expire: dto.Expire,
 	}
 
-	r.db.Connection().Create(&s)
+	r.db.Connection().Create(&model)
+
+	return model
 }
 
-func (r *Repository) Update(id int, dto DTO) error{
+func (r *Repository) Update(id int, dto DTO) (Stock, error){
 
 	model, err := r.Get(id)
 
 	if err != nil {
-		return err
+		return Stock{}, err
 	}
 
 	model.Quantity = dto.Quantity
 	model.Expire = dto.Expire
 
-	r.db.Connection().Model(&Stock{Id: id}).Updates(model)
-	return nil
+	r.db.Connection().Model(&Stock{Id: id}).Updates(&model)
+	return model, nil
 }
 
 func (r *Repository) Migrate() error{

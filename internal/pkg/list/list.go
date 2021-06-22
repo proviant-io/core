@@ -55,27 +55,28 @@ func (r *Repository) Delete(id int) error {
 	return nil
 }
 
-func (r *Repository) Create(dto DTO) {
+func (r *Repository) Create(dto DTO) List {
 
 	model := List{
 		Title: dto.Title,
 	}
 
 	r.db.Connection().Create(&model)
+	return model
 }
 
-func (r *Repository) Update(id int, dto DTO) error {
+func (r *Repository) Update(id int, dto DTO) (List, error) {
 
 	model, err := r.Get(id)
 
 	if err != nil {
-		return err
+		return List{}, err
 	}
 
 	model.Title = dto.Title
 
-	r.db.Connection().Model(&List{Id: id}).Updates(model)
-	return nil
+	r.db.Connection().Model(&List{Id: id}).Updates(&model)
+	return model, nil
 }
 
 func ModelToDTO(m List) DTO {

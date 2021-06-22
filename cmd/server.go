@@ -160,7 +160,7 @@ func main() {
 			return
 		}
 
-		err = relationService.CreateProduct(dto)
+		productDto, err := relationService.CreateProduct(dto)
 
 		if err != nil {
 			response := Response{
@@ -174,12 +174,13 @@ func main() {
 
 		response := Response{
 			Status: 200,
+			Data: productDto,
 		}
 
 		c.JSON(response.Status, response)
 	})
 
-	r.POST("/api/v1/product/:id/", func(c *gin.Context) {
+	r.PUT("/api/v1/product/:id/", func(c *gin.Context) {
 
 		idString := c.Param("id")
 		id, err := strconv.Atoi(idString)
@@ -210,7 +211,7 @@ func main() {
 
 		dto.Id = id
 
-		err = relationService.UpdateProduct(dto)
+		productDTO, err := relationService.UpdateProduct(dto)
 
 		if err != nil {
 			response := Response{
@@ -224,6 +225,7 @@ func main() {
 
 		response := Response{
 			Status: 200,
+			Data: productDTO,
 		}
 
 		c.JSON(response.Status, response)
@@ -463,16 +465,17 @@ func main() {
 			return
 		}
 
-		categoryRepo.Create(dto)
+		categoryModel := categoryRepo.Create(dto)
 
 		response := Response{
 			Status: 200,
+			Data: category.ModelToDTO(categoryModel),
 		}
 
 		c.JSON(response.Status, response)
 	})
 
-	r.POST("/api/v1/category/:id/", func(c *gin.Context) {
+	r.PUT("/api/v1/category/:id/", func(c *gin.Context) {
 
 		idString := c.Param("id")
 		id, err := strconv.Atoi(idString)
@@ -501,7 +504,7 @@ func main() {
 			return
 		}
 
-		err = categoryRepo.Update(id, dto)
+		categoryModel, err := categoryRepo.Update(id, dto)
 
 		if err != nil {
 			response := Response{
@@ -515,6 +518,7 @@ func main() {
 
 		response := Response{
 			Status: 200,
+			Data: category.ModelToDTO(categoryModel),
 		}
 
 		c.JSON(response.Status, response)
@@ -625,16 +629,17 @@ func main() {
 			return
 		}
 
-		listRepo.Create(dto)
+		listModel := listRepo.Create(dto)
 
 		response := Response{
 			Status: 200,
+			Data: list.ModelToDTO(listModel),
 		}
 
 		c.JSON(response.Status, response)
 	})
 
-	r.POST("/api/v1/list/:id/", func(c *gin.Context) {
+	r.PUT("/api/v1/list/:id/", func(c *gin.Context) {
 
 		idString := c.Param("id")
 		id, err := strconv.Atoi(idString)
@@ -663,7 +668,7 @@ func main() {
 			return
 		}
 
-		err = listRepo.Update(id, dto)
+		listModel, err := listRepo.Update(id, dto)
 
 		if err != nil {
 			response := Response{
@@ -677,6 +682,7 @@ func main() {
 
 		response := Response{
 			Status: 200,
+			Data: list.ModelToDTO(listModel),
 		}
 
 		c.JSON(response.Status, response)

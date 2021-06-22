@@ -78,12 +78,12 @@ func (ps *RelationService) GetAllProducts() []product.DTO {
 	return dtos
 }
 
-func (ps *RelationService) CreateProduct(dto product.DTO) error {
+func (ps *RelationService) CreateProduct(dto product.DTO) (product.DTO, error) {
 
 	_, err := ps.listRepository.Get(dto.ListId)
 
 	if err != nil {
-		return err
+		return product.DTO{}, err
 	}
 
 	if len(dto.CategoryIds) != 0{
@@ -91,7 +91,7 @@ func (ps *RelationService) CreateProduct(dto product.DTO) error {
 			_, err := ps.categoryRepository.Get(categoryId)
 
 			if err != nil {
-				return err
+				return product.DTO{}, err
 			}
 		}
 	}
@@ -102,15 +102,15 @@ func (ps *RelationService) CreateProduct(dto product.DTO) error {
 		ps.productCategoryRepository.Link(p.Id, dto.CategoryIds)
 	}
 
-	return nil
+	return ps.GetProduct(p.Id)
 }
 
-func (ps *RelationService) UpdateProduct(dto product.DTO) error {
+func (ps *RelationService) UpdateProduct(dto product.DTO) (product.DTO, error) {
 
 	_, err := ps.listRepository.Get(dto.ListId)
 
 	if err != nil {
-		return err
+		return product.DTO{}, err
 	}
 
 	if len(dto.CategoryIds) != 0{
@@ -118,7 +118,7 @@ func (ps *RelationService) UpdateProduct(dto product.DTO) error {
 			_, err := ps.categoryRepository.Get(categoryId)
 
 			if err != nil {
-				return err
+				return product.DTO{}, err
 			}
 		}
 	}
@@ -126,14 +126,14 @@ func (ps *RelationService) UpdateProduct(dto product.DTO) error {
 	p, err := ps.productRepository.Update(dto)
 
 	if err != nil {
-		return err
+		return product.DTO{}, err
 	}
 
 	if len(dto.CategoryIds) != 0 {
 		ps.productCategoryRepository.Link(p.Id, dto.CategoryIds)
 	}
 
-	return nil
+	return ps.GetProduct(p.Id)
 }
 
 func (ps *RelationService) AddStock(dto stock.DTO) error {
