@@ -5,7 +5,7 @@
 
 This is yet another pantry organisation system, created with simplicity and automation in mind.
 Here's why:
-* We are tired if expired food in the pantry
+* We are tired of expired food in the pantry
 * We are tired of manual ordering food
 * We are tired of running out of stock for favorite ingredients and food
 
