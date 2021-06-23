@@ -59,7 +59,7 @@ func (r *Repository) Delete(id int) error{
 	}
 
 	//db.Unscoped().Delete(&order) to delete permanently
-	r.db.Connection().Delete(model, id)
+	r.db.Connection().Unscoped().Delete(model, id)
 	return nil
 }
 

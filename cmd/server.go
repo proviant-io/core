@@ -572,7 +572,7 @@ func main() {
 
 		model := listRepo.GetAll()
 
-		var models []list.DTO
+		models := []list.DTO{}
 
 		for _, model := range model {
 			models = append(models, list.ModelToDTO(model))

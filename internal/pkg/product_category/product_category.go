@@ -27,7 +27,7 @@ func (r *Repository) GetByProductId(id int) []ProductCategory {
 
 func (r *Repository) Link(productId int, categories []int) {
 
-	r.db.Connection().Where("product_id = ?", productId).Delete(&ProductCategory{})
+	r.db.Connection().Where("product_id = ?", productId).Unscoped().Delete(&ProductCategory{})
 
 	for _, category := range categories{
 		r.db.Connection().Create(&ProductCategory{ProductId: productId, CategoryId: category})
