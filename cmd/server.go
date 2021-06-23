@@ -20,6 +20,13 @@ type Response struct {
 	Error  string      `json:"error"`
 }
 
+const (
+	ResponseCodeOk = 200
+	ResponseCodeCreated = 201
+	BadRequest = 400
+	InternalServerError = 500
+)
+
 func main() {
 
 	d, err := db.NewSQLite(SqliteLocation)
@@ -70,7 +77,7 @@ func main() {
 		if err != nil {
 
 			response := Response{
-				Status: 500,
+				Status: BadRequest,
 				Error:  err.Error(),
 			}
 
@@ -78,13 +85,13 @@ func main() {
 			return
 		}
 
-		p, err := relationService.GetProduct(id)
+		p, customErr := relationService.GetProduct(id)
 
-		if err != nil {
+		if customErr != nil {
 
 			response := Response{
-				Status: 404,
-				Error:  err.Error(),
+				Status: customErr.Code(),
+				Error:  customErr.Error(),
 			}
 
 			c.JSON(response.Status, response)
@@ -92,7 +99,7 @@ func main() {
 		}
 
 		response := Response{
-			Status: 200,
+			Status: ResponseCodeOk,
 			Data:   p,
 		}
 
@@ -104,7 +111,7 @@ func main() {
 		dtos := relationService.GetAllProducts()
 
 		response := Response{
-			Status: 200,
+			Status: ResponseCodeOk,
 			Data:   dtos,
 		}
 
@@ -117,7 +124,7 @@ func main() {
 
 		if err != nil {
 			response := Response{
-				Status: 500,
+				Status: BadRequest,
 				Error:  err.Error(),
 			}
 
@@ -125,12 +132,12 @@ func main() {
 			return
 		}
 
-		err = productRepo.Delete(id)
+		customErr := productRepo.Delete(id)
 
-		if err != nil {
+		if customErr != nil {
 			response := Response{
-				Status: 404,
-				Error:  err.Error(),
+				Status: customErr.Code(),
+				Error:  customErr.Error(),
 			}
 
 			c.JSON(response.Status, response)
@@ -138,7 +145,7 @@ func main() {
 		}
 
 		response := Response{
-			Status: 200,
+			Status: ResponseCodeOk,
 		}
 
 		c.JSON(response.Status, response)
@@ -152,7 +159,7 @@ func main() {
 
 		if err != nil {
 			response := Response{
-				Status: 500,
+				Status: BadRequest,
 				Error:  err.Error(),
 			}
 
@@ -160,12 +167,12 @@ func main() {
 			return
 		}
 
-		productDto, err := relationService.CreateProduct(dto)
+		productDto, customErr := relationService.CreateProduct(dto)
 
-		if err != nil {
+		if customErr != nil {
 			response := Response{
-				Status: 404,
-				Error:  err.Error(),
+				Status: customErr.Code(),
+				Error:  customErr.Error(),
 			}
 
 			c.JSON(response.Status, response)
@@ -173,7 +180,7 @@ func main() {
 		}
 
 		response := Response{
-			Status: 200,
+			Status: ResponseCodeCreated,
 			Data: productDto,
 		}
 
@@ -187,7 +194,7 @@ func main() {
 
 		if err != nil {
 			response := Response{
-				Status: 500,
+				Status: BadRequest,
 				Error:  err.Error(),
 			}
 
@@ -201,7 +208,7 @@ func main() {
 
 		if err != nil {
 			response := Response{
-				Status: 500,
+				Status: BadRequest,
 				Error:  err.Error(),
 			}
 
@@ -211,12 +218,12 @@ func main() {
 
 		dto.Id = id
 
-		productDTO, err := relationService.UpdateProduct(dto)
+		productDTO, customErr := relationService.UpdateProduct(dto)
 
-		if err != nil {
+		if customErr != nil {
 			response := Response{
-				Status: 404,
-				Error:  err.Error(),
+				Status: customErr.Code(),
+				Error:  customErr.Error(),
 			}
 
 			c.JSON(response.Status, response)
@@ -224,7 +231,7 @@ func main() {
 		}
 
 		response := Response{
-			Status: 200,
+			Status: ResponseCodeOk,
 			Data: productDTO,
 		}
 
@@ -238,7 +245,7 @@ func main() {
 
 		if err != nil {
 			response := Response{
-				Status: 500,
+				Status: BadRequest,
 				Error:  err.Error(),
 			}
 
@@ -255,7 +262,7 @@ func main() {
 		}
 
 		response := Response{
-			Status: 200,
+			Status: ResponseCodeOk,
 			Data:   models,
 		}
 
@@ -268,7 +275,7 @@ func main() {
 
 		if err != nil {
 			response := Response{
-				Status: 500,
+				Status: BadRequest,
 				Error:  err.Error(),
 			}
 
@@ -282,7 +289,7 @@ func main() {
 
 		if err != nil {
 			response := Response{
-				Status: 500,
+				Status: BadRequest,
 				Error:  err.Error(),
 			}
 
@@ -292,12 +299,12 @@ func main() {
 
 		dto.ProductId = id
 
-		err = relationService.AddStock(dto)
+		customErr := relationService.AddStock(dto)
 
-		if err != nil {
+		if customErr != nil {
 			response := Response{
-				Status: 404,
-				Error:  err.Error(),
+				Status: customErr.Code(),
+				Error:  customErr.Error(),
 			}
 
 			c.JSON(response.Status, response)
@@ -305,7 +312,7 @@ func main() {
 		}
 
 		response := Response{
-			Status: 200,
+			Status: ResponseCodeCreated,
 		}
 
 		c.JSON(response.Status, response)
@@ -317,7 +324,7 @@ func main() {
 
 		if err != nil {
 			response := Response{
-				Status: 500,
+				Status: BadRequest,
 				Error:  err.Error(),
 			}
 
@@ -331,7 +338,7 @@ func main() {
 
 		if err != nil {
 			response := Response{
-				Status: 500,
+				Status: BadRequest,
 				Error:  err.Error(),
 			}
 
@@ -341,12 +348,12 @@ func main() {
 
 		dto.ProductId = id
 
-		err = relationService.ConsumeStock(dto)
+		customErr := relationService.ConsumeStock(dto)
 
-		if err != nil {
+		if customErr != nil {
 			response := Response{
-				Status: 404,
-				Error:  err.Error(),
+				Status: customErr.Code(),
+				Error:  customErr.Error(),
 			}
 
 			c.JSON(response.Status, response)
@@ -354,7 +361,7 @@ func main() {
 		}
 
 		response := Response{
-			Status: 200,
+			Status: ResponseCodeOk,
 		}
 
 		c.JSON(response.Status, response)
@@ -368,7 +375,7 @@ func main() {
 
 		if err != nil {
 			response := Response{
-				Status: 500,
+				Status: BadRequest,
 				Error:  err.Error(),
 			}
 
@@ -376,12 +383,12 @@ func main() {
 			return
 		}
 
-		model, err := categoryRepo.Get(id)
+		model, customErr := categoryRepo.Get(id)
 
-		if err != nil {
+		if customErr != nil {
 			response := Response{
-				Status: 404,
-				Error:  err.Error(),
+				Status: customErr.Code(),
+				Error:  customErr.Error(),
 			}
 
 			c.JSON(response.Status, response)
@@ -389,7 +396,7 @@ func main() {
 		}
 
 		response := Response{
-			Status: 200,
+			Status: ResponseCodeOk,
 			Data:   category.ModelToDTO(model),
 		}
 
@@ -408,7 +415,7 @@ func main() {
 		}
 
 		response := Response{
-			Status: 200,
+			Status: ResponseCodeOk,
 			Data:   models,
 		}
 
@@ -422,7 +429,7 @@ func main() {
 
 		if err != nil {
 			response := Response{
-				Status: 500,
+				Status: BadRequest,
 				Error:  err.Error(),
 			}
 
@@ -430,12 +437,12 @@ func main() {
 			return
 		}
 
-		err = categoryRepo.Delete(id)
+		customErr := categoryRepo.Delete(id)
 
-		if err != nil {
+		if customErr != nil {
 			response := Response{
-				Status: 404,
-				Error:  err.Error(),
+				Status: customErr.Code(),
+				Error:  customErr.Error(),
 			}
 
 			c.JSON(response.Status, response)
@@ -443,7 +450,7 @@ func main() {
 		}
 
 		response := Response{
-			Status: 200,
+			Status: ResponseCodeOk,
 		}
 
 		c.JSON(response.Status, response)
@@ -457,7 +464,7 @@ func main() {
 
 		if err != nil {
 			response := Response{
-				Status: 500,
+				Status: BadRequest,
 				Error:  err.Error(),
 			}
 
@@ -468,7 +475,7 @@ func main() {
 		categoryModel := categoryRepo.Create(dto)
 
 		response := Response{
-			Status: 200,
+			Status: ResponseCodeCreated,
 			Data: category.ModelToDTO(categoryModel),
 		}
 
@@ -482,7 +489,7 @@ func main() {
 
 		if err != nil {
 			response := Response{
-				Status: 500,
+				Status: BadRequest,
 				Error:  err.Error(),
 			}
 
@@ -496,7 +503,7 @@ func main() {
 
 		if err != nil {
 			response := Response{
-				Status: 500,
+				Status: BadRequest,
 				Error:  err.Error(),
 			}
 
@@ -504,12 +511,12 @@ func main() {
 			return
 		}
 
-		categoryModel, err := categoryRepo.Update(id, dto)
+		categoryModel, customErr := categoryRepo.Update(id, dto)
 
-		if err != nil {
+		if customErr != nil {
 			response := Response{
-				Status: 404,
-				Error:  err.Error(),
+				Status: customErr.Code(),
+				Error:  customErr.Error(),
 			}
 
 			c.JSON(response.Status, response)
@@ -517,7 +524,7 @@ func main() {
 		}
 
 		response := Response{
-			Status: 200,
+			Status: ResponseCodeOk,
 			Data: category.ModelToDTO(categoryModel),
 		}
 
@@ -532,7 +539,7 @@ func main() {
 
 		if err != nil {
 			response := Response{
-				Status: 500,
+				Status: BadRequest,
 				Error:  err.Error(),
 			}
 
@@ -540,13 +547,13 @@ func main() {
 			return
 		}
 
-		model, err := listRepo.Get(id)
+		model, customErr := listRepo.Get(id)
 
-		if err != nil {
+		if customErr != nil {
 
 			response := Response{
-				Status: 404,
-				Error:  err.Error(),
+				Status: customErr.Code(),
+				Error:  customErr.Error(),
 			}
 
 			c.JSON(response.Status, response)
@@ -554,7 +561,7 @@ func main() {
 		}
 
 		response := Response{
-			Status: 200,
+			Status: ResponseCodeOk,
 			Data:   list.ModelToDTO(model),
 		}
 
@@ -572,7 +579,7 @@ func main() {
 		}
 
 		response := Response{
-			Status: 200,
+			Status: ResponseCodeOk,
 			Data:   models,
 		}
 
@@ -586,7 +593,7 @@ func main() {
 
 		if err != nil {
 			response := Response{
-				Status: 500,
+				Status: BadRequest,
 				Error:  err.Error(),
 			}
 
@@ -594,12 +601,12 @@ func main() {
 			return
 		}
 
-		err = listRepo.Delete(id)
+		customErr := listRepo.Delete(id)
 
-		if err != nil {
+		if customErr != nil {
 			response := Response{
-				Status: 404,
-				Error:  err.Error(),
+				Status: customErr.Code(),
+				Error:  customErr.Error(),
 			}
 
 			c.JSON(response.Status, response)
@@ -607,7 +614,7 @@ func main() {
 		}
 
 		response := Response{
-			Status: 200,
+			Status: ResponseCodeOk,
 		}
 
 		c.JSON(response.Status, response)
@@ -621,7 +628,7 @@ func main() {
 
 		if err != nil {
 			response := Response{
-				Status: 500,
+				Status: BadRequest,
 				Error:  err.Error(),
 			}
 
@@ -632,7 +639,7 @@ func main() {
 		listModel := listRepo.Create(dto)
 
 		response := Response{
-			Status: 200,
+			Status: ResponseCodeCreated,
 			Data: list.ModelToDTO(listModel),
 		}
 
@@ -646,7 +653,7 @@ func main() {
 
 		if err != nil {
 			response := Response{
-				Status: 500,
+				Status: BadRequest,
 				Error:  err.Error(),
 			}
 
@@ -660,7 +667,7 @@ func main() {
 
 		if err != nil {
 			response := Response{
-				Status: 500,
+				Status: BadRequest,
 				Error:  err.Error(),
 			}
 
@@ -668,12 +675,12 @@ func main() {
 			return
 		}
 
-		listModel, err := listRepo.Update(id, dto)
+		listModel, customErr := listRepo.Update(id, dto)
 
-		if err != nil {
+		if customErr != nil {
 			response := Response{
-				Status: 404,
-				Error:  err.Error(),
+				Status: customErr.Code(),
+				Error:  customErr.Error(),
 			}
 
 			c.JSON(response.Status, response)
@@ -681,7 +688,7 @@ func main() {
 		}
 
 		response := Response{
-			Status: 200,
+			Status: ResponseCodeOk,
 			Data: list.ModelToDTO(listModel),
 		}
 

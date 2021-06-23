@@ -3,6 +3,7 @@ package product
 import (
 	"fmt"
 	"gitlab.com/behind-the-fridge/product/internal/db"
+	"gitlab.com/behind-the-fridge/product/internal/errors"
 	"gorm.io/gorm"
 	"log"
 )
@@ -35,7 +36,7 @@ type Repository struct {
 	db db.DB
 }
 
-func (r *Repository) Get(id int) (Product, error) {
+func (r *Repository) Get(id int) (Product, *errors.CustomError) {
 
 	log.Printf("id: %d\n", id)
 
@@ -44,7 +45,7 @@ func (r *Repository) Get(id int) (Product, error) {
 	r.db.Connection().First(p, "id = ?", id)
 
 	if (*p).Id == 0 {
-		return Product{}, fmt.Errorf("product with id %d not found", id)
+		return Product{}, errors.NewErrNotFound(fmt.Sprintf("product with id %d not found", id))
 	}
 
 	return *p, nil
@@ -58,7 +59,7 @@ func (r *Repository) GetAll() []Product {
 	return products
 }
 
-func (r *Repository) Delete(id int) error {
+func (r *Repository) Delete(id int) *errors.CustomError {
 
 	model, err := r.Get(id)
 
@@ -86,7 +87,7 @@ func (r *Repository) Create(dto DTO) Product {
 	return *p
 }
 
-func (r *Repository) Update(dto DTO) (Product, error) {
+func (r *Repository) Update(dto DTO) (Product, *errors.CustomError) {
 
 	model, err := r.Get(dto.Id)
 

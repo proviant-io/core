@@ -3,6 +3,7 @@ package category
 import (
 	"fmt"
 	"gitlab.com/behind-the-fridge/product/internal/db"
+	"gitlab.com/behind-the-fridge/product/internal/errors"
 	"gorm.io/gorm"
 )
 
@@ -21,14 +22,14 @@ type Repository struct {
 	db db.DB
 }
 
-func (r *Repository) Get(id int) (Category, error) {
+func (r *Repository) Get(id int) (Category, *errors.CustomError) {
 
 	model := &Category{}
 
 	r.db.Connection().First(model, "id = ?", id)
 
 	if (*model).Id == 0 {
-		return Category{}, fmt.Errorf("category with id %d not found", id)
+		return Category{}, errors.NewErrNotFound(fmt.Sprintf("category with id %d not found", id))
 	}
 
 	return *model, nil
@@ -50,7 +51,7 @@ func (r *Repository) GetAll() []Category {
 	return categories
 }
 
-func (r *Repository) Delete(id int) error {
+func (r *Repository) Delete(id int) *errors.CustomError {
 
 	model, err := r.Get(id)
 
@@ -73,7 +74,7 @@ func (r *Repository) Create(dto DTO) Category {
 	return model
 }
 
-func (r *Repository) Update(id int, dto DTO) (Category, error) {
+func (r *Repository) Update(id int, dto DTO) (Category, *errors.CustomError) {
 
 	model, err := r.Get(id)
 

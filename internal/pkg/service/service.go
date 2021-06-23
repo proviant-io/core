@@ -1,6 +1,7 @@
 package service
 
 import (
+	"gitlab.com/behind-the-fridge/product/internal/errors"
 	"gitlab.com/behind-the-fridge/product/internal/pkg/category"
 	"gitlab.com/behind-the-fridge/product/internal/pkg/list"
 	"gitlab.com/behind-the-fridge/product/internal/pkg/product"
@@ -16,7 +17,7 @@ type RelationService struct {
 	productCategoryRepository    *product_category.Repository
 }
 
-func (ps *RelationService) GetProduct(id int) (product.DTO, error) {
+func (ps *RelationService) GetProduct(id int) (product.DTO, *errors.CustomError) {
 
 	p, err := ps.productRepository.Get(id)
 
@@ -78,7 +79,7 @@ func (ps *RelationService) GetAllProducts() []product.DTO {
 	return dtos
 }
 
-func (ps *RelationService) CreateProduct(dto product.DTO) (product.DTO, error) {
+func (ps *RelationService) CreateProduct(dto product.DTO) (product.DTO, *errors.CustomError) {
 
 	_, err := ps.listRepository.Get(dto.ListId)
 
@@ -105,7 +106,7 @@ func (ps *RelationService) CreateProduct(dto product.DTO) (product.DTO, error) {
 	return ps.GetProduct(p.Id)
 }
 
-func (ps *RelationService) UpdateProduct(dto product.DTO) (product.DTO, error) {
+func (ps *RelationService) UpdateProduct(dto product.DTO) (product.DTO, *errors.CustomError) {
 
 	_, err := ps.listRepository.Get(dto.ListId)
 
@@ -136,7 +137,7 @@ func (ps *RelationService) UpdateProduct(dto product.DTO) (product.DTO, error) {
 	return ps.GetProduct(p.Id)
 }
 
-func (ps *RelationService) AddStock(dto stock.DTO) error {
+func (ps *RelationService) AddStock(dto stock.DTO) *errors.CustomError {
 
 	_, err := ps.productRepository.Get(dto.ProductId)
 
@@ -149,7 +150,7 @@ func (ps *RelationService) AddStock(dto stock.DTO) error {
 	return nil
 }
 
-func (ps *RelationService) ConsumeStock(dto stock.ConsumeDTO) error {
+func (ps *RelationService) ConsumeStock(dto stock.ConsumeDTO) *errors.CustomError {
 
 	_, err := ps.productRepository.Get(dto.ProductId)
 

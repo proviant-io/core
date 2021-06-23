@@ -3,6 +3,7 @@ package list
 import (
 	"fmt"
 	"gitlab.com/behind-the-fridge/product/internal/db"
+	"gitlab.com/behind-the-fridge/product/internal/errors"
 	"gorm.io/gorm"
 )
 
@@ -21,14 +22,14 @@ type Repository struct {
 	db db.DB
 }
 
-func (r *Repository) Get(id int) (List, error) {
+func (r *Repository) Get(id int) (List, *errors.CustomError) {
 
 	model := &List{}
 
 	r.db.Connection().First(model, "id = ?", id)
 
 	if (*model).Id == 0 {
-		return List{}, fmt.Errorf("list with id %d not found", id)
+		return List{}, errors.NewErrNotFound(fmt.Sprintf("list with id %d not found", id))
 	}
 
 	return *model, nil
@@ -42,7 +43,7 @@ func (r *Repository) GetAll() []List {
 	return models
 }
 
-func (r *Repository) Delete(id int) error {
+func (r *Repository) Delete(id int) *errors.CustomError {
 
 	model, err := r.Get(id)
 
@@ -65,7 +66,7 @@ func (r *Repository) Create(dto DTO) List {
 	return model
 }
 
-func (r *Repository) Update(id int, dto DTO) (List, error) {
+func (r *Repository) Update(id int, dto DTO) (List, *errors.CustomError) {
 
 	model, err := r.Get(id)
 
