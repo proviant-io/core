@@ -56,14 +56,63 @@ func TestApiList(t *testing.T){
 	expected = `{"status":200,"data":[{"id":1,"title":"Freezer"}],"error":""}`
 	assert.Equal(t, expected, actual)
 
-	// delete product 1
+	// delete list 1
 	actual = deleteRequest("http://localhost:8081/api/v1/list/1/")
 	expected = `{"status":200,"data":null,"error":""}`
 	assert.Equal(t, expected, actual)
 
-	// check that product does not exists
+	// check that list does not exists
 	actual = getRequest("http://localhost:8081/api/v1/list/1/")
 	expected = `{"status":404,"data":null,"error":"list with id 1 not found"}`
+	assert.Equal(t, expected, actual)
+}
+
+func TestApiCategory(t *testing.T) {
+
+	id := runContainer(t)
+
+	defer stopContainer(t, id)
+
+	time.Sleep(1 * time.Second)
+
+	// check that db is empty
+	actual := getRequest("http://localhost:8081/api/v1/category/")
+	expected := `{"status":200,"data":[],"error":""}`
+	assert.Equal(t, expected, actual)
+
+	// create category
+	actual = postRequest("http://localhost:8081/api/v1/category/", []byte(`{"title": "Drinks"}`))
+	expected = `{"status":201,"data":{"id":1,"title":"Drinks"},"error":""}`
+	assert.Equal(t, expected, actual)
+
+	// get existing category
+	actual = getRequest("http://localhost:8081/api/v1/category/1/")
+	expected = `{"status":200,"data":{"id":1,"title":"Drinks"},"error":""}`
+	assert.Equal(t, expected, actual)
+
+	// update category
+	actual = putRequest("http://localhost:8081/api/v1/category/1/", []byte(`{"title": "Cold Drinks"}`))
+	expected = `{"status":200,"data":{"id":1,"title":"Cold Drinks"},"error":""}`
+	assert.Equal(t, expected, actual)
+
+	// get existing category
+	actual = getRequest("http://localhost:8081/api/v1/category/1/")
+	expected = `{"status":200,"data":{"id":1,"title":"Cold Drinks"},"error":""}`
+	assert.Equal(t, expected, actual)
+
+	// get all categories
+	actual = getRequest("http://localhost:8081/api/v1/category/")
+	expected = `{"status":200,"data":[{"id":1,"title":"Cold Drinks"}],"error":""}`
+	assert.Equal(t, expected, actual)
+
+	// delete category 1
+	actual = deleteRequest("http://localhost:8081/api/v1/category/1/")
+	expected = `{"status":200,"data":null,"error":""}`
+	assert.Equal(t, expected, actual)
+
+	// check that category does not exists
+	actual = getRequest("http://localhost:8081/api/v1/category/1/")
+	expected = `{"status":404,"data":null,"error":"category with id 1 not found"}`
 	assert.Equal(t, expected, actual)
 
 }

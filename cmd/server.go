@@ -408,7 +408,7 @@ func main() {
 
 		model := categoryRepo.GetAll()
 
-		var models []category.DTO
+		models := []category.DTO{}
 
 		for _, model := range model {
 			models = append(models, category.ModelToDTO(model))
