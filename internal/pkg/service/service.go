@@ -68,6 +68,9 @@ func (ps *RelationService) GetAllProducts() []product.DTO {
 
 	for idx := range dtos{
 
+		dtos[idx].CategoryIds = []int{}
+		dtos[idx].Categories = []interface{}{}
+
 		productCategories := ps.productCategoryRepository.GetByProductId(dtos[idx].Id)
 
 		for _, productCategory := range productCategories{
