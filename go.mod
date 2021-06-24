@@ -1,4 +1,4 @@
-module gitlab.com/behind-the-fridge/product
+module github.com/brushknight/proviant
 
 go 1.16
 

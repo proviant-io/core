@@ -2,7 +2,7 @@ package product_category
 
 import (
 	"fmt"
-	"gitlab.com/behind-the-fridge/product/internal/db"
+	"github.com/brushknight/proviant/internal/db"
 	"gorm.io/gorm"
 )
 

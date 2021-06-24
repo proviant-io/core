@@ -2,7 +2,7 @@ package stock
 
 import (
 	"fmt"
-	"gitlab.com/behind-the-fridge/product/internal/db"
+	"github.com/brushknight/proviant/internal/db"
 	"gorm.io/gorm"
 )
 
@@ -90,8 +90,8 @@ func (r *Repository) Consume(dto ConsumeDTO){
 	}
 }
 
-func (r *Repository) Add(dto DTO){
-	r.Create(dto)
+func (r *Repository) Add(dto DTO) Stock{
+	return r.Create(dto)
 }
 
 func (r *Repository) Create(dto DTO) Stock{

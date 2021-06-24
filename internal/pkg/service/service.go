@@ -1,12 +1,12 @@
 package service
 
 import (
-	"gitlab.com/behind-the-fridge/product/internal/errors"
-	"gitlab.com/behind-the-fridge/product/internal/pkg/category"
-	"gitlab.com/behind-the-fridge/product/internal/pkg/list"
-	"gitlab.com/behind-the-fridge/product/internal/pkg/product"
-	"gitlab.com/behind-the-fridge/product/internal/pkg/product_category"
-	"gitlab.com/behind-the-fridge/product/internal/pkg/stock"
+	"github.com/brushknight/proviant/internal/errors"
+	"github.com/brushknight/proviant/internal/pkg/category"
+	"github.com/brushknight/proviant/internal/pkg/list"
+	"github.com/brushknight/proviant/internal/pkg/product"
+	"github.com/brushknight/proviant/internal/pkg/product_category"
+	"github.com/brushknight/proviant/internal/pkg/stock"
 )
 
 type RelationService struct {
@@ -140,17 +140,17 @@ func (ps *RelationService) UpdateProduct(dto product.DTO) (product.DTO, *errors.
 	return ps.GetProduct(p.Id)
 }
 
-func (ps *RelationService) AddStock(dto stock.DTO) *errors.CustomError {
+func (ps *RelationService) AddStock(dto stock.DTO) (stock.Stock, *errors.CustomError) {
 
 	_, err := ps.productRepository.Get(dto.ProductId)
 
 	if err != nil {
-		return err
+		return stock.Stock{}, err
 	}
 
-	ps.stockRepository.Add(dto)
+	model := ps.stockRepository.Add(dto)
 
-	return nil
+	return model, nil
 }
 
 func (ps *RelationService) ConsumeStock(dto stock.ConsumeDTO) *errors.CustomError {

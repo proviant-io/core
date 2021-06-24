@@ -2,8 +2,8 @@ package product
 
 import (
 	"fmt"
-	"gitlab.com/behind-the-fridge/product/internal/db"
-	"gitlab.com/behind-the-fridge/product/internal/errors"
+	"github.com/brushknight/proviant/internal/db"
+	"github.com/brushknight/proviant/internal/errors"
 	"gorm.io/gorm"
 	"log"
 )

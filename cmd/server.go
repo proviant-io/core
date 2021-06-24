@@ -2,13 +2,13 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"gitlab.com/behind-the-fridge/product/internal/db"
-	"gitlab.com/behind-the-fridge/product/internal/pkg/category"
-	"gitlab.com/behind-the-fridge/product/internal/pkg/list"
-	"gitlab.com/behind-the-fridge/product/internal/pkg/product"
-	"gitlab.com/behind-the-fridge/product/internal/pkg/product_category"
-	"gitlab.com/behind-the-fridge/product/internal/pkg/service"
-	"gitlab.com/behind-the-fridge/product/internal/pkg/stock"
+	"github.com/brushknight/proviant/internal/db"
+	"github.com/brushknight/proviant/internal/pkg/category"
+	"github.com/brushknight/proviant/internal/pkg/list"
+	"github.com/brushknight/proviant/internal/pkg/product"
+	"github.com/brushknight/proviant/internal/pkg/product_category"
+	"github.com/brushknight/proviant/internal/pkg/service"
+	"github.com/brushknight/proviant/internal/pkg/stock"
 	"strconv"
 )
 
@@ -299,7 +299,7 @@ func main() {
 
 		dto.ProductId = id
 
-		customErr := relationService.AddStock(dto)
+		model, customErr := relationService.AddStock(dto)
 
 		if customErr != nil {
 			response := Response{
@@ -313,6 +313,7 @@ func main() {
 
 		response := Response{
 			Status: ResponseCodeCreated,
+			Data: stock.ModelToDTO(model),
 		}
 
 		c.JSON(response.Status, response)

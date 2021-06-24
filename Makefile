@@ -2,7 +2,6 @@
 docker/compile:
 	CGO_ENABLED=1 go build -ldflags="-X 'main.SqliteLocation=/app/db/pantry.db'" -o app ./cmd
 
-
 .PHONY: docker/build
 docker/build:
 	docker build -t pantry:latest -f Dockerfile .
@@ -18,3 +17,7 @@ docker/run/test: docker/build
 .PHONY: docker/stop/test
 docker/stop/test:
 	docker rm -f "proviant-test"
+
+.PHONY: test/e2e
+test/e2e: docker/build
+	go test -v ./test/e2e/
