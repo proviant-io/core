@@ -75,7 +75,7 @@ func putRequest(url string, json []byte) string{
 }
 
 func runContainer(t *testing.T) string{
-	id, err := createNewContainer("proviant:e2e")
+	id, err := createNewContainer("brushknight/proviant:e2e")
 	if err != nil{
 		fmt.Errorf(err.Error())
 		t.Fail()

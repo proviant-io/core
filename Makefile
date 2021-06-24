@@ -8,11 +8,11 @@ docker/compile:
 
 .PHONY: test/2e2/docker-build
 test/2e2/docker-build:
-	docker build -t proviant:e2e -f Dockerfile .
+	docker build -t brushknight/proviant:e2e -f Dockerfile .
 
 .PHONY: docker/build
 docker/build:
-	docker build -t proviant:$(TAG) -f Dockerfile .
+	docker build -t brushknight/proviant:$(TAG) -f Dockerfile .
 
 .PHOMY: docker/publish
 docker/publish:
