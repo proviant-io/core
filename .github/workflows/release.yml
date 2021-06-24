@@ -7,16 +7,29 @@ on:
     tags:
       - '*'
 
-
 env:
   TAG: ${{ github.event.release.tag_name }}
   DOCKER_HUB_ID: ${{ secrets.DOCKER_HUB_ID }}
   DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
 jobs:
+
+  test-e2e:
+    name: Run e2e tests
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16.5
+      - run: make test/e2e
+
   docker:
     name: Publish docker image
     runs-on: ubuntu-20.04
+    needs: [test-e2e]
 
     steps:
       - uses: actions/checkout@v2
