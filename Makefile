@@ -4,7 +4,7 @@ endif
 
 .PHONY: docker/compile
 docker/compile:
-	CGO_ENABLED=1 go build -ldflags="-X 'main.SqliteLocation=/app/db/pantry.db'" -o app ./cmd
+	CGO_ENABLED=1 go build -ldflags="-X 'main.SqliteLocation=/app/db/proviant.db'" -o app ./cmd
 
 .PHONY: test/2e2/docker-build
 test/2e2/docker-build:

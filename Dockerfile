@@ -1,36 +1,25 @@
 # Dockerfile References: https://docs.docker.com/engine/reference/builder/
-
-# Start from the latest golang base image
-FROM golang:latest
-
-# Add Maintainer Info
+# Alpine packages: https://pkgs.alpinelinux.org/packages
+FROM alpine:3.14 AS build
 LABEL maintainer="Grigorii Merkushev <brushknight@gmail.com>"
-
-# Set the Current Working Directory inside the container
+RUN apk update
+RUN apk upgrade
+RUN apk add --update go=1.16.5-r0 gcc=10.3.1_git20210424-r2 g++=10.3.1_git20210424-r2 make=4.3-r0
 WORKDIR /app
-
-# Declare mountpoint for db volume
-VOLUME ["/app/db"]
-
-# Copy go mod and sum files
 COPY go.mod go.sum ./
-
-# Download all dependencies. Dependencies will be cached if the go.mod and go.sum files are not changed
 RUN go mod download
-
-# Copy the source from the current directory to the Working Directory inside the container
 COPY cmd ./cmd
 COPY internal ./internal
-COPY static ./static
-
-# copy Makefile
 COPY Makefile ./Makefile
-
-# Build the Go app
 RUN make docker/compile
 
-# Expose port 80 to the outside world
+### Create executable image
+FROM alpine:latest AS app
+LABEL maintainer="Grigorii Merkushev <brushknight@gmail.com>"
+WORKDIR /app
+RUN mkdir /app/db
+COPY --from=build /app/app .
+RUN chmod +x ./app
+COPY static ./static
 EXPOSE 80
-
-# Command to run the executable
 CMD ["./app"]
