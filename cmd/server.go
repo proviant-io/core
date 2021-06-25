@@ -69,6 +69,12 @@ func main() {
 
 	r := gin.Default()
 
+	// static
+	r.Static("/css", "./static/css")
+	r.Static("/js", "./static/js")
+	r.StaticFile("/", "./static/index.html")
+
+
 	// product
 	r.GET("/api/v1/product/:id/", func(c *gin.Context) {
 		idString := c.Param("id")

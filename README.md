@@ -26,7 +26,7 @@ This is an example of how to list things you need to use the software and how to
 * [Docker](https://docs.docker.com/get-docker/)
 * [GNU make](https://www.gnu.org/software/make/)
 
-### Installation
+### Dev installation
 
 1. Clone the repo
 2. Run app
@@ -35,3 +35,16 @@ This is an example of how to list things you need to use the software and how to
    ```
 3. Open browser http://0.0.0.0:8080/api/v1/product
 4. List of possible htp endpoints listed in this folder [http-calls](./http-calls)
+
+### Installation
+
+Preferable installation is via official docker container
+
+```shell
+docker run -d -p8080:80 --name="proviant" brushknight/proviant:latest
+```
+
+You can expose db file if you want to persist it via
+```shell
+-v /home/user/provian/db:/app/db
+```
