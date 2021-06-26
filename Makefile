@@ -20,7 +20,8 @@ docker/build:
 
 .PHOMY: docker/publish
 docker/publish:
-	docker push brushknight/proviant:$(TAG) brushknight/proviant:latest
+	docker push brushknight/proviant:$(TAG)
+	docker push brushknight/proviant:latest
 
 .PHONY: docker/run
 docker/run: docker/build
