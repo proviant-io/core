@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/brushknight/proviant/internal/db"
 	"github.com/brushknight/proviant/internal/pkg/category"
 	"github.com/brushknight/proviant/internal/pkg/list"
@@ -9,6 +8,8 @@ import (
 	"github.com/brushknight/proviant/internal/pkg/product_category"
 	"github.com/brushknight/proviant/internal/pkg/service"
 	"github.com/brushknight/proviant/internal/pkg/stock"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 	"strconv"
 )
 
@@ -68,6 +69,13 @@ func main() {
 	relationService := service.NewRelationService(productRepo, listRepo, categoryRepo, stockRepo, productCategoryRepo)
 
 	r := gin.Default()
+
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"*"}
+	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTION"}
+	// config.AllowOrigins == []string{"http://google.com", "http://facebook.com"}
+
+	r.Use(cors.New(config))
 
 	// product
 	r.GET("/api/v1/product/:id/", func(c *gin.Context) {
@@ -699,6 +707,7 @@ func main() {
 	// static
 	r.Static("/static/", "./public/")
 	r.StaticFile("/", "./public/index.html")
+	//r.StaticFile("/product*", "./public/index.html")
 
 
 	r.Run("0.0.0.0:80")
