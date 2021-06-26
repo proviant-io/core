@@ -71,7 +71,8 @@ func main() {
 	r := gin.Default()
 
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://localhost:9000"}
+	config.AllowOrigins = []string{"*"}
+	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTION"}
 	// config.AllowOrigins == []string{"http://google.com", "http://facebook.com"}
 
 	r.Use(cors.New(config))
