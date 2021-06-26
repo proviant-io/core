@@ -2,6 +2,10 @@ ifndef TAG
 TAG := dev
 endif
 
+ifndef UI_VERSION
+UI_VERSION := pre-alpha.1
+endif
+
 .PHONY: docker/compile
 docker/compile:
 	CGO_ENABLED=1 go build -ldflags="-X 'main.SqliteLocation=/app/db/proviant.db'" -o app ./cmd
@@ -12,7 +16,7 @@ test/2e2/docker-build:
 
 .PHONY: docker/build
 docker/build:
-	docker build -t brushknight/proviant:$(TAG) -t brushknight/proviant:latest -f Dockerfile .
+	docker build --build-arg UI_VERSION_ARG=$(UI_VERSION) -t brushknight/proviant:$(TAG) -t brushknight/proviant:latest -f Dockerfile .
 
 .PHOMY: docker/publish
 docker/publish:
@@ -28,5 +32,5 @@ test/e2e: test/2e2/docker-build
 
 .PHONY: download/ui
 download/ui:
-	curl -L https://github.com/brushknight/proviant-ui/releases/download/pre-alpha.1/ui-release-pre-alpha.1.tar.gz -o /tmp/ui-release.tar.gz
+	curl -L https://github.com/brushknight/proviant-ui/releases/download/$(UI_VERSION)/ui-release-$(UI_VERSION).tar.gz -o /tmp/ui-release.tar.gz
 	tar -xvf /tmp/ui-release.tar.gz -C ./public/

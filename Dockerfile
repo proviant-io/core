@@ -2,15 +2,22 @@
 # Alpine packages: https://pkgs.alpinelinux.org/packages
 FROM alpine:3.14 AS build
 LABEL maintainer="Grigorii Merkushev <brushknight@gmail.com>"
+ARG UI_VERSION_ARG=pre-alpha.1
+ENV UI_VERSION=$UI_VERSION_ARG
 RUN apk update
 RUN apk upgrade
-RUN apk add --update go=1.16.5-r0 gcc=10.3.1_git20210424-r2 g++=10.3.1_git20210424-r2 make=4.3-r0
+RUN apk add --update go=1.16.5-r0 gcc=10.3.1_git20210424-r2 g++=10.3.1_git20210424-r2 make=4.3-r0 curl=7.77.0-r1
 WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 COPY cmd ./cmd
 COPY internal ./internal
 COPY Makefile ./Makefile
+
+RUN mkdir -p ./public
+RUN make download/ui
+COPY static ./static
+RUN cp -f ./static/index.html ./public/index.html
 RUN make docker/compile
 
 ### Create executable image
@@ -21,6 +28,6 @@ RUN mkdir /app/db
 VOLUME /app/db
 COPY --from=build /app/app .
 RUN chmod +x ./app
-COPY public ./public
+COPY --from=build /app/public ./public
 EXPOSE 80
 CMD ["./app"]

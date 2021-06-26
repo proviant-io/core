@@ -69,12 +69,6 @@ func main() {
 
 	r := gin.Default()
 
-	// static
-	r.Static("/static", "./public/static")
-	r.Static("/asset-manifest.json", "./public/asset-manifest.json")
-	r.StaticFile("/", "./public/index.html")
-
-
 	// product
 	r.GET("/api/v1/product/:id/", func(c *gin.Context) {
 		idString := c.Param("id")
@@ -701,6 +695,11 @@ func main() {
 
 		c.JSON(response.Status, response)
 	})
+
+	// static
+	r.Static("/static/", "./public/")
+	r.StaticFile("/", "./public/index.html")
+
 
 	r.Run("0.0.0.0:80")
 }
