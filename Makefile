@@ -1,5 +1,5 @@
 ifndef TAG
-TAG := "dev"
+TAG := dev
 endif
 
 .PHONY: docker/compile
@@ -25,3 +25,8 @@ docker/run: docker/build
 .PHONY: test/e2e
 test/e2e: test/2e2/docker-build
 	go test -v ./test/e2e/
+
+.PHONY: download/ui
+download/ui:
+	curl -L https://github.com/brushknight/proviant-ui/releases/download/pre-alpha.1/ui-release-pre-alpha.1.tar.gz -o /tmp/ui-release.tar.gz
+	tar -xvf /tmp/ui-release.tar.gz -C ./public/

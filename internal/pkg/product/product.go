@@ -20,16 +20,16 @@ type Product struct {
 }
 
 type DTO struct {
-	Id          int           `json:"id"`
-	Title       string        `json:"title"`
-	Description string        `json:"description"`
-	Link        string        `json:"link"`
-	Image       string        `json:"image"`
-	Barcode     string        `json:"barcode"`
-	CategoryIds []int         `json:"category_ids"`
+	Id          int         `json:"id"`
+	Title       string      `json:"title"`
+	Description string      `json:"description"`
+	Link        string      `json:"link"`
+	Image       string      `json:"image"`
+	Barcode     string      `json:"barcode"`
+	CategoryIds []int       `json:"category_ids"`
 	Categories  interface{} `json:"categories"`
-	ListId      int           `json:"list_id"`
-	List        interface{}   `json:"list"`
+	ListId      int         `json:"list_id"`
+	List        interface{} `json:"list"`
 }
 
 type Repository struct {

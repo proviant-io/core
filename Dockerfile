@@ -18,8 +18,9 @@ FROM alpine:latest AS app
 LABEL maintainer="Grigorii Merkushev <brushknight@gmail.com>"
 WORKDIR /app
 RUN mkdir /app/db
+VOLUME /app/db
 COPY --from=build /app/app .
 RUN chmod +x ./app
-COPY static ./static
+COPY public ./public
 EXPOSE 80
 CMD ["./app"]

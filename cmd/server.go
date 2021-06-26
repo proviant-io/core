@@ -70,9 +70,9 @@ func main() {
 	r := gin.Default()
 
 	// static
-	r.Static("/css", "./static/css")
-	r.Static("/js", "./static/js")
-	r.StaticFile("/", "./static/index.html")
+	r.Static("/static", "./public/static")
+	r.Static("/asset-manifest.json", "./public/asset-manifest.json")
+	r.StaticFile("/", "./public/index.html")
 
 
 	// product
