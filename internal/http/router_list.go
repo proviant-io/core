@@ -66,7 +66,7 @@ func (s *Server) getLists(w http.ResponseWriter, r *http.Request) {
 
 	response := Response{
 		Status: ResponseCodeOk,
-		Data:   models,
+		Data:   dtos,
 	}
 
 	s.JSONResponse(w, response)
