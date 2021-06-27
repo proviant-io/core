@@ -22,9 +22,9 @@ type Response struct {
 }
 
 const (
-	ResponseCodeOk = 200
+	ResponseCodeOk      = 200
 	ResponseCodeCreated = 201
-	BadRequest = 400
+	BadRequest          = 400
 	InternalServerError = 500
 )
 
@@ -116,7 +116,50 @@ func main() {
 
 	r.GET("/api/v1/product/", func(c *gin.Context) {
 
-		dtos := relationService.GetAllProducts()
+		queryRaw := c.Request.URL.Query()
+
+		var query *product.Query
+
+		if len(queryRaw) > 0 {
+			query = &product.Query{}
+
+			if listFilterRaw, ok := queryRaw["list"]; ok {
+				if len(listFilterRaw) > 0 {
+					listFilter, err := strconv.Atoi(listFilterRaw[0])
+
+					if err != nil {
+						response := Response{
+							Status: BadRequest,
+							Error:  err.Error(),
+						}
+
+						c.JSON(response.Status, response)
+						return
+					}
+
+					query.List = listFilter
+				}
+			}
+			if categoryFilterRaw, ok := queryRaw["category"]; ok {
+				if len(categoryFilterRaw) > 0 {
+					categoryFilter, err := strconv.Atoi(categoryFilterRaw[0])
+
+					if err != nil {
+						response := Response{
+							Status: BadRequest,
+							Error:  err.Error(),
+						}
+
+						c.JSON(response.Status, response)
+						return
+					}
+
+					query.Category = categoryFilter
+				}
+			}
+		}
+
+		dtos := relationService.GetAllProducts(query)
 
 		response := Response{
 			Status: ResponseCodeOk,
@@ -189,7 +232,7 @@ func main() {
 
 		response := Response{
 			Status: ResponseCodeCreated,
-			Data: productDto,
+			Data:   productDto,
 		}
 
 		c.JSON(response.Status, response)
@@ -240,7 +283,7 @@ func main() {
 
 		response := Response{
 			Status: ResponseCodeOk,
-			Data: productDTO,
+			Data:   productDTO,
 		}
 
 		c.JSON(response.Status, response)
@@ -321,7 +364,7 @@ func main() {
 
 		response := Response{
 			Status: ResponseCodeCreated,
-			Data: stock.ModelToDTO(model),
+			Data:   stock.ModelToDTO(model),
 		}
 
 		c.JSON(response.Status, response)
@@ -485,7 +528,7 @@ func main() {
 
 		response := Response{
 			Status: ResponseCodeCreated,
-			Data: category.ModelToDTO(categoryModel),
+			Data:   category.ModelToDTO(categoryModel),
 		}
 
 		c.JSON(response.Status, response)
@@ -534,7 +577,7 @@ func main() {
 
 		response := Response{
 			Status: ResponseCodeOk,
-			Data: category.ModelToDTO(categoryModel),
+			Data:   category.ModelToDTO(categoryModel),
 		}
 
 		c.JSON(response.Status, response)
@@ -649,7 +692,7 @@ func main() {
 
 		response := Response{
 			Status: ResponseCodeCreated,
-			Data: list.ModelToDTO(listModel),
+			Data:   list.ModelToDTO(listModel),
 		}
 
 		c.JSON(response.Status, response)
@@ -698,7 +741,7 @@ func main() {
 
 		response := Response{
 			Status: ResponseCodeOk,
-			Data: list.ModelToDTO(listModel),
+			Data:   list.ModelToDTO(listModel),
 		}
 
 		c.JSON(response.Status, response)
@@ -708,7 +751,6 @@ func main() {
 	r.Static("/static/", "./public/")
 	r.StaticFile("/", "./public/index.html")
 	//r.StaticFile("/product*", "./public/index.html")
-
 
 	r.Run("0.0.0.0:80")
 }

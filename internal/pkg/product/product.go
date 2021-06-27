@@ -36,6 +36,11 @@ type Repository struct {
 	db db.DB
 }
 
+type Query struct {
+	Category int
+	List int
+}
+
 func (r *Repository) Get(id int) (Product, *errors.CustomError) {
 
 	log.Printf("id: %d\n", id)
@@ -51,10 +56,20 @@ func (r *Repository) Get(id int) (Product, *errors.CustomError) {
 	return *p, nil
 }
 
-func (r *Repository) GetAll() []Product {
+func (r *Repository) GetAll(query *Query) []Product {
 
 	var products []Product
-	r.db.Connection().Find(&products)
+
+	if query == nil {
+		r.db.Connection().Find(&products)
+	}else{
+		queryBuilder := &Product{}
+
+		if query.List != 0 {
+			queryBuilder.ListId = query.List
+		}
+		r.db.Connection().Where(queryBuilder).Find(&products)
+	}
 
 	return products
 }

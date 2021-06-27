@@ -117,7 +117,7 @@ func createNewContainer(image string) (string, error) {
 		},
 		&container.HostConfig{
 			PortBindings: portBinding,
-		}, nil, nil, "test")
+		}, nil, nil, "proviant-e2e")
 	if err != nil {
 		panic(err)
 	}
