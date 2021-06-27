@@ -5,7 +5,6 @@ import (
 	"github.com/brushknight/proviant/internal/db"
 	"github.com/brushknight/proviant/internal/errors"
 	"gorm.io/gorm"
-	"log"
 )
 
 type Product struct {
@@ -42,8 +41,6 @@ type Query struct {
 }
 
 func (r *Repository) Get(id int) (Product, *errors.CustomError) {
-
-	log.Printf("id: %d\n", id)
 
 	p := &Product{}
 
