@@ -132,6 +132,16 @@ func (s *Server) createList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if dto.Title == "" {
+		response := Response{
+			Status: BadRequest,
+			Error:  "title should mot be empty",
+		}
+
+		s.JSONResponse(w, response)
+		return
+	}
+
 	model := s.listRepo.Create(dto)
 
 	response := Response{

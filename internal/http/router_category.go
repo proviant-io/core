@@ -132,6 +132,16 @@ func (s *Server) createCategory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if dto.Title == "" {
+		response := Response{
+			Status: BadRequest,
+			Error:  "title should mot be empty",
+		}
+
+		s.JSONResponse(w, response)
+		return
+	}
+
 	model := s.categoryRepo.Create(dto)
 
 	response := Response{
