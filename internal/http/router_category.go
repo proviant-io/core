@@ -135,7 +135,7 @@ func (s *Server) createCategory(w http.ResponseWriter, r *http.Request) {
 	if dto.Title == "" {
 		response := Response{
 			Status: BadRequest,
-			Error:  "title should mot be empty",
+			Error:  "title should not be empty",
 		}
 
 		s.JSONResponse(w, response)
@@ -185,6 +185,16 @@ func (s *Server) updateCategory(w http.ResponseWriter, r *http.Request) {
 		response := Response{
 			Status: BadRequest,
 			Error:  err.Error(),
+		}
+
+		s.JSONResponse(w, response)
+		return
+	}
+
+	if dto.Title == "" {
+		response := Response{
+			Status: BadRequest,
+			Error:  "title should not be empty",
 		}
 
 		s.JSONResponse(w, response)
