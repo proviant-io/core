@@ -3,7 +3,7 @@ TAG := dev
 endif
 
 ifndef UI_VERSION
-UI_VERSION := pre-alpha.3
+UI_VERSION := pre-alpha.4
 endif
 
 .PHONY: docker/compile
