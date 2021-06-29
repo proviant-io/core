@@ -1,4 +1,4 @@
 POST http://localhost:8080/api/v1/product/1/consume/
 Content-Type: application/json
 
-{"quantity":  3}
+{"quantity":  16}

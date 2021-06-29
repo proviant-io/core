@@ -89,6 +89,16 @@ func (s *Server) addStock(w http.ResponseWriter, r *http.Request) {
 
 	dto.ProductId = id
 
+	if dto.Quantity == 0 {
+		response := Response{
+			Status: BadRequest,
+			Error:  "quantity should not be 0",
+		}
+
+		s.JSONResponse(w, response)
+		return
+	}
+
 	model, customErr := s.relationService.AddStock(dto)
 
 	if customErr != nil {
@@ -142,6 +152,16 @@ func (s *Server) consumeStock(w http.ResponseWriter, r *http.Request) {
 		response := Response{
 			Status: BadRequest,
 			Error:  err.Error(),
+		}
+
+		s.JSONResponse(w, response)
+		return
+	}
+
+	if dto.Quantity == 0 {
+		response := Response{
+			Status: BadRequest,
+			Error:  "quantity should not be 0",
 		}
 
 		s.JSONResponse(w, response)
