@@ -18,6 +18,16 @@ type Product struct {
 	ListId      int    `json:"list_id"`
 }
 
+type CreateDTO struct {
+	Title       string      `json:"title"`
+	Description string      `json:"description"`
+	Link        string      `json:"link"`
+	Image       string      `json:"image"`
+	Barcode     string      `json:"barcode"`
+	CategoryIds []int       `json:"category_ids"`
+	ListId      int         `json:"list_id"`
+}
+
 type DTO struct {
 	Id          int         `json:"id"`
 	Title       string      `json:"title"`
@@ -84,7 +94,7 @@ func (r *Repository) Delete(id int) *errors.CustomError {
 	return nil
 }
 
-func (r *Repository) Create(dto DTO) Product {
+func (r *Repository) Create(dto CreateDTO) Product {
 
 	p := &Product{
 		Title:       dto.Title,

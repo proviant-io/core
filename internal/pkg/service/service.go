@@ -95,7 +95,7 @@ func (ps *RelationService) GetAllProducts(query *product.Query) []product.DTO {
 	return filteredDTOs
 }
 
-func (ps *RelationService) CreateProduct(dto product.DTO) (product.DTO, *errors.CustomError) {
+func (ps *RelationService) CreateProduct(dto product.CreateDTO) (product.DTO, *errors.CustomError) {
 
 	_, err := ps.listRepository.Get(dto.ListId)
 

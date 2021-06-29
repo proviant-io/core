@@ -160,7 +160,7 @@ func (s *Server) deleteProduct(w http.ResponseWriter, r *http.Request){
 }
 
 func (s *Server) createProduct(w http.ResponseWriter, r *http.Request){
-	dto := product.DTO{}
+	dto := product.CreateDTO{}
 
 	err := s.parseJSON(r, &dto)
 
