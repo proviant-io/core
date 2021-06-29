@@ -182,8 +182,18 @@ func (s *Server) consumeStock(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//stock left
+	models := s.stockRepo.GetAllByProductId(id)
+
+	var dtos []stock.DTO
+
+	for _, model := range models {
+		dtos = append(dtos, stock.ModelToDTO(model))
+	}
+
 	response := Response{
 		Status: ResponseCodeOk,
+		Data: dtos,
 	}
 
 	s.JSONResponse(w, response)
