@@ -86,6 +86,7 @@ func NewServer(productRepo *product.Repository,
 	router.HandleFunc("/api/v1/product/{id}/stock/", server.getStock).Methods("GET")
 	router.HandleFunc("/api/v1/product/{id}/add/", server.addStock).Methods("POST")
 	router.HandleFunc("/api/v1/product/{id}/consume/", server.consumeStock).Methods("POST")
+	router.HandleFunc("/api/v1/product/{product_id}/stock/{id}/", server.deleteStock).Methods("DELETE")
 
 	router.PathPrefix("/static").Handler(http.FileServer(http.Dir("./public/")))
 

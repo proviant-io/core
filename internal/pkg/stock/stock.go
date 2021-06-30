@@ -3,6 +3,7 @@ package stock
 import (
 	"fmt"
 	"github.com/brushknight/proviant/internal/db"
+	"github.com/brushknight/proviant/internal/errors"
 	"gorm.io/gorm"
 )
 
@@ -50,15 +51,14 @@ func (r *Repository) GetAllByProductId(id int) []Stock{
 	return s
 }
 
-func (r *Repository) Delete(id int) error{
+func (r *Repository) Delete(id int) *errors.CustomError{
 
 	model, err := r.Get(id)
 
 	if err != nil {
-		return err
+		return errors.NewErrNotFound(fmt.Sprintf("stock with id %d not found", id))
 	}
 
-	//db.Unscoped().Delete(&order) to delete permanently
 	r.db.Connection().Unscoped().Delete(model, id)
 	return nil
 }

@@ -52,32 +52,44 @@ func TestApiStock(t *testing.T) {
 	assert.Equal(t, expected, actual)
 	fmt.Println(" OK")
 
+	fmt.Print("stock: add 3")
+	actual = postRequest("http://localhost:8081/api/v1/product/1/add/", []byte(`{"quantity":  3, "expire":  1609502259}`))
+	expected = `{"status":201,"data":{"id":3,"product_id":1,"quantity":3,"expire":1609502259},"error":""}`
+	assert.Equal(t, expected, actual)
+	fmt.Println(" OK")
+
 	fmt.Print("stock: get")
 	actual = getRequest("http://localhost:8081/api/v1/product/1/stock/")
-	expected = `{"status":200,"data":[{"id":1,"product_id":1,"quantity":5,"expire":1609458959},{"id":2,"product_id":1,"quantity":3,"expire":1609502159}],"error":""}`
+	expected = `{"status":200,"data":[{"id":1,"product_id":1,"quantity":5,"expire":1609458959},{"id":2,"product_id":1,"quantity":3,"expire":1609502159},{"id":3,"product_id":1,"quantity":3,"expire":1609502259}],"error":""}`
 	assert.Equal(t, expected, actual)
 	fmt.Println(" OK")
 
 	fmt.Print("stock: consume 3")
 	actual = postRequest("http://localhost:8081/api/v1/product/1/consume/", []byte(`{"quantity":  3}`))
-	expected = `{"status":200,"data":[{"id":1,"product_id":1,"quantity":2,"expire":1609458959},{"id":2,"product_id":1,"quantity":3,"expire":1609502159}],"error":""}`
+	expected = `{"status":200,"data":[{"id":1,"product_id":1,"quantity":2,"expire":1609458959},{"id":2,"product_id":1,"quantity":3,"expire":1609502159},{"id":3,"product_id":1,"quantity":3,"expire":1609502259}],"error":""}`
 	assert.Equal(t, expected, actual)
 	fmt.Println(" OK")
 
 	fmt.Print("stock: get after consume")
 	actual = getRequest("http://localhost:8081/api/v1/product/1/stock/")
-	expected = `{"status":200,"data":[{"id":1,"product_id":1,"quantity":2,"expire":1609458959},{"id":2,"product_id":1,"quantity":3,"expire":1609502159}],"error":""}`
+	expected = `{"status":200,"data":[{"id":1,"product_id":1,"quantity":2,"expire":1609458959},{"id":2,"product_id":1,"quantity":3,"expire":1609502159},{"id":3,"product_id":1,"quantity":3,"expire":1609502259}],"error":""}`
 	assert.Equal(t, expected, actual)
 	fmt.Println(" OK")
 
 	fmt.Print("stock: consume 3")
 	actual = postRequest("http://localhost:8081/api/v1/product/1/consume/", []byte(`{"quantity":  3}`))
-	expected = `{"status":200,"data":[{"id":2,"product_id":1,"quantity":2,"expire":1609502159}],"error":""}`
+	expected = `{"status":200,"data":[{"id":2,"product_id":1,"quantity":2,"expire":1609502159},{"id":3,"product_id":1,"quantity":3,"expire":1609502259}],"error":""}`
 	assert.Equal(t, expected, actual)
 	fmt.Println(" OK")
 
 	fmt.Print("stock: get after second consume")
 	actual = getRequest("http://localhost:8081/api/v1/product/1/stock/")
+	expected = `{"status":200,"data":[{"id":2,"product_id":1,"quantity":2,"expire":1609502159},{"id":3,"product_id":1,"quantity":3,"expire":1609502259}],"error":""}`
+	assert.Equal(t, expected, actual)
+	fmt.Println(" OK")
+
+	fmt.Print("stock: delete with id 3")
+	actual = deleteRequest("http://localhost:8081/api/v1/product/1/stock/3/")
 	expected = `{"status":200,"data":[{"id":2,"product_id":1,"quantity":2,"expire":1609502159}],"error":""}`
 	assert.Equal(t, expected, actual)
 	fmt.Println(" OK")

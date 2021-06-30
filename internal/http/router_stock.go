@@ -32,6 +32,18 @@ func (s *Server) getStock(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	_, customErr := s.productRepo.Get(id)
+
+	if customErr != nil {
+		response := Response{
+			Status: customErr.Code(),
+			Error:  customErr.Error(),
+		}
+
+		s.JSONResponse(w, response)
+		return
+	}
+
 	models := s.stockRepo.GetAllByProductId(id)
 
 	var dtos []stock.DTO
@@ -184,6 +196,83 @@ func (s *Server) consumeStock(w http.ResponseWriter, r *http.Request) {
 
 	//stock left
 	models := s.stockRepo.GetAllByProductId(id)
+
+	var dtos []stock.DTO
+
+	for _, model := range models {
+		dtos = append(dtos, stock.ModelToDTO(model))
+	}
+
+	response := Response{
+		Status: ResponseCodeOk,
+		Data: dtos,
+	}
+
+	s.JSONResponse(w, response)
+}
+
+func (s *Server) deleteStock(w http.ResponseWriter, r *http.Request){
+	vars := mux.Vars(r)
+	productIdString := vars["product_id"]
+
+	if productIdString == "" {
+		response := Response{
+			Status: BadRequest,
+			Error:  "product_id cannot be empty",
+		}
+
+		s.JSONResponse(w, response)
+		return
+	}
+	productId, err := strconv.Atoi(productIdString)
+
+	if err != nil {
+		response := Response{
+			Status: BadRequest,
+			Error:  err.Error(),
+		}
+
+		s.JSONResponse(w, response)
+		return
+	}
+
+	idString := vars["id"]
+
+	if productIdString == "" {
+		response := Response{
+			Status: BadRequest,
+			Error:  "id cannot be empty",
+		}
+
+		s.JSONResponse(w, response)
+		return
+	}
+	id, err := strconv.Atoi(idString)
+
+	if err != nil {
+		response := Response{
+			Status: BadRequest,
+			Error:  err.Error(),
+		}
+
+		s.JSONResponse(w, response)
+		return
+	}
+
+	customErr := s.stockRepo.Delete(id)
+
+	if customErr != nil {
+		response := Response{
+			Status: customErr.Code(),
+			Error:  customErr.Error(),
+		}
+
+		s.JSONResponse(w, response)
+		return
+	}
+
+	//stock left
+	models := s.stockRepo.GetAllByProductId(productId)
 
 	var dtos []stock.DTO
 
