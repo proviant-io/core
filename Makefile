@@ -3,7 +3,7 @@ TAG := dev
 endif
 
 ifndef UI_VERSION
-UI_VERSION := 0.0.7
+UI_VERSION := 0.0.8
 endif
 
 .PHONY: docker/compile
@@ -25,7 +25,8 @@ docker/publish:
 
 .PHONY: docker/run
 docker/run: docker/build
-	docker run --rm -t --name "proviant" -p8080:80 brushknight/proviant:$(TAG)
+	mkdir -p $(PWD)/db
+	docker run --rm -t --name "proviant" -v $(PWD)/db:/app/db/ -p8080:80 brushknight/proviant:$(TAG)
 
 .PHONY: test/e2e
 test/e2e: test/2e2/docker-build

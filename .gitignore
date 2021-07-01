@@ -2,3 +2,4 @@
 mariadb
 *.db
 public
+db
