@@ -28,6 +28,11 @@ docker/run: docker/build
 	mkdir -p $(PWD)/db
 	docker run --rm -t --name "proviant" -v $(PWD)/db:/app/db/ -p8080:80 brushknight/proviant:$(TAG)
 
+.PHONY: docker/run-latest
+docker/run-latest:
+	mkdir -p $(PWD)/db
+	docker run --rm -t --name "proviant" -v $(PWD)/db:/app/db/ -p8080:80 brushknight/proviant:latest
+
 .PHONY: test/e2e
 test/e2e: test/2e2/docker-build
 	go test -v ./test/e2e/
