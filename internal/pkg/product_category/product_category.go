@@ -8,8 +8,8 @@ import (
 
 type ProductCategory struct {
 	gorm.Model
-	ProductId int `json:"product_id",gorm:"uniqueIndex:idx_member"`
-	CategoryId int `json:"category_id",gorm:"uniqueIndex:idx_member"`
+	ProductId int `json:"product_id" gorm:"uniqueIndex:idx_member"`
+	CategoryId int `json:"category_id" gorm:"uniqueIndex:idx_member"`
 }
 
 type Repository struct {
@@ -25,9 +25,17 @@ func (r *Repository) GetByProductId(id int) []ProductCategory {
 	return models
 }
 
+func (r *Repository) DeleteByProductId(id int){
+	r.db.Connection().Where("product_id = ?", id).Unscoped().Delete(&ProductCategory{})
+}
+
+func (r *Repository) DeleteByCategory(id int){
+	r.db.Connection().Where("category_id = ?", id).Unscoped().Delete(&ProductCategory{})
+}
+
 func (r *Repository) Link(productId int, categories []int) {
 
-	r.db.Connection().Where("product_id = ?", productId).Unscoped().Delete(&ProductCategory{})
+	r.DeleteByProductId(productId)
 
 	for _, category := range categories{
 		r.db.Connection().Create(&ProductCategory{ProductId: productId, CategoryId: category})

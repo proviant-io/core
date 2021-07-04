@@ -98,7 +98,7 @@ func (s *Server) deleteCategory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	customErr := s.categoryRepo.Delete(id)
+	customErr := s.relationService.DeleteCategory(id)
 
 	if customErr != nil {
 		response := Response{

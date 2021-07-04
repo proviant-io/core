@@ -140,7 +140,7 @@ func (s *Server) deleteProduct(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	customErr := s.productRepo.Delete(id)
+	customErr := s.relationService.DeleteProduct(id)
 
 	if customErr != nil {
 		response := Response{

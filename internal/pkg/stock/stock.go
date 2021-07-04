@@ -9,7 +9,7 @@ import (
 
 type Stock struct {
 	gorm.Model
-	Id int `json:"id"`
+	Id int `json:"id" gorm:"primaryKey;autoIncrement;"`
 	ProductId int `json:"product_id"`
 	Quantity int `json:"quantity"`
 	Expire int `json:"expire"`
@@ -47,6 +47,14 @@ func (r *Repository) GetAllByProductId(id int) []Stock{
 
 	var s []Stock
 	r.db.Connection().Where("product_id = ?", id).Order("expire ASC").Find(&s)
+
+	return s
+}
+
+func (r *Repository) DeleteByProductId(id int) []Stock{
+
+	var s []Stock
+	r.db.Connection().Where("product_id = ?", id).Order("expire ASC").Unscoped().Delete(&Stock{})
 
 	return s
 }

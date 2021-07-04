@@ -98,7 +98,7 @@ func (s *Server) deleteList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	customErr := s.listRepo.Delete(id)
+	customErr := s.relationService.DeleteList(id)
 
 	if customErr != nil {
 		response := Response{

@@ -9,7 +9,7 @@ import (
 
 type Product struct {
 	gorm.Model
-	Id          int    `json:"id"`
+	Id          int    `json:"id" gorm:"primaryKey;autoIncrement;"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
 	Link        string `json:"link"`

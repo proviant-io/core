@@ -16,3 +16,7 @@ func (e *CustomError) Code() int{
 func NewErrNotFound(message string) *CustomError {
 	return &CustomError{message: message, code: 404}
 }
+
+func NewErrBadRequest(message string) *CustomError {
+	return &CustomError{message: message, code: 400}
+}
