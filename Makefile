@@ -28,8 +28,12 @@ docker/run: docker/build
 	mkdir -p $(PWD)/db
 	docker run --rm -t --name "proviant" -v $(PWD)/db:/app/db/ -p8080:80 brushknight/proviant:$(TAG)
 
+.PHONY: docker/pull-latest
+docker/pull-latest:
+	docker pull brushknight/proviant:latest
+
 .PHONY: docker/run-latest
-docker/run-latest:
+docker/run-latest: docker/pull-latest
 	mkdir -p $(PWD)/db
 	docker run --rm -t --name "proviant" -v $(PWD)/db:/app/db/ -p8080:80 brushknight/proviant:latest
 

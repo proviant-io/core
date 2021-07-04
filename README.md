@@ -33,8 +33,13 @@ This is an example of how to list things you need to use the software and how to
    ```sh
    make docker/run
    ```
-3. Open browser http://0.0.0.0:8080/api/v1/product
+3. Open browser http://0.0.0.0:8080/
 4. List of possible htp endpoints listed in this folder [http-calls](./http-calls)
+
+### Run latest docker image in attached mode
+```shell
+make docker/run-latest
+```
 
 ### Installation
 
