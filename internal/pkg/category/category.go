@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/brushknight/proviant/internal/db"
 	"github.com/brushknight/proviant/internal/errors"
+	"github.com/brushknight/proviant/internal/i18n"
 	"gorm.io/gorm"
 )
 
@@ -29,7 +30,7 @@ func (r *Repository) Get(id int) (Category, *errors.CustomError) {
 	r.db.Connection().First(model, "id = ?", id)
 
 	if (*model).Id == 0 {
-		return Category{}, errors.NewErrNotFound(fmt.Sprintf("category with id %d not found", id))
+		return Category{}, errors.NewErrNotFound(i18n.NewMessage("category with id %d not found", id))
 	}
 
 	return *model, nil

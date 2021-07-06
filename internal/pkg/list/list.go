@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/brushknight/proviant/internal/db"
 	"github.com/brushknight/proviant/internal/errors"
+	"github.com/brushknight/proviant/internal/i18n"
 	"gorm.io/gorm"
 )
 
@@ -29,7 +30,7 @@ func (r *Repository) Get(id int) (List, *errors.CustomError) {
 	r.db.Connection().First(model, "id = ?", id)
 
 	if (*model).Id == 0 {
-		return List{}, errors.NewErrNotFound(fmt.Sprintf("list with id %d not found", id))
+		return List{}, errors.NewErrNotFound(i18n.NewMessage("list with id %d not found", id))
 	}
 
 	return *model, nil

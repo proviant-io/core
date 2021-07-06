@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/brushknight/proviant/internal/db"
 	"github.com/brushknight/proviant/internal/http"
+	"github.com/brushknight/proviant/internal/i18n"
 	"github.com/brushknight/proviant/internal/pkg/category"
 	"github.com/brushknight/proviant/internal/pkg/list"
 	"github.com/brushknight/proviant/internal/pkg/product"
@@ -53,7 +54,9 @@ func main() {
 
 	relationService := service.NewRelationService(productRepo, listRepo, categoryRepo, stockRepo, productCategoryRepo)
 
-	server := http.NewServer(productRepo, listRepo, categoryRepo, productCategoryRepo, stockRepo, relationService)
+	l := i18n.NewFileLocalizer()
+
+	server := http.NewServer(productRepo, listRepo, categoryRepo, productCategoryRepo, stockRepo, relationService, l)
 
 	err = server.Run("0.0.0.0:80")
 

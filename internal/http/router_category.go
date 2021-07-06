@@ -8,42 +8,27 @@ import (
 )
 
 func (s *Server) getCategory(w http.ResponseWriter, r *http.Request) {
+	locale := s.getLocale(r)
+
 	vars := mux.Vars(r)
 	idString := vars["id"]
 
 	if idString == "" {
-		response := Response{
-			Status: BadRequest,
-			Error:  "id cannot be empty",
-		}
-
-		s.JSONResponse(w, response)
+		s.handleBadRequest(w, locale, "id cannot be empty")
 		return
 	}
 
 	id, err := strconv.Atoi(idString)
 
 	if err != nil {
-
-		response := Response{
-			Status: BadRequest,
-			Error:  err.Error(),
-		}
-
-		s.JSONResponse(w, response)
+		s.handleBadRequest(w, locale, "id is not a number: %v", err.Error())
 		return
 	}
 
 	model, customErr := s.categoryRepo.Get(id)
 
 	if customErr != nil {
-
-		response := Response{
-			Status: customErr.Code(),
-			Error:  customErr.Error(),
-		}
-
-		s.JSONResponse(w, response)
+		s.handleError(w, locale, *customErr)
 		return
 	}
 
@@ -52,7 +37,7 @@ func (s *Server) getCategory(w http.ResponseWriter, r *http.Request) {
 		Data:   category.ModelToDTO(model),
 	}
 
-	s.JSONResponse(w, response)
+	s.jsonResponse(w, response)
 }
 
 func (s *Server) getCategories(w http.ResponseWriter, r *http.Request) {
@@ -69,44 +54,30 @@ func (s *Server) getCategories(w http.ResponseWriter, r *http.Request) {
 		Data:   dtos,
 	}
 
-	s.JSONResponse(w, response)
+	s.jsonResponse(w, response)
 }
 
 func (s *Server) deleteCategory(w http.ResponseWriter, r *http.Request) {
+	locale := s.getLocale(r)
 	vars := mux.Vars(r)
 	idString := vars["id"]
 
 	if idString == "" {
-		response := Response{
-			Status: BadRequest,
-			Error:  "id cannot be empty",
-		}
-
-		s.JSONResponse(w, response)
+		s.handleBadRequest(w, locale, "id cannot be empty")
 		return
 	}
 
 	id, err := strconv.Atoi(idString)
 
 	if err != nil {
-		response := Response{
-			Status: BadRequest,
-			Error:  err.Error(),
-		}
-
-		s.JSONResponse(w, response)
+		s.handleBadRequest(w, locale, "id is not a number: %v", err.Error())
 		return
 	}
 
 	customErr := s.relationService.DeleteCategory(id)
 
 	if customErr != nil {
-		response := Response{
-			Status: customErr.Code(),
-			Error:  customErr.Error(),
-		}
-
-		s.JSONResponse(w, response)
+		s.handleError(w, locale, *customErr)
 		return
 	}
 
@@ -114,31 +85,22 @@ func (s *Server) deleteCategory(w http.ResponseWriter, r *http.Request) {
 		Status: ResponseCodeOk,
 	}
 
-	s.JSONResponse(w, response)
+	s.jsonResponse(w, response)
 }
 
 func (s *Server) createCategory(w http.ResponseWriter, r *http.Request) {
+	locale := s.getLocale(r)
 	dto := category.DTO{}
 
 	err := s.parseJSON(r, &dto)
 
 	if err != nil {
-		response := Response{
-			Status: BadRequest,
-			Error:  err.Error(),
-		}
-
-		s.JSONResponse(w, response)
+		s.handleBadRequest(w, locale, "parse payload error: %v", err.Error())
 		return
 	}
 
 	if dto.Title == "" {
-		response := Response{
-			Status: BadRequest,
-			Error:  "title should not be empty",
-		}
-
-		s.JSONResponse(w, response)
+		s.handleBadRequest(w, locale, "title should not be empty")
 		return
 	}
 
@@ -149,31 +111,22 @@ func (s *Server) createCategory(w http.ResponseWriter, r *http.Request) {
 		Data:   category.ModelToDTO(model),
 	}
 
-	s.JSONResponse(w, response)
+	s.jsonResponse(w, response)
 }
 
 func (s *Server) updateCategory(w http.ResponseWriter, r *http.Request) {
+	locale := s.getLocale(r)
 	vars := mux.Vars(r)
 	idString := vars["id"]
 
 	if idString == "" {
-		response := Response{
-			Status: BadRequest,
-			Error:  "id cannot be empty",
-		}
-
-		s.JSONResponse(w, response)
+		s.handleBadRequest(w, locale, "id cannot be empty")
 		return
 	}
 	id, err := strconv.Atoi(idString)
 
 	if err != nil {
-		response := Response{
-			Status: BadRequest,
-			Error:  err.Error(),
-		}
-
-		s.JSONResponse(w, response)
+		s.handleBadRequest(w, locale, "id is not a number: %v", err.Error())
 		return
 	}
 
@@ -182,34 +135,19 @@ func (s *Server) updateCategory(w http.ResponseWriter, r *http.Request) {
 	err = s.parseJSON(r, &dto)
 
 	if err != nil {
-		response := Response{
-			Status: BadRequest,
-			Error:  err.Error(),
-		}
-
-		s.JSONResponse(w, response)
+		s.handleBadRequest(w, locale, "parse payload error: %v", err.Error())
 		return
 	}
 
 	if dto.Title == "" {
-		response := Response{
-			Status: BadRequest,
-			Error:  "title should not be empty",
-		}
-
-		s.JSONResponse(w, response)
+		s.handleBadRequest(w, locale, "title should not be empty")
 		return
 	}
 
 	model, customErr := s.categoryRepo.Update(id, dto)
 
 	if customErr != nil {
-		response := Response{
-			Status: customErr.Code(),
-			Error:  customErr.Error(),
-		}
-
-		s.JSONResponse(w, response)
+		s.handleError(w, locale, *customErr)
 		return
 	}
 
@@ -218,7 +156,5 @@ func (s *Server) updateCategory(w http.ResponseWriter, r *http.Request) {
 		Data:   category.ModelToDTO(model),
 	}
 
-	s.JSONResponse(w, response)
+	s.jsonResponse(w, response)
 }
-
-

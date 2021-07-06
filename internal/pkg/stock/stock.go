@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/brushknight/proviant/internal/db"
 	"github.com/brushknight/proviant/internal/errors"
+	"github.com/brushknight/proviant/internal/i18n"
 	"gorm.io/gorm"
 )
 
@@ -64,7 +65,7 @@ func (r *Repository) Delete(id int) *errors.CustomError{
 	model, err := r.Get(id)
 
 	if err != nil {
-		return errors.NewErrNotFound(fmt.Sprintf("stock with id %d not found", id))
+		return errors.NewErrNotFound(i18n.NewMessage("stock with id %d not found", id))
 	}
 
 	r.db.Connection().Unscoped().Delete(model, id)

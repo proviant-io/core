@@ -1,1 +1,2 @@
-DELETE http://localhost:8080/api/v1/product/2/
+DELETE http://localhost:8080/api/v1/product//
+User-Locale: en

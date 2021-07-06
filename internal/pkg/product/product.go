@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/brushknight/proviant/internal/db"
 	"github.com/brushknight/proviant/internal/errors"
+	"github.com/brushknight/proviant/internal/i18n"
 	"gorm.io/gorm"
 )
 
@@ -57,7 +58,7 @@ func (r *Repository) Get(id int) (Product, *errors.CustomError) {
 	r.db.Connection().First(p, "id = ?", id)
 
 	if (*p).Id == 0 {
-		return Product{}, errors.NewErrNotFound(fmt.Sprintf("product with id %d not found", id))
+		return Product{}, errors.NewErrNotFound(i18n.NewMessage("product with id %d not found", id))
 	}
 
 	return *p, nil
