@@ -65,7 +65,7 @@ func NewFileLocalizer() Localizer {
 		},
 		"stock with id %d not found": {
 			En: "stock with id %d not found",
-			Ru: "запись стока под номером %d не найдена",
+			Ru: "запись остатка под номером %d не найдена",
 		},
 		"id cannot be empty": {
 			En: "id cannot be empty",
