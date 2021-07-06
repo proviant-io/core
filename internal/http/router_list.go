@@ -8,42 +8,26 @@ import (
 )
 
 func (s *Server) getList(w http.ResponseWriter, r *http.Request) {
+	locale := s.getLocale(r)
 	vars := mux.Vars(r)
 	idString := vars["id"]
 
 	if idString == "" {
-		response := Response{
-			Status: BadRequest,
-			Error:  "id cannot be empty",
-		}
-
-		s.JSONResponse(w, response)
+		s.handleBadRequest(w, locale, "id cannot be empty")
 		return
 	}
 
 	id, err := strconv.Atoi(idString)
 
 	if err != nil {
-
-		response := Response{
-			Status: BadRequest,
-			Error:  err.Error(),
-		}
-
-		s.JSONResponse(w, response)
+		s.handleBadRequest(w, locale, "id is not a number: %v", err.Error())
 		return
 	}
 
 	model, customErr := s.listRepo.Get(id)
 
 	if customErr != nil {
-
-		response := Response{
-			Status: customErr.Code(),
-			Error:  customErr.Error(),
-		}
-
-		s.JSONResponse(w, response)
+		s.handleError(w, locale, *customErr)
 		return
 	}
 
@@ -52,7 +36,7 @@ func (s *Server) getList(w http.ResponseWriter, r *http.Request) {
 		Data:   list.ModelToDTO(model),
 	}
 
-	s.JSONResponse(w, response)
+	s.jsonResponse(w, response)
 }
 
 func (s *Server) getLists(w http.ResponseWriter, r *http.Request) {
@@ -69,44 +53,30 @@ func (s *Server) getLists(w http.ResponseWriter, r *http.Request) {
 		Data:   dtos,
 	}
 
-	s.JSONResponse(w, response)
+	s.jsonResponse(w, response)
 }
 
 func (s *Server) deleteList(w http.ResponseWriter, r *http.Request) {
+	locale := s.getLocale(r)
 	vars := mux.Vars(r)
 	idString := vars["id"]
 
 	if idString == "" {
-		response := Response{
-			Status: BadRequest,
-			Error:  "id cannot be empty",
-		}
-
-		s.JSONResponse(w, response)
+		s.handleBadRequest(w, locale, "id cannot be empty")
 		return
 	}
 
 	id, err := strconv.Atoi(idString)
 
 	if err != nil {
-		response := Response{
-			Status: BadRequest,
-			Error:  err.Error(),
-		}
-
-		s.JSONResponse(w, response)
+		s.handleBadRequest(w, locale, "id is not a number: %v", err.Error())
 		return
 	}
 
 	customErr := s.relationService.DeleteList(id)
 
 	if customErr != nil {
-		response := Response{
-			Status: customErr.Code(),
-			Error:  customErr.Error(),
-		}
-
-		s.JSONResponse(w, response)
+		s.handleError(w, locale, *customErr)
 		return
 	}
 
@@ -114,31 +84,22 @@ func (s *Server) deleteList(w http.ResponseWriter, r *http.Request) {
 		Status: ResponseCodeOk,
 	}
 
-	s.JSONResponse(w, response)
+	s.jsonResponse(w, response)
 }
 
 func (s *Server) createList(w http.ResponseWriter, r *http.Request) {
+	locale := s.getLocale(r)
 	dto := list.DTO{}
 
 	err := s.parseJSON(r, &dto)
 
 	if err != nil {
-		response := Response{
-			Status: BadRequest,
-			Error:  err.Error(),
-		}
-
-		s.JSONResponse(w, response)
+		s.handleBadRequest(w, locale, "parse payload error: %v", err.Error())
 		return
 	}
 
 	if dto.Title == "" {
-		response := Response{
-			Status: BadRequest,
-			Error:  "title should not be empty",
-		}
-
-		s.JSONResponse(w, response)
+		s.handleBadRequest(w, locale, "title should not be empty")
 		return
 	}
 
@@ -149,31 +110,22 @@ func (s *Server) createList(w http.ResponseWriter, r *http.Request) {
 		Data:   list.ModelToDTO(model),
 	}
 
-	s.JSONResponse(w, response)
+	s.jsonResponse(w, response)
 }
 
 func (s *Server) updateList(w http.ResponseWriter, r *http.Request) {
+	locale := s.getLocale(r)
 	vars := mux.Vars(r)
 	idString := vars["id"]
 
 	if idString == "" {
-		response := Response{
-			Status: BadRequest,
-			Error:  "id cannot be empty",
-		}
-
-		s.JSONResponse(w, response)
+		s.handleBadRequest(w, locale, "id cannot be empty")
 		return
 	}
 	id, err := strconv.Atoi(idString)
 
 	if err != nil {
-		response := Response{
-			Status: BadRequest,
-			Error:  err.Error(),
-		}
-
-		s.JSONResponse(w, response)
+		s.handleBadRequest(w, locale, "id is not a number: %v", err.Error())
 		return
 	}
 
@@ -182,34 +134,19 @@ func (s *Server) updateList(w http.ResponseWriter, r *http.Request) {
 	err = s.parseJSON(r, &dto)
 
 	if err != nil {
-		response := Response{
-			Status: BadRequest,
-			Error:  err.Error(),
-		}
-
-		s.JSONResponse(w, response)
+		s.handleBadRequest(w, locale, "parse payload error: %v", err.Error())
 		return
 	}
 
 	if dto.Title == "" {
-		response := Response{
-			Status: BadRequest,
-			Error:  "title should not be empty",
-		}
-
-		s.JSONResponse(w, response)
+		s.handleBadRequest(w, locale, "title should not be empty")
 		return
 	}
 
 	model, customErr := s.listRepo.Update(id, dto)
 
 	if customErr != nil {
-		response := Response{
-			Status: customErr.Code(),
-			Error:  customErr.Error(),
-		}
-
-		s.JSONResponse(w, response)
+		s.handleError(w, locale, *customErr)
 		return
 	}
 
@@ -218,5 +155,5 @@ func (s *Server) updateList(w http.ResponseWriter, r *http.Request) {
 		Data:   list.ModelToDTO(model),
 	}
 
-	s.JSONResponse(w, response)
+	s.jsonResponse(w, response)
 }

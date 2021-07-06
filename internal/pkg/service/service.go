@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/brushknight/proviant/internal/errors"
+	"github.com/brushknight/proviant/internal/i18n"
 	"github.com/brushknight/proviant/internal/pkg/category"
 	"github.com/brushknight/proviant/internal/pkg/list"
 	"github.com/brushknight/proviant/internal/pkg/product"
@@ -206,7 +207,7 @@ func (s *RelationService) DeleteList(id int) *errors.CustomError{
 	models := s.productRepository.GetAll(q)
 
 	if len(models) > 0 {
-		return errors.NewErrBadRequest("You can't remove list with products. Clean products first")
+		return errors.NewErrBadRequest(i18n.NewMessage("You can't remove list with products. Clean products first."))
 	}
 
 	return s.listRepository.Delete(id)

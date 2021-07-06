@@ -8,42 +8,26 @@ import (
 )
 
 func (s *Server) getProduct(w http.ResponseWriter, r *http.Request) {
+	locale := s.getLocale(r)
 	vars := mux.Vars(r)
 	idString := vars["id"]
 
 	if idString == "" {
-		response := Response{
-			Status: BadRequest,
-			Error:  "id cannot be empty",
-		}
-
-		s.JSONResponse(w, response)
+		s.handleBadRequest(w, locale, "id cannot be empty")
 		return
 	}
 
 	id, err := strconv.Atoi(idString)
 
 	if err != nil {
-
-		response := Response{
-			Status: BadRequest,
-			Error:  err.Error(),
-		}
-
-		s.JSONResponse(w, response)
+		s.handleBadRequest(w, locale, "id is not a number: %v", err.Error())
 		return
 	}
 
 	p, customErr := s.relationService.GetProduct(id)
 
 	if customErr != nil {
-
-		response := Response{
-			Status: customErr.Code(),
-			Error:  customErr.Error(),
-		}
-
-		s.JSONResponse(w, response)
+		s.handleError(w, locale, *customErr)
 		return
 	}
 
@@ -52,10 +36,11 @@ func (s *Server) getProduct(w http.ResponseWriter, r *http.Request) {
 		Data:   p,
 	}
 
-	s.JSONResponse(w, response)
+	s.jsonResponse(w, response)
 }
 
 func (s *Server) getProducts(w http.ResponseWriter, r *http.Request) {
+	locale := s.getLocale(r)
 
 	var query *product.Query
 
@@ -68,12 +53,7 @@ func (s *Server) getProducts(w http.ResponseWriter, r *http.Request) {
 		listFilter, err = strconv.Atoi(listFilterRaw)
 
 		if err != nil {
-			response := Response{
-				Status: BadRequest,
-				Error:  err.Error(),
-			}
-
-			s.JSONResponse(w, response)
+			s.handleBadRequest(w, locale, "list id is not a number: %v", err.Error())
 			return
 		}
 	}
@@ -87,12 +67,7 @@ func (s *Server) getProducts(w http.ResponseWriter, r *http.Request) {
 		categoryFilter, err = strconv.Atoi(categoryFilterRaw)
 
 		if err != nil {
-			response := Response{
-				Status: BadRequest,
-				Error:  err.Error(),
-			}
-
-			s.JSONResponse(w, response)
+			s.handleBadRequest(w, locale, "category id is not a number: %v", err.Error())
 			return
 		}
 
@@ -111,44 +86,30 @@ func (s *Server) getProducts(w http.ResponseWriter, r *http.Request) {
 		Data:   dtos,
 	}
 
-	s.JSONResponse(w, response)
+	s.jsonResponse(w, response)
 }
 
 func (s *Server) deleteProduct(w http.ResponseWriter, r *http.Request){
+	locale := s.getLocale(r)
 	vars := mux.Vars(r)
 	idString := vars["id"]
 
 	if idString == "" {
-		response := Response{
-			Status: BadRequest,
-			Error:  "id cannot be empty",
-		}
-
-		s.JSONResponse(w, response)
+		s.handleBadRequest(w, locale, "id cannot be empty")
 		return
 	}
 
 	id, err := strconv.Atoi(idString)
 
 	if err != nil {
-		response := Response{
-			Status: BadRequest,
-			Error:  err.Error(),
-		}
-
-		s.JSONResponse(w, response)
+		s.handleBadRequest(w, locale, "id is not a number: %v", err.Error())
 		return
 	}
 
 	customErr := s.relationService.DeleteProduct(id)
 
 	if customErr != nil {
-		response := Response{
-			Status: customErr.Code(),
-			Error:  customErr.Error(),
-		}
-
-		s.JSONResponse(w, response)
+		s.handleError(w, locale, *customErr)
 		return
 	}
 
@@ -156,33 +117,24 @@ func (s *Server) deleteProduct(w http.ResponseWriter, r *http.Request){
 		Status: ResponseCodeOk,
 	}
 
-	s.JSONResponse(w, response)
+	s.jsonResponse(w, response)
 }
 
 func (s *Server) createProduct(w http.ResponseWriter, r *http.Request){
+	locale := s.getLocale(r)
 	dto := product.CreateDTO{}
 
 	err := s.parseJSON(r, &dto)
 
 	if err != nil {
-		response := Response{
-			Status: BadRequest,
-			Error:  err.Error(),
-		}
-
-		s.JSONResponse(w, response)
+		s.handleBadRequest(w, locale, "parse payload error: %v", err.Error())
 		return
 	}
 
 	productDto, customErr := s.relationService.CreateProduct(dto)
 
 	if customErr != nil {
-		response := Response{
-			Status: customErr.Code(),
-			Error:  customErr.Error(),
-		}
-
-		s.JSONResponse(w, response)
+		s.handleError(w, locale, *customErr)
 		return
 	}
 
@@ -191,31 +143,22 @@ func (s *Server) createProduct(w http.ResponseWriter, r *http.Request){
 		Data:   productDto,
 	}
 
-	s.JSONResponse(w, response)
+	s.jsonResponse(w, response)
 }
 
 func (s *Server) updateProduct(w http.ResponseWriter, r *http.Request){
+	locale := s.getLocale(r)
 	vars := mux.Vars(r)
 	idString := vars["id"]
 
 	if idString == "" {
-		response := Response{
-			Status: BadRequest,
-			Error:  "id cannot be empty",
-		}
-
-		s.JSONResponse(w, response)
+		s.handleBadRequest(w, locale, "id cannot be empty")
 		return
 	}
 	id, err := strconv.Atoi(idString)
 
 	if err != nil {
-		response := Response{
-			Status: BadRequest,
-			Error:  err.Error(),
-		}
-
-		s.JSONResponse(w, response)
+		s.handleBadRequest(w, locale, "id is not a number: %v", err.Error())
 		return
 	}
 
@@ -224,12 +167,7 @@ func (s *Server) updateProduct(w http.ResponseWriter, r *http.Request){
 	err = s.parseJSON(r, &dto)
 
 	if err != nil {
-		response := Response{
-			Status: BadRequest,
-			Error:  err.Error(),
-		}
-
-		s.JSONResponse(w, response)
+		s.handleBadRequest(w, locale, "parse payload error: %v", err.Error())
 		return
 	}
 
@@ -238,12 +176,7 @@ func (s *Server) updateProduct(w http.ResponseWriter, r *http.Request){
 	productDTO, customErr := s.relationService.UpdateProduct(dto)
 
 	if customErr != nil {
-		response := Response{
-			Status: customErr.Code(),
-			Error:  customErr.Error(),
-		}
-
-		s.JSONResponse(w, response)
+		s.handleError(w, locale, *customErr)
 		return
 	}
 
@@ -252,5 +185,5 @@ func (s *Server) updateProduct(w http.ResponseWriter, r *http.Request){
 		Data:   productDTO,
 	}
 
-	s.JSONResponse(w, response)
+	s.jsonResponse(w, response)
 }
