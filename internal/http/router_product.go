@@ -2,6 +2,7 @@ package http
 
 import (
 	"github.com/brushknight/proviant/internal/pkg/product"
+	"github.com/brushknight/proviant/internal/utils"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
@@ -131,6 +132,8 @@ func (s *Server) createProduct(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
+	dto.Title = utils.ClearString(dto.Title)
+
 	productDto, customErr := s.relationService.CreateProduct(dto)
 
 	if customErr != nil {
@@ -172,6 +175,7 @@ func (s *Server) updateProduct(w http.ResponseWriter, r *http.Request){
 	}
 
 	dto.Id = id
+	dto.Title = utils.ClearString(dto.Title)
 
 	productDTO, customErr := s.relationService.UpdateProduct(dto)
 

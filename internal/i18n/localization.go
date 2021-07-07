@@ -30,7 +30,7 @@ type FileLocalizer struct {
 	missing []string
 }
 
-func (l *FileLocalizer) Missing() []string{
+func (l *FileLocalizer) Missing() []string {
 	return l.missing
 }
 
@@ -38,14 +38,23 @@ func (l *FileLocalizer) T(m Message, locale Locale) string {
 
 	if translations, ok := l.strings[m.Template]; ok {
 		if translation, ok := translations[locale]; ok {
-			return fmt.Sprintf(translation, m.Params...)
+			if len(m.Params) > 0 {
+				log.Println(translation, m.Params)
+				return fmt.Sprintf(translation, m.Params...)
+			}
+			return translation
+
 		}
 	}
 
 	log.Printf("missing translation: %s - %s \n", locale, m.Template)
 	l.missing = append(l.missing, m.Template)
 
-	return fmt.Sprintf(m.Template, m.Params...)
+	if len(m.Params) > 0 {
+		log.Println(m.Template, m.Params)
+		return fmt.Sprintf(m.Template, m.Params...)
+	}
+	return m.Template
 }
 
 func NewFileLocalizer() Localizer {

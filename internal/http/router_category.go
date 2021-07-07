@@ -2,6 +2,7 @@ package http
 
 import (
 	"github.com/brushknight/proviant/internal/pkg/category"
+	"github.com/brushknight/proviant/internal/utils"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
@@ -99,6 +100,8 @@ func (s *Server) createCategory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	dto.Title = utils.ClearString(dto.Title)
+
 	if dto.Title == "" {
 		s.handleBadRequest(w, locale, "title should not be empty")
 		return
@@ -138,6 +141,8 @@ func (s *Server) updateCategory(w http.ResponseWriter, r *http.Request) {
 		s.handleBadRequest(w, locale, "parse payload error: %v", err.Error())
 		return
 	}
+
+	dto.Title = utils.ClearString(dto.Title)
 
 	if dto.Title == "" {
 		s.handleBadRequest(w, locale, "title should not be empty")

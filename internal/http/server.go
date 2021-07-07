@@ -40,7 +40,7 @@ func (s *Server) getLocale(r *http.Request) i18n.Locale {
 
 
 func (s *Server) handleBadRequest(w http.ResponseWriter,locale i18n.Locale,  error string, params ...interface{}) {
-	m := i18n.NewMessage(error, params)
+	m := i18n.NewMessage(error, params...)
 	response := Response{
 		Status: BadRequest,
 		Error:  s.l.T(m, locale),

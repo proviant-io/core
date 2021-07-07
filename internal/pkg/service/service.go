@@ -147,6 +147,10 @@ func (s *RelationService) UpdateProduct(dto product.DTO) (product.DTO, *errors.C
 		return product.DTO{}, err
 	}
 
+	// NOTE: here could be performance bottle neck
+
+	s.productCategoryRepository.DeleteByProductId(p.Id)
+
 	if len(dto.CategoryIds) != 0 {
 		s.productCategoryRepository.Link(p.Id, dto.CategoryIds)
 	}
