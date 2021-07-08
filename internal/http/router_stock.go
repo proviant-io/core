@@ -188,7 +188,7 @@ func (s *Server) deleteStock(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	customErr := s.stockRepo.Delete(id)
+	customErr := s.relationService.DeleteStock(id)
 
 	if customErr != nil {
 		s.handleError(w, locale, *customErr)
