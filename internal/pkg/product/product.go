@@ -126,6 +126,7 @@ func (r *Repository) Update(dto DTO) (Product, *errors.CustomError) {
 	model.Image = dto.Image
 	model.Barcode = dto.Barcode
 	model.ListId = dto.ListId
+	model.Stock = dto.Stock
 
 	r.db.Connection().Model(&Product{Id: dto.Id}).Updates(model)
 	return model, nil
