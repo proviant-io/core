@@ -32,13 +32,13 @@ type Repository struct {
 	db db.DB
 }
 
-func (r *Repository) Get(id int) (Stock, error){
+func (r *Repository) Get(id int) (Stock, *errors.CustomError){
 
 	model := Stock{}
 	r.db.Connection().First(&model, "id = ?", id)
 
 	if (model).Id == 0 {
-		return Stock{}, fmt.Errorf("stock with id %d not found", id)
+		return Stock{}, errors.NewErrNotFound(i18n.NewMessage("stock with id %d not found", id))
 	}
 
 	return model, nil

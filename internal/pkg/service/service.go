@@ -160,7 +160,7 @@ func (s *RelationService) UpdateProduct(dto product.DTO) (product.DTO, *errors.C
 
 func (s *RelationService) AddStock(dto stock.DTO) (stock.Stock, *errors.CustomError) {
 
-	_, err := s.productRepository.Get(dto.ProductId)
+	p, err := s.productRepository.Get(dto.ProductId)
 
 	if err != nil {
 		return stock.Stock{}, err
@@ -168,12 +168,16 @@ func (s *RelationService) AddStock(dto stock.DTO) (stock.Stock, *errors.CustomEr
 
 	model := s.stockRepository.Add(dto)
 
-	return model, nil
+	p.Stock += dto.Quantity
+
+	_, err = s.productRepository.Update(product.ModelToDTO(p))
+
+	return model, err
 }
 
 func (s *RelationService) ConsumeStock(dto stock.ConsumeDTO) *errors.CustomError {
 
-	_, err := s.productRepository.Get(dto.ProductId)
+	p, err := s.productRepository.Get(dto.ProductId)
 
 	if err != nil {
 		return err
@@ -181,10 +185,49 @@ func (s *RelationService) ConsumeStock(dto stock.ConsumeDTO) *errors.CustomError
 
 	s.stockRepository.Consume(dto)
 
+	p.Stock -= dto.Quantity
+
+	if p.Stock < 0 {
+		p.Stock = 0
+	}
+
+	_, err = s.productRepository.Update(product.ModelToDTO(p))
+
 	return nil
 }
 
-func (s * RelationService) DeleteProduct(id int) *errors.CustomError{
+func (s *RelationService) DeleteStock(id int) *errors.CustomError {
+
+	st, err := s.stockRepository.Get(id)
+
+	if err != nil {
+		return err
+	}
+
+	p, err := s.productRepository.Get(st.ProductId)
+
+	if err != nil {
+		return err
+	}
+
+	err = s.stockRepository.Delete(id)
+
+	if err != nil {
+		return err
+	}
+
+	p.Stock -= st.Quantity
+
+	if p.Stock < 0 {
+		p.Stock = 0
+	}
+
+	_, err = s.productRepository.Update(product.ModelToDTO(p))
+
+	return err
+}
+
+func (s *RelationService) DeleteProduct(id int) *errors.CustomError {
 
 	s.stockRepository.DeleteByProductId(id)
 
@@ -195,14 +238,14 @@ func (s * RelationService) DeleteProduct(id int) *errors.CustomError{
 	return err
 }
 
-func (s *RelationService) DeleteCategory(id int) *errors.CustomError{
+func (s *RelationService) DeleteCategory(id int) *errors.CustomError {
 
 	s.productCategoryRepository.DeleteByCategory(id)
 
 	return s.categoryRepository.Delete(id)
 }
 
-func (s *RelationService) DeleteList(id int) *errors.CustomError{
+func (s *RelationService) DeleteList(id int) *errors.CustomError {
 
 	q := &product.Query{
 		List: id,

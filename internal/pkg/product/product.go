@@ -17,16 +17,17 @@ type Product struct {
 	Image       string `json:"image"`
 	Barcode     string `json:"barcode"`
 	ListId      int    `json:"list_id"`
+	Stock       int    `json:"stock"`
 }
 
 type CreateDTO struct {
-	Title       string      `json:"title"`
-	Description string      `json:"description"`
-	Link        string      `json:"link"`
-	Image       string      `json:"image"`
-	Barcode     string      `json:"barcode"`
-	CategoryIds []int       `json:"category_ids"`
-	ListId      int         `json:"list_id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Link        string `json:"link"`
+	Image       string `json:"image"`
+	Barcode     string `json:"barcode"`
+	CategoryIds []int  `json:"category_ids"`
+	ListId      int    `json:"list_id"`
 }
 
 type DTO struct {
@@ -40,6 +41,7 @@ type DTO struct {
 	Categories  interface{} `json:"categories"`
 	ListId      int         `json:"list_id"`
 	List        interface{} `json:"list"`
+	Stock       int         `json:"stock"`
 }
 
 type Repository struct {
@@ -48,7 +50,7 @@ type Repository struct {
 
 type Query struct {
 	Category int
-	List int
+	List     int
 }
 
 func (r *Repository) Get(id int) (Product, *errors.CustomError) {
@@ -70,7 +72,7 @@ func (r *Repository) GetAll(query *Query) []Product {
 
 	if query == nil {
 		r.db.Connection().Find(&products)
-	}else{
+	} else {
 		queryBuilder := &Product{}
 
 		if query.List != 0 {
@@ -124,6 +126,7 @@ func (r *Repository) Update(dto DTO) (Product, *errors.CustomError) {
 	model.Image = dto.Image
 	model.Barcode = dto.Barcode
 	model.ListId = dto.ListId
+	model.Stock = dto.Stock
 
 	r.db.Connection().Model(&Product{Id: dto.Id}).Updates(model)
 	return model, nil
@@ -138,6 +141,7 @@ func ModelToDTO(m Product) DTO {
 		Image:       m.Image,
 		Barcode:     m.Barcode,
 		ListId:      m.ListId,
+		Stock:       m.Stock,
 	}
 }
 
