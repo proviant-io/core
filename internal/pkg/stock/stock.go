@@ -80,7 +80,7 @@ func (r *Repository) Consume(dto ConsumeDTO){
 	models := r.GetAllByProductId(dto.ProductId)
 
 	for _, model := range models {
-		if model.Quantity < quantityLeftToConsume{
+		if model.Quantity <= quantityLeftToConsume{
 			quantityLeftToConsume -= model.Quantity
 			r.Delete(model.Id)
 		}else{
