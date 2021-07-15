@@ -185,10 +185,10 @@ func (s *RelationService) ConsumeStock(dto stock.ConsumeDTO) *errors.CustomError
 
 	s.stockRepository.Consume(dto)
 
-	p.Stock -= dto.Quantity
-
-	if p.Stock < 0 {
+	if dto.Quantity >= p.Stock {
 		p.Stock = 0
+	}else{
+		p.Stock -= dto.Quantity
 	}
 
 	_, err = s.productRepository.Update(product.ModelToDTO(p))

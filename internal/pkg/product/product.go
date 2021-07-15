@@ -17,7 +17,7 @@ type Product struct {
 	Image       string `json:"image"`
 	Barcode     string `json:"barcode"`
 	ListId      int    `json:"list_id"`
-	Stock       int    `json:"stock"`
+	Stock       uint    `json:"stock",gorm:"type:UINT(10)"`
 }
 
 type CreateDTO struct {
@@ -41,7 +41,7 @@ type DTO struct {
 	Categories  interface{} `json:"categories"`
 	ListId      int         `json:"list_id"`
 	List        interface{} `json:"list"`
-	Stock       int         `json:"stock"`
+	Stock       uint         `json:"stock"`
 }
 
 type Repository struct {
@@ -129,6 +129,11 @@ func (r *Repository) Update(dto DTO) (Product, *errors.CustomError) {
 	model.Stock = dto.Stock
 
 	r.db.Connection().Model(&Product{Id: dto.Id}).Updates(model)
+
+	if model.Stock == 0 {
+		r.db.Connection().Model(&Product{Id: dto.Id}).Select("Stock").Updates(Product{Stock: 0})
+	}
+
 	return model, nil
 }
 

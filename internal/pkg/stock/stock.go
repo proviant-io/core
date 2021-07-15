@@ -12,20 +12,20 @@ type Stock struct {
 	gorm.Model
 	Id int `json:"id" gorm:"primaryKey;autoIncrement;"`
 	ProductId int `json:"product_id"`
-	Quantity int `json:"quantity"`
+	Quantity uint `json:"quantity"`
 	Expire int `json:"expire"`
 }
 
 type DTO struct {
 	Id int `json:"id"`
 	ProductId int `json:"product_id"`
-	Quantity int `json:"quantity"`
+	Quantity uint `json:"quantity"`
 	Expire int `json:"expire"`
 }
 
 type ConsumeDTO struct {
 	ProductId int `json:"product_id"`
-	Quantity int `json:"quantity"`
+	Quantity uint `json:"quantity"`
 }
 
 type Repository struct {
