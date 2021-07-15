@@ -12,7 +12,7 @@ Here's why:
 ### Built With
 
 * [GO](https://golang.org/)
-* [GIN](https://github.com/gin-gonic/gin)
+* [gorilla/mux](https://github.com/gorilla/mux)
 * [GORM](https://gorm.io/index.html)
 
 ## Getting Started
@@ -34,7 +34,6 @@ This is an example of how to list things you need to use the software and how to
    make docker/run
    ```
 3. Open browser http://0.0.0.0:8080/
-4. List of possible htp endpoints listed in this folder [http-calls](./http-calls)
 
 ### Run latest docker image in attached mode
 ```shell

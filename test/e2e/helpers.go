@@ -3,11 +3,13 @@ package e2e
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
+	"gotest.tools/assert"
 	"io"
 	"io/ioutil"
 	"log"
@@ -15,7 +17,56 @@ import (
 	"testing"
 )
 
-func getRequest(url string) string{
+const (
+	GET    = "get"
+	POST   = "post"
+	PUT    = "put"
+	DELETE = "delete"
+)
+
+func url(t string, params ...interface{}) string{
+	return fmt.Sprintf(t, params...)
+}
+
+func execSuitStep(t *testing.T, title string, uri string, requestType string, requestPayload string, e apiResponse) {
+	fmt.Print(title)
+	var actual string
+	finalUrl := generateApiUrl(uri)
+	switch requestType {
+	case GET:
+		actual = getRequest(finalUrl)
+	case POST:
+		actual = postRequest(finalUrl, []byte(requestPayload))
+	}
+	assert.Equal(t, generateExpResponse(e.Status, e.Data, e.Error), actual)
+	fmt.Println(" OK")
+}
+
+type apiResponse struct {
+	Status int         `json:"status"`
+	Data   interface{} `json:"data"`
+	Error  string      `json:"error"`
+}
+
+func generateExpResponse(s int, d interface{}, e string) string {
+	expected, err := json.Marshal(apiResponse{
+		Status: s,
+		Data:   d,
+		Error:  e,
+	})
+
+	if err != nil {
+		panic(err)
+	}
+
+	return string(expected)
+}
+
+func generateApiUrl(uri string) string {
+	return fmt.Sprintf("http://localhost:8081%s", uri)
+}
+
+func getRequest(url string) string {
 	resp, err := http.Get(url)
 	if err != nil {
 		// handle error
@@ -27,7 +78,7 @@ func getRequest(url string) string{
 	return string(body)
 }
 
-func deleteRequest(url string) string{
+func deleteRequest(url string) string {
 	req, err := http.NewRequest("DELETE", url, nil)
 	req.Header.Set("Content-Type", "application/json")
 
@@ -42,7 +93,7 @@ func deleteRequest(url string) string{
 	return string(body)
 }
 
-func postRequest(url string, json []byte) string{
+func postRequest(url string, json []byte) string {
 	//var jsonStr = []byte(`{"title":"Buy cheese and bread for breakfast."}`)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(json))
 	req.Header.Set("Content-Type", "application/json")
@@ -58,7 +109,7 @@ func postRequest(url string, json []byte) string{
 	return string(body)
 }
 
-func putRequest(url string, json []byte) string{
+func putRequest(url string, json []byte) string {
 	//var jsonStr = []byte(`{"title":"Buy cheese and bread for breakfast."}`)
 	req, err := http.NewRequest("PUT", url, bytes.NewBuffer(json))
 	req.Header.Set("Content-Type", "application/json")
@@ -74,9 +125,9 @@ func putRequest(url string, json []byte) string{
 	return string(body)
 }
 
-func runContainer(t *testing.T) string{
+func runContainer(t *testing.T) string {
 	id, err := createNewContainer("brushknight/proviant:e2e")
-	if err != nil{
+	if err != nil {
 		fmt.Errorf(err.Error())
 		t.Fail()
 		return ""
@@ -84,10 +135,10 @@ func runContainer(t *testing.T) string{
 	return id
 }
 
-func stopContainer(t *testing.T, id string){
+func stopContainer(t *testing.T, id string) {
 	err := stopAndRemoveContainer(id)
 
-	if err != nil{
+	if err != nil {
 		fmt.Errorf(err.Error())
 		t.Fail()
 	}

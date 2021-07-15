@@ -10,13 +10,9 @@ endif
 docker/compile:
 	CGO_ENABLED=1 go build -ldflags="-X 'main.SqliteLocation=/app/db/proviant.db'" -o app ./cmd
 
-.PHONY: test/2e2/docker-build
-test/2e2/docker-build:
-	docker build -t brushknight/proviant:e2e -f Dockerfile .
-
 .PHONY: docker/build
 docker/build:
-	docker build --build-arg UI_VERSION_ARG=$(UI_VERSION) -t brushknight/proviant:$(TAG) -t brushknight/proviant:latest -f Dockerfile .
+	docker build --target web --build-arg UI_VERSION_ARG=$(UI_VERSION) -t brushknight/proviant:$(TAG) -t brushknight/proviant:latest -f Dockerfile .
 
 .PHOMY: docker/publish
 docker/publish:
@@ -26,7 +22,14 @@ docker/publish:
 .PHONY: docker/run
 docker/run: docker/build
 	mkdir -p $(PWD)/db
+	docker rm -f proviant
 	docker run --rm -t --name "proviant" -v $(PWD)/db:/app/db/ -p8080:80 brushknight/proviant:$(TAG)
+
+.PHONY: docker/run-empty
+docker/run: docker/build
+	mkdir -p $(PWD)/db
+	docker rm -f proviant
+	docker run --rm -t --name "proviant" -p8080:80 brushknight/proviant:$(TAG)
 
 .PHONY: docker/pull-latest
 docker/pull-latest:
@@ -36,6 +39,11 @@ docker/pull-latest:
 docker/run-latest: docker/pull-latest
 	mkdir -p $(PWD)/db
 	docker run --rm -t --name "proviant" -v $(PWD)/db:/app/db/ -p8080:80 brushknight/proviant:latest
+
+
+.PHONY: test/2e2/docker-build
+test/2e2/docker-build:
+	docker build --target api -t brushknight/proviant:e2e -f Dockerfile .
 
 .PHONY: test/e2e
 test/e2e: test/2e2/docker-build
