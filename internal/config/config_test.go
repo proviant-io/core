@@ -2,7 +2,6 @@ package config
 
 import (
 	"github.com/stretchr/testify/assert"
-	"reflect"
 	"strings"
 	"testing"
 )
@@ -29,5 +28,5 @@ db:
 		},
 	}
 
-	assert.True(t, reflect.DeepEqual(expected, *actual))
+	assert.Equal(t, expected, *actual)
 }
