@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"github.com/brushknight/proviant/internal/config"
 	"github.com/brushknight/proviant/internal/db"
 	"github.com/brushknight/proviant/internal/http"
 	"github.com/brushknight/proviant/internal/i18n"
@@ -10,16 +12,40 @@ import (
 	"github.com/brushknight/proviant/internal/pkg/product_category"
 	"github.com/brushknight/proviant/internal/pkg/service"
 	"github.com/brushknight/proviant/internal/pkg/stock"
+	"log"
+	"os"
 )
-
-var SqliteLocation = "pantry.db"
 
 func main() {
 
-	d, err := db.NewSQLite(SqliteLocation)
-
+	f, err := os.Open("/app/config.yml")
 	if err != nil {
 		panic(err)
+	}
+	defer f.Close()
+
+	cfg, err := config.NewConfig(f)
+	if err != nil {
+		panic(err)
+	}
+
+	log.Println(cfg)
+
+	var d db.DB
+
+	switch cfg.Db.Driver {
+	case config.DbDriverSqlite:
+		d, err = db.NewSQLite(cfg.Db.Dsn)
+		if err != nil {
+			panic(err)
+		}
+	case config.DbDriverMysql:
+		d, err = db.NewMySQL(cfg.Db.Dsn)
+		if err != nil {
+			panic(err)
+		}
+	default:
+		panic(fmt.Sprintf("unsupported db driver: %s", cfg.Db.Driver))
 	}
 
 	productRepo, err := product.Setup(d)
@@ -56,9 +82,13 @@ func main() {
 
 	l := i18n.NewFileLocalizer()
 
-	server := http.NewServer(productRepo, listRepo, categoryRepo, productCategoryRepo, stockRepo, relationService, l)
+	server := http.NewServer(productRepo, listRepo, categoryRepo, productCategoryRepo, stockRepo, relationService, l, *cfg)
 
-	err = server.Run("0.0.0.0:80")
+	hostPort := fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port)
+
+	log.Printf("starting server@%s\n", hostPort)
+
+	err = server.Run(hostPort)
 
 	if err != nil {
 		panic(err)

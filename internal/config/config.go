@@ -10,12 +10,28 @@ type DB struct {
 	Dsn    string `yaml:"dsn"`
 }
 
-type Config struct {
-	Db DB `yaml:"db"`
-	// db
-	// api or full
-	// image storage type & location
+type UserContent struct {
+	Mode     string `yaml:"mode"`
+	Location string `yaml:"location"`
 }
+
+type Server struct {
+	Port int    `yaml:"port"`
+	Host string `yaml:"host"`
+}
+
+type Config struct {
+	Db          DB          `yaml:"db"`
+	Mode        string      `yaml:"mode"`
+	Server      Server      `yaml:"server"`
+	UserContent UserContent `yaml:"user_content"`
+}
+
+const DbDriverSqlite = "sqlite"
+const DbDriverMysql = "mysql"
+
+const ModeWeb = "web"
+const ModeApi = "api"
 
 func NewConfig(r io.Reader) (*Config, error) {
 

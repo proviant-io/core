@@ -1,0 +1,7 @@
+db:
+  driver: sqlite
+  dsn: /app/db/proviant.sqlite
+mode: web
+server:
+  host: 0.0.0.0
+  port: 80

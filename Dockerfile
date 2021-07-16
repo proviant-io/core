@@ -24,7 +24,7 @@ FROM alpine:latest AS api
 LABEL maintainer="Grigorii Merkushev <brushknight@gmail.com>"
 WORKDIR /app
 RUN mkdir /app/db
-VOLUME /app/db
+VOLUME /app/config
 COPY --from=build /app/app .
 RUN chmod +x ./app
 EXPOSE 80
