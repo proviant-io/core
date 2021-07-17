@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+  proviant:
+    container_name: "proviant-compose"
+    image: brushknight/proviant:dev
+    volumes:
+    - ./config/web-mysql.yml:/app/default-config.yml
+    links:
+      - mariadb:db
+    depends_on:
+      - mariadb
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+    ports:
+      - 8082:80
+    dns:
+      - 8.8.8.8
+    restart: unless-stopped
+
+  mariadb:
+    container_name: "proviant-mariadb"
+    image: mariadb
+    restart: unless-stopped
+    volumes:
+      - mysql:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: "proviant"
+      MYSQL_ROOT_PASSWORD: "proviant"
+
+volumes:
+  mysql:
+    driver: local
+    driver_opts:
+      type: none
+      device: $PWD/db/mysql
+      o: bind

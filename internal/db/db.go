@@ -18,7 +18,7 @@ func (d *SQLite) Connection() *gorm.DB {
 	return d.c
 }
 
-func NewSQLite(sqliteLocation string) (*SQLite, error){
+func NewSQLite(sqliteLocation string) (DB, error){
 
 	d := &SQLite{}
 
@@ -40,11 +40,9 @@ func (d *MySQL) Connection() *gorm.DB {
 	return d.c
 }
 
-func NewMySQL() (*MySQL, error){
+func NewMySQL(dsn string) (DB, error){
 
 	d := &MySQL{}
-
-	dsn := "root:product@tcp(127.0.0.1:7777)/product?multiStatements=true&parseTime=true"
 
 	var err error
 

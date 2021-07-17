@@ -26,10 +26,22 @@ jobs:
           go-version: 1.16.5
       - run: make test/e2e
 
+  test-unit:
+    name: Run unit tests
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16.5
+      - run: make test/unit
+
   docker:
     name: Publish docker image
     runs-on: ubuntu-20.04
-    needs: [test-e2e]
+    needs: [test-e2e, test-unit]
 
     steps:
       - uses: actions/checkout@v2

@@ -1,0 +1,7 @@
+db:
+  driver: mysql
+  dsn: root:proviant@tcp(db:3306)/proviant?multiStatements=true&parseTime=true
+mode: api
+server:
+  host: 0.0.0.0
+  port: 80
