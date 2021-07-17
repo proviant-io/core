@@ -20,7 +20,7 @@ type Image struct {
 	mimeType string
 }
 
-func DecodeFromBase64(b64 string) (*Image, error) {
+func decodeFromBase64(b64 string) (*Image, error) {
 	var err error
 
 	commaIndex := strings.Index(b64, ",")
@@ -57,11 +57,27 @@ func DecodeFromBase64(b64 string) (*Image, error) {
 }
 
 type Saver interface {
-	Save(img image.Image) (string, error)
+	SaveBase64(base64 string) (string, error)
+}
+
+func NewLocalSaver(location string) Saver {
+	return &LocalSaver{
+		location: location,
+	}
 }
 
 type LocalSaver struct {
 	location string
+}
+
+func (ls *LocalSaver) SaveBase64(base64 string) (string, error) {
+	img, err := decodeFromBase64(base64)
+
+	if err != nil {
+		return "", fmt.Errorf("failed to parse image: %s", err.Error())
+	}
+
+	return ls.persist(*img)
 }
 
 func (ls *LocalSaver) generateFileName(mimeType string) string {
@@ -70,13 +86,20 @@ func (ls *LocalSaver) generateFileName(mimeType string) string {
 	return path.Join(ls.location, fmt.Sprintf("%s.%s", fileName, mimeType))
 }
 
-func (ls *LocalSaver) Save(img Image) (string, error) {
+func (ls *LocalSaver) persist(img Image) (string, error) {
+
+	if _, err := os.Stat(ls.location); os.IsNotExist(err) {
+		err := os.Mkdir(ls.location, 0644)
+		if err != nil {
+			return "", err
+		}
+	}
 
 	fileName := ls.generateFileName(img.mimeType)
 
 	f, err := os.Create(fileName)
 	if err != nil {
-		// Handle error
+		return "", err
 	}
 	defer f.Close()
 

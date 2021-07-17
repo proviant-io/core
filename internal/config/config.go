@@ -33,6 +33,9 @@ const DbDriverMysql = "mysql"
 const ModeWeb = "web"
 const ModeApi = "api"
 
+const UserContentModeLocal = "local"
+const UserContentModeS3 = "s3"
+
 func NewConfig(r io.Reader) (*Config, error) {
 
 	cfg := &Config{}

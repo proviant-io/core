@@ -1,14 +1,18 @@
 package service
 
 import (
+	"github.com/brushknight/proviant/internal/config"
 	"github.com/brushknight/proviant/internal/errors"
 	"github.com/brushknight/proviant/internal/i18n"
 	"github.com/brushknight/proviant/internal/pkg/category"
+	"github.com/brushknight/proviant/internal/pkg/image"
 	"github.com/brushknight/proviant/internal/pkg/list"
 	"github.com/brushknight/proviant/internal/pkg/product"
 	"github.com/brushknight/proviant/internal/pkg/product_category"
 	"github.com/brushknight/proviant/internal/pkg/stock"
 	"github.com/brushknight/proviant/internal/utils"
+	"path"
+	"strings"
 )
 
 type RelationService struct {
@@ -17,6 +21,8 @@ type RelationService struct {
 	categoryRepository        *category.Repository
 	stockRepository           *stock.Repository
 	productCategoryRepository *product_category.Repository
+	imageSaver                image.Saver
+	config                    config.Config
 }
 
 func (s *RelationService) GetProduct(id int) (product.DTO, *errors.CustomError) {
@@ -68,7 +74,6 @@ func (s *RelationService) GetAllProducts(query *product.Query) []product.DTO {
 		dtos = append(dtos, product.ModelToDTO(model))
 	}
 
-	// TODO apply category filtering here
 	filteredDTOs := []product.DTO{}
 
 	for idx := range dtos {
@@ -112,6 +117,18 @@ func (s *RelationService) CreateProduct(dto product.CreateDTO) (product.DTO, *er
 				return product.DTO{}, err
 			}
 		}
+	}
+
+	if dto.ImageBase64 != "" {
+		imgPath, pureErr := s.imageSaver.SaveBase64(dto.ImageBase64)
+		if pureErr != nil {
+			return product.DTO{}, errors.NewInternalServer(i18n.NewMessage(pureErr.Error()))
+		}
+
+		// convert imgPath into server accessable one
+		imgPath = strings.Replace(imgPath, s.config.UserContent.Location, "", 1)
+		imgPath = path.Join("/content", imgPath)
+		dto.Image = imgPath
 	}
 
 	p := s.productRepository.Create(dto)
@@ -187,7 +204,7 @@ func (s *RelationService) ConsumeStock(dto stock.ConsumeDTO) *errors.CustomError
 
 	if dto.Quantity >= p.Stock {
 		p.Stock = 0
-	}else{
+	} else {
 		p.Stock -= dto.Quantity
 	}
 
@@ -264,12 +281,17 @@ func NewRelationService(productRepository *product.Repository,
 	listRepository *list.Repository,
 	categoryRepository *category.Repository,
 	stockRepository *stock.Repository,
-	productCategoryRepository *product_category.Repository) *RelationService {
+	productCategoryRepository *product_category.Repository,
+	imageSaver image.Saver,
+	config config.Config,
+) *RelationService {
 	return &RelationService{
 		productRepository:         productRepository,
 		listRepository:            listRepository,
 		categoryRepository:        categoryRepository,
 		stockRepository:           stockRepository,
 		productCategoryRepository: productCategoryRepository,
+		imageSaver:                imageSaver,
+		config:                    config,
 	}
 }

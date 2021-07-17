@@ -17,7 +17,7 @@ type Product struct {
 	Image       string `json:"image"`
 	Barcode     string `json:"barcode"`
 	ListId      int    `json:"list_id"`
-	Stock       uint    `json:"stock",gorm:"type:UINT(10)"`
+	Stock       uint   `json:"stock",gorm:"type:UINT(10)"`
 }
 
 type CreateDTO struct {
@@ -28,6 +28,7 @@ type CreateDTO struct {
 	Barcode     string `json:"barcode"`
 	CategoryIds []int  `json:"category_ids"`
 	ListId      int    `json:"list_id"`
+	ImageBase64 string `json:"image_base64"`
 }
 
 type DTO struct {
@@ -41,7 +42,7 @@ type DTO struct {
 	Categories  interface{} `json:"categories"`
 	ListId      int         `json:"list_id"`
 	List        interface{} `json:"list"`
-	Stock       uint         `json:"stock"`
+	Stock       uint        `json:"stock"`
 }
 
 type Repository struct {
