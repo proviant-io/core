@@ -12,13 +12,26 @@ import (
 	"github.com/brushknight/proviant/internal/pkg/product_category"
 	"github.com/brushknight/proviant/internal/pkg/service"
 	"github.com/brushknight/proviant/internal/pkg/stock"
+	"github.com/spf13/viper"
 	"log"
 	"os"
 )
 
 func main() {
 
-	f, err := os.Open("/app/config.yml")
+	err := viper.BindEnv("config")
+
+	if err != nil {
+		panic(err)
+	}
+
+	configPath := viper.GetString("config")
+
+	if configPath == "" {
+		configPath = "/app/default-config.yml"
+	}
+
+	f, err := os.Open(configPath)
 	if err != nil {
 		panic(err)
 	}

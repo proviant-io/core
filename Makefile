@@ -6,13 +6,44 @@ ifndef UI_VERSION
 UI_VERSION := 0.0.18
 endif
 
-.PHONY: docker/compile
-docker/compile:
+# Compile
+.PHONY: compile
+compile:
 	CGO_ENABLED=1 go build -o app ./cmd
 
+# Testing
+.PHONY: test/2e2/docker-build
+test/2e2/docker-build:
+	docker build --target app \
+		--build-arg CONFIG_VERSION_ARG="./config/api-sqlite.yml" \
+		--build-arg UI_VERSION_ARG=$(UI_VERSION) \
+		-t brushknight/proviant:e2e \
+		-f Dockerfile .
+
+.PHONY: test/e2e
+test/e2e: test/2e2/docker-build
+	docker rm -f proviant-e2e
+	go test -v ./test/e2e/
+
+.PHONY: test/unit
+test/unit:
+	go test -v ./internal/...
+
+# Download assets
+.PHONY: download/ui
+download/ui:
+	curl -L https://github.com/brushknight/proviant-ui/releases/download/$(UI_VERSION)/ui-release-$(UI_VERSION).tar.gz -o /tmp/ui-release.tar.gz
+	tar -xvf /tmp/ui-release.tar.gz -C ./public/
+
+# Docker
 .PHONY: docker/build
 docker/build:
-	docker build --target web --build-arg UI_VERSION_ARG=$(UI_VERSION) -t brushknight/proviant:$(TAG) -t brushknight/proviant:latest -f Dockerfile .
+	docker build --target app \
+		--build-arg CONFIG_VERSION_ARG="./config/web-sqlite.yml" \
+		--build-arg UI_VERSION_ARG=$(UI_VERSION) \
+		-t brushknight/proviant:$(TAG) \
+		-t brushknight/proviant:latest \
+		-f Dockerfile .
 
 .PHOMY: docker/publish
 docker/publish:
@@ -23,13 +54,12 @@ docker/publish:
 docker/run: docker/build
 	mkdir -p $(PWD)/db
 	docker rm -f proviant
-	docker run --rm -t --name "proviant" -v $(PWD)/db:/app/db/ -v $(PWD)/config/simple.yml:/app/config.yml -p8080:80 brushknight/proviant:$(TAG)
-
-.PHONY: docker/run-empty
-docker/run-empty: docker/build
-	mkdir -p $(PWD)/db
-	docker rm -f proviant
-	docker run --rm -t --name "proviant" -v $(PWD)/config/simple.yml:/app/config.yml -p8080:80 brushknight/proviant:$(TAG)
+	docker run --rm -t \
+		--name "proviant" \
+		-v $(PWD)/db:/app/db/ \
+		-v $(PWD)/config/web-sqlite.yml:/app/default-config.yml \
+		-p8080:80 \
+		brushknight/proviant:$(TAG)
 
 .PHONY: docker/pull-latest
 docker/pull-latest:
@@ -40,25 +70,11 @@ docker/run-latest: docker/pull-latest
 	mkdir -p $(PWD)/db
 	docker run --rm -t --name "proviant" -v $(PWD)/config/simple.yml:/app/config.yml -v $(PWD)/db:/app/db/ -p8080:80 brushknight/proviant:latest
 
+# docker compose
 .PHONY: docker/compose
 docker/compose: docker/build
 	mkdir -p $(PWD)/db/mysql
 	docker-compose up -d --force-recreate
 
 
-.PHONY: test/2e2/docker-build
-test/2e2/docker-build:
-	docker build --target api -t brushknight/proviant:e2e -f Dockerfile .
 
-.PHONY: test/e2e
-test/e2e: test/2e2/docker-build
-	go test -v ./test/e2e/
-
-.PHONY: test/unit
-test/unit:
-	go test -v ./internal/...
-
-.PHONY: download/ui
-download/ui:
-	curl -L https://github.com/brushknight/proviant-ui/releases/download/$(UI_VERSION)/ui-release-$(UI_VERSION).tar.gz -o /tmp/ui-release.tar.gz
-	tar -xvf /tmp/ui-release.tar.gz -C ./public/

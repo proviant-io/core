@@ -5,7 +5,7 @@ services:
     container_name: "proviant-compose"
     image: brushknight/proviant:dev
     volumes:
-    - ./config/mysql.yml:/app/config.yml
+    - ./config/web-mysql.yml:/app/config.yml
     links:
       - mariadb:db
     depends_on:
