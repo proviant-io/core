@@ -5,7 +5,7 @@ services:
     container_name: "proviant-compose"
     image: brushknight/proviant:dev
     volumes:
-    - ./config/web-mysql.yml:/app/config.yml
+    - ./config/web-mysql.yml:/app/default-config.yml
     links:
       - mariadb:db
     depends_on:
@@ -15,7 +15,7 @@ services:
       options:
         max-size: 10m
     ports:
-      - 8081:80
+      - 8082:80
     dns:
       - 8.8.8.8
     restart: unless-stopped
