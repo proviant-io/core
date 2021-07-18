@@ -165,7 +165,7 @@ func (s *Server) updateProduct(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	dto := product.DTO{}
+	dto := product.UpdateDTO{}
 
 	err = s.parseJSON(r, &dto)
 

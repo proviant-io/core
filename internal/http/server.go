@@ -126,9 +126,15 @@ func NewServer(productRepo *product.Repository,
 	if cfg.Mode == config.ModeWeb {
 		router.PathPrefix("/static").Handler(http.FileServer(http.Dir("./public/")))
 
+		if cfg.UserContent.Mode == config.UserContentModeLocal {
+			router.PathPrefix("/content/").Handler(http.StripPrefix("/content/", http.FileServer(http.Dir(cfg.UserContent.Location))))
+		}
+
+
 		spa := spaHandler{staticPath: "public", indexPath: "index.html"}
 		router.PathPrefix("/").Handler(spa)
 	}
+
 
 	server.router = router
 

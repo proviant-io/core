@@ -7,6 +7,7 @@ import (
 	"github.com/brushknight/proviant/internal/http"
 	"github.com/brushknight/proviant/internal/i18n"
 	"github.com/brushknight/proviant/internal/pkg/category"
+	"github.com/brushknight/proviant/internal/pkg/image"
 	"github.com/brushknight/proviant/internal/pkg/list"
 	"github.com/brushknight/proviant/internal/pkg/product"
 	"github.com/brushknight/proviant/internal/pkg/product_category"
@@ -61,6 +62,14 @@ func main() {
 		panic(fmt.Sprintf("unsupported db driver: %s", cfg.Db.Driver))
 	}
 
+	var imageSaver image.Saver
+	switch cfg.UserContent.Mode {
+	case config.UserContentModeLocal:
+		imageSaver = image.NewLocalSaver(cfg.UserContent.Location)
+	default:
+		panic(fmt.Sprintf("unsupported user content saver: %s", cfg.UserContent.Mode))
+	}
+
 	productRepo, err := product.Setup(d)
 
 	if err != nil {
@@ -91,7 +100,7 @@ func main() {
 		panic(err)
 	}
 
-	relationService := service.NewRelationService(productRepo, listRepo, categoryRepo, stockRepo, productCategoryRepo)
+	relationService := service.NewRelationService(productRepo, listRepo, categoryRepo, stockRepo, productCategoryRepo, imageSaver, *cfg)
 
 	l := i18n.NewFileLocalizer()
 

@@ -29,26 +29,16 @@ This is an example of how to list things you need to use the software and how to
 ### Dev installation
 
 1. Clone the repo
-2. Run app
+2. Copy envfile.template into envfile and update variable for volumes (or remove variable from file)
+3. Run app
    ```sh
    make docker/run
    ```
-3. Open browser http://0.0.0.0:8080/
+4. Open browser http://0.0.0.0:8080/
 
 ### Run latest docker image in attached mode
 ```shell
 make docker/run-latest
 ```
 
-### Installation
-
-Preferable installation is via official docker container
-
-```shell
-docker run -d -p8080:80 --name="proviant" brushknight/proviant:latest
-```
-
-You can expose db file if you want to persist it via
-```shell
--v /home/user/provian/db:/app/db
-```
+### [Docker Compose example](./docker-compose.yml)

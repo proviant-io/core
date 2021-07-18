@@ -29,3 +29,7 @@ func NewErrNotFound(message i18n.Message) *CustomError {
 func NewErrBadRequest(message i18n.Message) *CustomError {
 	return &CustomError{message: message, code: 400}
 }
+
+func NewInternalServer(message i18n.Message) *CustomError {
+	return &CustomError{message: message, code: 500}
+}

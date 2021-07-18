@@ -1,14 +1,18 @@
 package service
 
 import (
+	"github.com/brushknight/proviant/internal/config"
 	"github.com/brushknight/proviant/internal/errors"
 	"github.com/brushknight/proviant/internal/i18n"
 	"github.com/brushknight/proviant/internal/pkg/category"
+	"github.com/brushknight/proviant/internal/pkg/image"
 	"github.com/brushknight/proviant/internal/pkg/list"
 	"github.com/brushknight/proviant/internal/pkg/product"
 	"github.com/brushknight/proviant/internal/pkg/product_category"
 	"github.com/brushknight/proviant/internal/pkg/stock"
 	"github.com/brushknight/proviant/internal/utils"
+	"path"
+	"strings"
 )
 
 type RelationService struct {
@@ -17,6 +21,8 @@ type RelationService struct {
 	categoryRepository        *category.Repository
 	stockRepository           *stock.Repository
 	productCategoryRepository *product_category.Repository
+	imageSaver                image.Saver
+	config                    config.Config
 }
 
 func (s *RelationService) GetProduct(id int) (product.DTO, *errors.CustomError) {
@@ -68,7 +74,6 @@ func (s *RelationService) GetAllProducts(query *product.Query) []product.DTO {
 		dtos = append(dtos, product.ModelToDTO(model))
 	}
 
-	// TODO apply category filtering here
 	filteredDTOs := []product.DTO{}
 
 	for idx := range dtos {
@@ -114,6 +119,18 @@ func (s *RelationService) CreateProduct(dto product.CreateDTO) (product.DTO, *er
 		}
 	}
 
+	if dto.ImageBase64 != "" {
+		imgPath, pureErr := s.imageSaver.SaveBase64(dto.ImageBase64)
+		if pureErr != nil {
+			return product.DTO{}, errors.NewInternalServer(i18n.NewMessage(pureErr.Error()))
+		}
+
+		// convert imgPath into server accessable one
+		imgPath = strings.Replace(imgPath, s.config.UserContent.Location, "", 1)
+		imgPath = path.Join("/content", imgPath)
+		dto.Image = imgPath
+	}
+
 	p := s.productRepository.Create(dto)
 
 	if len(dto.CategoryIds) != 0 {
@@ -123,7 +140,7 @@ func (s *RelationService) CreateProduct(dto product.CreateDTO) (product.DTO, *er
 	return s.GetProduct(p.Id)
 }
 
-func (s *RelationService) UpdateProduct(dto product.DTO) (product.DTO, *errors.CustomError) {
+func (s *RelationService) UpdateProduct(dto product.UpdateDTO) (product.DTO, *errors.CustomError) {
 
 	_, err := s.listRepository.Get(dto.ListId)
 
@@ -141,14 +158,27 @@ func (s *RelationService) UpdateProduct(dto product.DTO) (product.DTO, *errors.C
 		}
 	}
 
-	p, err := s.productRepository.Update(dto)
+	// todo - remove old images
+
+	if dto.ImageBase64 != "" {
+		imgPath, pureErr := s.imageSaver.SaveBase64(dto.ImageBase64)
+		if pureErr != nil {
+			return product.DTO{}, errors.NewInternalServer(i18n.NewMessage(pureErr.Error()))
+		}
+
+		// convert imgPath into server accessable
+		imgPath = strings.Replace(imgPath, s.config.UserContent.Location, "", 1)
+		imgPath = path.Join("/content", imgPath)
+		dto.Image = imgPath
+	}
+
+	p, err := s.productRepository.UpdateFromDTO(dto)
 
 	if err != nil {
 		return product.DTO{}, err
 	}
 
 	// NOTE: here could be performance bottle neck
-
 	s.productCategoryRepository.DeleteByProductId(p.Id)
 
 	if len(dto.CategoryIds) != 0 {
@@ -170,7 +200,7 @@ func (s *RelationService) AddStock(dto stock.DTO) (stock.Stock, *errors.CustomEr
 
 	p.Stock += dto.Quantity
 
-	_, err = s.productRepository.Update(product.ModelToDTO(p))
+	_, err = s.productRepository.Save(p)
 
 	return model, err
 }
@@ -187,11 +217,11 @@ func (s *RelationService) ConsumeStock(dto stock.ConsumeDTO) *errors.CustomError
 
 	if dto.Quantity >= p.Stock {
 		p.Stock = 0
-	}else{
+	} else {
 		p.Stock -= dto.Quantity
 	}
 
-	_, err = s.productRepository.Update(product.ModelToDTO(p))
+	_, err = s.productRepository.Save(p)
 
 	return nil
 }
@@ -222,7 +252,7 @@ func (s *RelationService) DeleteStock(id int) *errors.CustomError {
 		p.Stock = 0
 	}
 
-	_, err = s.productRepository.Update(product.ModelToDTO(p))
+	_, err = s.productRepository.Save(p)
 
 	return err
 }
@@ -264,12 +294,17 @@ func NewRelationService(productRepository *product.Repository,
 	listRepository *list.Repository,
 	categoryRepository *category.Repository,
 	stockRepository *stock.Repository,
-	productCategoryRepository *product_category.Repository) *RelationService {
+	productCategoryRepository *product_category.Repository,
+	imageSaver image.Saver,
+	config config.Config,
+) *RelationService {
 	return &RelationService{
 		productRepository:         productRepository,
 		listRepository:            listRepository,
 		categoryRepository:        categoryRepository,
 		stockRepository:           stockRepository,
 		productCategoryRepository: productCategoryRepository,
+		imageSaver:                imageSaver,
+		config:                    config,
 	}
 }
