@@ -16,7 +16,7 @@ func TestDecodeFromBase64(t *testing.T) {
 	base64, err := ioutil.ReadFile("./test-assets/base64.txt")
 	assert.NoError(t, err)
 
-	actual, err := DecodeFromBase64(string(base64))
+	actual, err := decodeFromBase64(string(base64))
 	assert.NoError(t, err)
 
 	file, err := ioutil.TempFile("/tmp", "test-image.*.png")
@@ -34,4 +34,13 @@ func TestDecodeFromBase64(t *testing.T) {
 
 	assert.Greater(t, fileInfo.Size(), int64(0))
 	assert.Less(t, fileInfo.Size(), expected.Size())
+}
+
+func TestIsBase64ImageValidSize(t *testing.T){
+
+	base64, err := ioutil.ReadFile("./test-assets/base64.txt")
+	assert.NoError(t, err)
+
+	assert.NoError(t, isBase64ImageValidSize(string(base64)))
+
 }

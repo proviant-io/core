@@ -6,6 +6,7 @@ services:
     image: brushknight/proviant:dev
     volumes:
     - ./config/web-mysql.yml:/app/default-config.yml
+    - user_content:/app/user_content
     links:
       - mariadb:db
     depends_on:
@@ -15,7 +16,7 @@ services:
       options:
         max-size: 10m
     ports:
-      - 8082:80
+      - 8080:80
     dns:
       - 8.8.8.8
     restart: unless-stopped
@@ -35,5 +36,12 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: $PWD/db/mysql
+      device: $PWD/runtime/mysql
+      o: bind
+
+  user_content:
+    driver: local
+    driver_opts:
+      type: none
+      device: $PWD/runtime/user_content
       o: bind

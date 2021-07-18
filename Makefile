@@ -3,7 +3,7 @@ TAG := dev
 endif
 
 ifndef UI_VERSION
-UI_VERSION := 0.0.18
+UI_VERSION := 0.0.19
 endif
 
 # Compile
@@ -51,12 +51,12 @@ docker/publish:
 	docker push brushknight/proviant:latest
 
 .PHONY: docker/run
-docker/run: docker/build
-	mkdir -p $(PWD)/db
+docker/run: docker/build docker/prepare-folders
 	docker rm -f proviant
 	docker run --rm -t \
 		--name "proviant" \
-		-v $(PWD)/db:/app/db/ \
+		-v $(PWD)/runtime/sqlite:/app/db/ \
+		-v $(PWD)/runtime/user_content:/app/user_content/ \
 		-v $(PWD)/config/web-sqlite.yml:/app/default-config.yml \
 		-p8080:80 \
 		brushknight/proviant:$(TAG)
@@ -66,15 +66,23 @@ docker/pull-latest:
 	docker pull brushknight/proviant:latest
 
 .PHONY: docker/run-latest
-docker/run-latest: docker/pull-latest
+docker/run-latest: docker/pull-latest docker/prepare-folders
 	mkdir -p $(PWD)/db
-	docker run --rm -t --name "proviant" -v $(PWD)/config/simple.yml:/app/config.yml -v $(PWD)/db:/app/db/ -p8080:80 brushknight/proviant:latest
+	docker run --rm -t \
+		--name "proviant" \
+		-v $(PWD)/runtime/sqlite:/app/db/ \
+		-v $(PWD)/runtime/user_content:/app/user_content/ \
+		-v $(PWD)/config/simple.yml:/app/config.yml \
+		-p8080:80 \
+		brushknight/proviant:latest
 
 # docker compose
 .PHONY: docker/compose
-docker/compose: docker/build
-	mkdir -p $(PWD)/db/mysql
+docker/compose: docker/build docker/prepare-folders
 	docker-compose up -d --force-recreate
 
-
+.PHONY: docker/prepare-folders
+docker/prepare-folders:
+	mkdir -p $(PWD)/runtime/mysql
+	mkdir -p $(PWD)/runtime/user_content
 
