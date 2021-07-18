@@ -16,6 +16,8 @@ RUN go mod download
 # compile and download UI
 FROM environment AS build
 LABEL maintainer="Grigorii Merkushev <brushknight@gmail.com>"
+# required for back compatibility with parent make
+COPY envfile.template ./envfile
 # compile
 COPY cmd ./cmd
 COPY internal ./internal

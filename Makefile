@@ -1,9 +1,17 @@
+#!make
+include envfile
+export $(shell sed 's/=.*//' envfile)
+
 ifndef TAG
 TAG := dev
 endif
 
 ifndef UI_VERSION
 UI_VERSION := 0.0.19
+endif
+
+ifndef VOLUMES_PREFIX
+VOLUMES_PREFIX=$(PWD)
 endif
 
 # Compile
@@ -55,9 +63,9 @@ docker/run: docker/build docker/prepare-folders
 	docker rm -f proviant
 	docker run --rm -t \
 		--name "proviant" \
-		-v $(PWD)/runtime/sqlite:/app/db/ \
-		-v $(PWD)/runtime/user_content:/app/user_content/ \
-		-v $(PWD)/config/web-sqlite.yml:/app/default-config.yml \
+		-v $(VOLUMES_PREFIX)/runtime/sqlite:/app/db/ \
+		-v $(VOLUMES_PREFIX)/runtime/user_content:/app/user_content/ \
+		-v $(VOLUMES_PREFIX)/config/web-sqlite.yml:/app/default-config.yml \
 		-p8080:80 \
 		brushknight/proviant:$(TAG)
 
@@ -67,12 +75,11 @@ docker/pull-latest:
 
 .PHONY: docker/run-latest
 docker/run-latest: docker/pull-latest docker/prepare-folders
-	mkdir -p $(PWD)/db
 	docker run --rm -t \
 		--name "proviant" \
-		-v $(PWD)/runtime/sqlite:/app/db/ \
-		-v $(PWD)/runtime/user_content:/app/user_content/ \
-		-v $(PWD)/config/simple.yml:/app/config.yml \
+		-v $(VOLUMES_PREFIX)/runtime/sqlite:/app/db/ \
+		-v $(VOLUMES_PREFIX)/runtime/user_content:/app/user_content/ \
+		-v $(VOLUMES_PREFIX)/config/simple.yml:/app/config.yml \
 		-p8080:80 \
 		brushknight/proviant:latest
 
@@ -83,6 +90,6 @@ docker/compose: docker/build docker/prepare-folders
 
 .PHONY: docker/prepare-folders
 docker/prepare-folders:
-	mkdir -p $(PWD)/runtime/mysql
-	mkdir -p $(PWD)/runtime/user_content
+	mkdir -p $(VOLUMES_PREFIX)/runtime/mysql
+	mkdir -p $(VOLUMES_PREFIX)/runtime/user_content
 

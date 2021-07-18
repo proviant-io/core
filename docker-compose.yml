@@ -36,12 +36,12 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: $PWD/runtime/mysql
+      device: $VOLUMES_PREFIX/runtime/mysql
       o: bind
 
   user_content:
     driver: local
     driver_opts:
       type: none
-      device: $PWD/runtime/user_content
+      device: $VOLUMES_PREFIX/runtime/user_content
       o: bind

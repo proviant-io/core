@@ -140,7 +140,7 @@ func (s *RelationService) CreateProduct(dto product.CreateDTO) (product.DTO, *er
 	return s.GetProduct(p.Id)
 }
 
-func (s *RelationService) UpdateProduct(dto product.DTO) (product.DTO, *errors.CustomError) {
+func (s *RelationService) UpdateProduct(dto product.UpdateDTO) (product.DTO, *errors.CustomError) {
 
 	_, err := s.listRepository.Get(dto.ListId)
 
@@ -172,7 +172,7 @@ func (s *RelationService) UpdateProduct(dto product.DTO) (product.DTO, *errors.C
 		dto.Image = imgPath
 	}
 
-	p, err := s.productRepository.Update(dto)
+	p, err := s.productRepository.UpdateFromDTO(dto)
 
 	if err != nil {
 		return product.DTO{}, err
@@ -200,7 +200,7 @@ func (s *RelationService) AddStock(dto stock.DTO) (stock.Stock, *errors.CustomEr
 
 	p.Stock += dto.Quantity
 
-	_, err = s.productRepository.Update(product.ModelToDTO(p))
+	_, err = s.productRepository.Save(p)
 
 	return model, err
 }
@@ -221,7 +221,7 @@ func (s *RelationService) ConsumeStock(dto stock.ConsumeDTO) *errors.CustomError
 		p.Stock -= dto.Quantity
 	}
 
-	_, err = s.productRepository.Update(product.ModelToDTO(p))
+	_, err = s.productRepository.Save(p)
 
 	return nil
 }
@@ -252,7 +252,7 @@ func (s *RelationService) DeleteStock(id int) *errors.CustomError {
 		p.Stock = 0
 	}
 
-	_, err = s.productRepository.Update(product.ModelToDTO(p))
+	_, err = s.productRepository.Save(p)
 
 	return err
 }

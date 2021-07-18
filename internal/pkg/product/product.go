@@ -29,6 +29,20 @@ type CreateDTO struct {
 	Barcode     string `json:"barcode"`
 	CategoryIds []int  `json:"category_ids"`
 	ListId      int    `json:"list_id"`
+	Stock       uint   `json:"stock"`
+}
+
+type UpdateDTO struct {
+	Id          int    `json:"id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Link        string `json:"link"`
+	Image       string `json:"image"`
+	ImageBase64 string `json:"image_base64"`
+	Barcode     string `json:"barcode"`
+	CategoryIds []int  `json:"category_ids"`
+	ListId      int    `json:"list_id"`
+	Stock       uint   `json:"stock"`
 }
 
 type DTO struct {
@@ -37,7 +51,6 @@ type DTO struct {
 	Description string      `json:"description"`
 	Link        string      `json:"link"`
 	Image       string      `json:"image"`
-	ImageBase64 string      `json:"image_base64"`
 	Barcode     string      `json:"barcode"`
 	CategoryIds []int       `json:"category_ids"`
 	Categories  interface{} `json:"categories"`
@@ -108,13 +121,25 @@ func (r *Repository) Create(dto CreateDTO) Product {
 		Image:       dto.Image,
 		Barcode:     dto.Barcode,
 		ListId:      dto.ListId,
+		Stock:       0,
 	}
 
 	r.db.Connection().Create(p)
 	return *p
 }
 
-func (r *Repository) Update(dto DTO) (Product, *errors.CustomError) {
+func (r *Repository) Save(model Product) (Product, *errors.CustomError) {
+
+	r.db.Connection().Model(&Product{Id: model.Id}).Updates(model)
+
+	if model.Stock == 0 {
+		r.db.Connection().Model(&Product{Id: model.Id}).Select("Stock").Updates(Product{Stock: 0})
+	}
+
+	return model, nil
+}
+
+func (r *Repository) UpdateFromDTO(dto UpdateDTO) (Product, *errors.CustomError) {
 
 	model, err := r.Get(dto.Id)
 
