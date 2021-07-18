@@ -25,10 +25,10 @@ type CreateDTO struct {
 	Description string `json:"description"`
 	Link        string `json:"link"`
 	Image       string `json:"image"`
+	ImageBase64 string `json:"image_base64"`
 	Barcode     string `json:"barcode"`
 	CategoryIds []int  `json:"category_ids"`
 	ListId      int    `json:"list_id"`
-	ImageBase64 string `json:"image_base64"`
 }
 
 type DTO struct {
@@ -37,6 +37,7 @@ type DTO struct {
 	Description string      `json:"description"`
 	Link        string      `json:"link"`
 	Image       string      `json:"image"`
+	ImageBase64 string      `json:"image_base64"`
 	Barcode     string      `json:"barcode"`
 	CategoryIds []int       `json:"category_ids"`
 	Categories  interface{} `json:"categories"`

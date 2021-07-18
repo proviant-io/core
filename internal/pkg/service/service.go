@@ -158,6 +158,20 @@ func (s *RelationService) UpdateProduct(dto product.DTO) (product.DTO, *errors.C
 		}
 	}
 
+	// todo - remove old images
+
+	if dto.ImageBase64 != "" {
+		imgPath, pureErr := s.imageSaver.SaveBase64(dto.ImageBase64)
+		if pureErr != nil {
+			return product.DTO{}, errors.NewInternalServer(i18n.NewMessage(pureErr.Error()))
+		}
+
+		// convert imgPath into server accessable
+		imgPath = strings.Replace(imgPath, s.config.UserContent.Location, "", 1)
+		imgPath = path.Join("/content", imgPath)
+		dto.Image = imgPath
+	}
+
 	p, err := s.productRepository.Update(dto)
 
 	if err != nil {
@@ -165,7 +179,6 @@ func (s *RelationService) UpdateProduct(dto product.DTO) (product.DTO, *errors.C
 	}
 
 	// NOTE: here could be performance bottle neck
-
 	s.productCategoryRepository.DeleteByProductId(p.Id)
 
 	if len(dto.CategoryIds) != 0 {
