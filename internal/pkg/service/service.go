@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"github.com/brushknight/proviant/internal/config"
 	"github.com/brushknight/proviant/internal/errors"
 	"github.com/brushknight/proviant/internal/i18n"
@@ -158,6 +159,12 @@ func (s *RelationService) UpdateProduct(dto product.UpdateDTO) (product.DTO, *er
 		}
 	}
 
+	oldModel, err := s.productRepository.Get(dto.Id)
+
+	if err != nil {
+		return product.DTO{}, err
+	}
+
 	// todo - remove old images
 
 	if dto.ImageBase64 != "" {
@@ -170,6 +177,13 @@ func (s *RelationService) UpdateProduct(dto product.UpdateDTO) (product.DTO, *er
 		imgPath = strings.Replace(imgPath, s.config.UserContent.Location, "", 1)
 		imgPath = path.Join("/content", imgPath)
 		dto.Image = imgPath
+
+		fileToRemove := strings.Replace(oldModel.Image, "/content", "", 1)
+
+		pureErr = s.imageSaver.DeleteFile(fileToRemove)
+		if pureErr != nil {
+			fmt.Printf("cannot delete product image file: %s, %v", fileToRemove, pureErr)
+		}
 	}
 
 	p, err := s.productRepository.UpdateFromDTO(dto)
@@ -259,11 +273,24 @@ func (s *RelationService) DeleteStock(id int) *errors.CustomError {
 
 func (s *RelationService) DeleteProduct(id int) *errors.CustomError {
 
+	oldModel, err := s.productRepository.Get(id)
+
+	if err != nil {
+		return err
+	}
+
+	fileToRemove := strings.Replace(oldModel.Image, "/content", "", 1)
+
+	pureErr := s.imageSaver.DeleteFile(fileToRemove)
+	if pureErr != nil {
+		fmt.Printf("cannot delete product image file: %s, %v", fileToRemove, pureErr)
+	}
+
 	s.stockRepository.DeleteByProductId(id)
 
 	s.productCategoryRepository.DeleteByProductId(id)
 
-	err := s.productRepository.Delete(id)
+	err = s.productRepository.Delete(id)
 
 	return err
 }

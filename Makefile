@@ -7,7 +7,7 @@ TAG := dev
 endif
 
 ifndef UI_VERSION
-UI_VERSION := 0.0.20
+UI_VERSION := 0.0.21
 endif
 
 ifndef VOLUMES_PREFIX
@@ -65,7 +65,7 @@ docker/run: docker/build docker/prepare-folders
 		--name "proviant" \
 		-v $(VOLUMES_PREFIX)/runtime/sqlite:/app/db/ \
 		-v $(VOLUMES_PREFIX)/runtime/user_content:/app/user_content/ \
-		-v $(VOLUMES_PREFIX)/config/web-sqlite.yml:/app/default-config.yml \
+		-v $(PWD)/config/web-sqlite.yml:/app/default-config.yml \
 		-p8080:80 \
 		brushknight/proviant:$(TAG)
 
@@ -79,7 +79,7 @@ docker/run-latest: docker/pull-latest docker/prepare-folders
 		--name "proviant" \
 		-v $(VOLUMES_PREFIX)/runtime/sqlite:/app/db/ \
 		-v $(VOLUMES_PREFIX)/runtime/user_content:/app/user_content/ \
-		-v $(VOLUMES_PREFIX)/config/simple.yml:/app/config.yml \
+		-v $(PWD)/config/web-sqlite.yml:/app/default-config.yml \
 		-p8080:80 \
 		brushknight/proviant:latest
 

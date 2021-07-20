@@ -22,6 +22,7 @@ type Image struct {
 
 type Saver interface {
 	SaveBase64(base64 string) (string, error)
+	DeleteFile(fileName string) error
 }
 
 func NewLocalSaver(location string) Saver {
@@ -49,6 +50,12 @@ func (ls *LocalSaver) SaveBase64(base64 string) (string, error) {
 	}
 
 	return ls.persist(*img)
+}
+
+func (ls *LocalSaver) DeleteFile(fileName string) error{
+	fullPath := path.Join(ls.location, fileName)
+
+	return os.Remove(fullPath)
 }
 
 func (ls *LocalSaver) generateFileName(mimeType string) string {
@@ -80,7 +87,7 @@ func (ls *LocalSaver) persist(img Image) (string, error) {
 		if err != nil {
 			return "", err
 		}
-	case "jpg":
+	case "jpeg":
 		err = jpeg.Encode(f, img.img, &jpeg.Options{
 			Quality: 100,
 		})
@@ -88,7 +95,7 @@ func (ls *LocalSaver) persist(img Image) (string, error) {
 			return "", err
 		}
 	default:
-		return "", fmt.Errorf("unsuported file type")
+		return "", fmt.Errorf("unsuported file type %s", img.mimeType)
 	}
 
 	return fileName, nil
@@ -124,6 +131,8 @@ func decodeFromBase64(b64 string) (*Image, error) {
 			return nil, err
 		}
 	}
+
+
 	return &Image{
 		img:      img,
 		mimeType: mimeType,
