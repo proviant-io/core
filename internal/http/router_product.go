@@ -133,6 +133,7 @@ func (s *Server) createProduct(w http.ResponseWriter, r *http.Request){
 	}
 
 	dto.Title = utils.ClearString(dto.Title)
+	dto.Image = ""
 
 	productDto, customErr := s.relationService.CreateProduct(dto)
 

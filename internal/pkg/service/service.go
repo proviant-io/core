@@ -165,7 +165,10 @@ func (s *RelationService) UpdateProduct(dto product.UpdateDTO) (product.DTO, *er
 		return product.DTO{}, err
 	}
 
-	// todo - remove old images
+	// sanitize from custom urls
+	if oldModel.Image != dto.Image {
+		dto.Image = ""
+	}
 
 	if dto.ImageBase64 != "" {
 		imgPath, pureErr := s.imageSaver.SaveBase64(dto.ImageBase64)
