@@ -40,7 +40,7 @@ test/unit:
 # Download assets
 .PHONY: download/ui
 download/ui:
-	curl -L https://github.com/brushknight/proviant-ui/releases/download/$(UI_VERSION)/ui-release-$(UI_VERSION).tar.gz -o /tmp/ui-release.tar.gz
+	curl -L https://github.com/proviant-io/ui/releases/download/$(UI_VERSION)/ui-release-$(UI_VERSION).tar.gz -o /tmp/ui-release.tar.gz
 	tar -xvf /tmp/ui-release.tar.gz -C ./public/
 
 # Docker
