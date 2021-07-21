@@ -14,6 +14,7 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 type Server struct {
@@ -75,7 +76,21 @@ func (s *Server) jsonResponse(w http.ResponseWriter, response Response) {
 }
 
 func (s *Server) accountId(r *http.Request) int {
-	return 0
+
+	accountHeader := r.Header.Get("AccountId")
+
+	if accountHeader == "" {
+		return 0
+	}
+
+	accountId, err := strconv.Atoi(accountHeader)
+
+	if err != nil {
+		log.Println(err)
+		return 0
+	}
+
+	return accountId
 }
 
 func NewServer(productRepo *product.Repository,
