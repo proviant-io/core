@@ -133,7 +133,8 @@ func (r *Repository) Create(dto CreateDTO, accountId int) Product {
 
 func (r *Repository) Save(model Product, accountId int) (Product, *errors.CustomError) {
 
-	model, err := r.Get(model.Id, accountId)
+	// sanity check
+	_, err := r.Get(model.Id, accountId)
 
 	if err != nil {
 		return Product{}, err
