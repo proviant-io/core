@@ -35,33 +35,33 @@ func TestApiProduct(t *testing.T) {
 
 	fmt.Print("product: create")
 	actual = postRequest(generateApiUrl("/api/v1/product/"),
-		[]byte(`{"title":"Milk Shake", "description":  "Milk Shake", "link":  "https://test.com/test", "image":  "https://inage.com/1.jpg", "barcode":  "1234567890Z", "list_id": 1, "category_ids":  [1]}`))
-	expected = `{"status":201,"data":{"id":1,"title":"Milk Shake","description":"Milk Shake","link":"https://test.com/test","image":"https://inage.com/1.jpg","barcode":"1234567890Z","category_ids":[1],"categories":[{"id":1,"title":"Drinks"}],"list_id":1,"list":{"id":1,"title":"Fridge"},"stock":0},"error":""}`
+		[]byte(`{"title":"Milk Shake", "description":  "Milk Shake", "link":  "https://test.com/test", "barcode":  "1234567890Z", "list_id": 1, "category_ids":  [1]}`))
+	expected = `{"status":201,"data":{"id":1,"title":"Milk Shake","description":"Milk Shake","link":"https://test.com/test","image":"","barcode":"1234567890Z","category_ids":[1],"categories":[{"id":1,"title":"Drinks"}],"list_id":1,"list":{"id":1,"title":"Fridge"},"stock":0},"error":""}`
 	assert.Equal(t, expected, actual)
 	fmt.Println(" OK")
 
 	fmt.Print("product: get")
 	actual = getRequest(generateApiUrl("/api/v1/product/1/"))
-	expected = `{"status":200,"data":{"id":1,"title":"Milk Shake","description":"Milk Shake","link":"https://test.com/test","image":"https://inage.com/1.jpg","barcode":"1234567890Z","category_ids":[1],"categories":[{"id":1,"title":"Drinks"}],"list_id":1,"list":{"id":1,"title":"Fridge"},"stock":0},"error":""}`
+	expected = `{"status":200,"data":{"id":1,"title":"Milk Shake","description":"Milk Shake","link":"https://test.com/test","image":"","barcode":"1234567890Z","category_ids":[1],"categories":[{"id":1,"title":"Drinks"}],"list_id":1,"list":{"id":1,"title":"Fridge"},"stock":0},"error":""}`
 	assert.Equal(t, expected, actual)
 	fmt.Println(" OK")
 
 	fmt.Print("product: update")
 	actual = putRequest(generateApiUrl("/api/v1/product/1/"),
-		[]byte(`{"title":"Milk Shake 2", "description":  "Milk Shake 2", "link":  "https://test.com/test", "image":  "https://inage.com/1.jpg", "barcode":  "1234567890Z", "list_id": 1, "category_ids":  [1]}`))
-	expected = `{"status":200,"data":{"id":1,"title":"Milk Shake 2","description":"Milk Shake 2","link":"https://test.com/test","image":"https://inage.com/1.jpg","barcode":"1234567890Z","category_ids":[1],"categories":[{"id":1,"title":"Drinks"}],"list_id":1,"list":{"id":1,"title":"Fridge"},"stock":0},"error":""}`
+		[]byte(`{"title":"Milk Shake 2", "description":  "Milk Shake 2", "link":  "https://test.com/test", "barcode":  "1234567890Z", "list_id": 1, "category_ids":  [1]}`))
+	expected = `{"status":200,"data":{"id":1,"title":"Milk Shake 2","description":"Milk Shake 2","link":"https://test.com/test","image":"","barcode":"1234567890Z","category_ids":[1],"categories":[{"id":1,"title":"Drinks"}],"list_id":1,"list":{"id":1,"title":"Fridge"},"stock":0},"error":""}`
 	assert.Equal(t, expected, actual)
 	fmt.Println(" OK")
 
 	fmt.Print("product: get updated")
 	actual = getRequest(generateApiUrl("/api/v1/product/1/"))
-	expected = `{"status":200,"data":{"id":1,"title":"Milk Shake 2","description":"Milk Shake 2","link":"https://test.com/test","image":"https://inage.com/1.jpg","barcode":"1234567890Z","category_ids":[1],"categories":[{"id":1,"title":"Drinks"}],"list_id":1,"list":{"id":1,"title":"Fridge"},"stock":0},"error":""}`
+	expected = `{"status":200,"data":{"id":1,"title":"Milk Shake 2","description":"Milk Shake 2","link":"https://test.com/test","image":"","barcode":"1234567890Z","category_ids":[1],"categories":[{"id":1,"title":"Drinks"}],"list_id":1,"list":{"id":1,"title":"Fridge"},"stock":0},"error":""}`
 	assert.Equal(t, expected, actual)
 	fmt.Println(" OK")
 
 	fmt.Print("product: get all")
 	actual = getRequest(generateApiUrl("/api/v1/product/"))
-	expected = `{"status":200,"data":[{"id":1,"title":"Milk Shake 2","description":"Milk Shake 2","link":"https://test.com/test","image":"https://inage.com/1.jpg","barcode":"1234567890Z","category_ids":[1],"categories":[],"list_id":1,"list":null,"stock":0}],"error":""}`
+	expected = `{"status":200,"data":[{"id":1,"title":"Milk Shake 2","description":"Milk Shake 2","link":"https://test.com/test","image":"","barcode":"1234567890Z","category_ids":[1],"categories":[],"list_id":1,"list":null,"stock":0}],"error":""}`
 	assert.Equal(t, expected, actual)
 	fmt.Println(" OK")
 
@@ -105,14 +105,14 @@ func TestApiProductFilter(t *testing.T){
 
 	fmt.Print("product: create")
 	actual = postRequest(generateApiUrl("/api/v1/product/"),
-		[]byte(`{"title":"Milk Shake", "description":  "Milk Shake", "link":  "https://test.com/test", "image":  "https://inage.com/1.jpg", "barcode":  "1234567890Z", "list_id": 1, "category_ids":  [1]}`))
-	expected = `{"status":201,"data":{"id":1,"title":"Milk Shake","description":"Milk Shake","link":"https://test.com/test","image":"https://inage.com/1.jpg","barcode":"1234567890Z","category_ids":[1],"categories":[{"id":1,"title":"Drinks"}],"list_id":1,"list":{"id":1,"title":"Fridge"},"stock":0},"error":""}`
+		[]byte(`{"title":"Milk Shake", "description":  "Milk Shake", "link":  "https://test.com/test", "barcode":  "1234567890Z", "list_id": 1, "category_ids":  [1]}`))
+	expected = `{"status":201,"data":{"id":1,"title":"Milk Shake","description":"Milk Shake","link":"https://test.com/test","image":"","barcode":"1234567890Z","category_ids":[1],"categories":[{"id":1,"title":"Drinks"}],"list_id":1,"list":{"id":1,"title":"Fridge"},"stock":0},"error":""}`
 	assert.Equal(t, expected, actual)
 	fmt.Println(" OK")
 
 	fmt.Print("product: get by ?list=1")
 	actual = getRequest(generateApiUrl("/api/v1/product/?list=1"))
-	expected = `{"status":200,"data":[{"id":1,"title":"Milk Shake","description":"Milk Shake","link":"https://test.com/test","image":"https://inage.com/1.jpg","barcode":"1234567890Z","category_ids":[1],"categories":[],"list_id":1,"list":null,"stock":0}],"error":""}`
+	expected = `{"status":200,"data":[{"id":1,"title":"Milk Shake","description":"Milk Shake","link":"https://test.com/test","image":"","barcode":"1234567890Z","category_ids":[1],"categories":[],"list_id":1,"list":null,"stock":0}],"error":""}`
 	assert.Equal(t, expected, actual)
 	fmt.Println(" OK")
 
@@ -124,7 +124,7 @@ func TestApiProductFilter(t *testing.T){
 
 	fmt.Print("product: get by ?category=1")
 	actual = getRequest(generateApiUrl("/api/v1/product/?category=1"))
-	expected = `{"status":200,"data":[{"id":1,"title":"Milk Shake","description":"Milk Shake","link":"https://test.com/test","image":"https://inage.com/1.jpg","barcode":"1234567890Z","category_ids":[1],"categories":[],"list_id":1,"list":null,"stock":0}],"error":""}`
+	expected = `{"status":200,"data":[{"id":1,"title":"Milk Shake","description":"Milk Shake","link":"https://test.com/test","image":"","barcode":"1234567890Z","category_ids":[1],"categories":[],"list_id":1,"list":null,"stock":0}],"error":""}`
 	assert.Equal(t, expected, actual)
 	fmt.Println(" OK")
 

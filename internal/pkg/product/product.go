@@ -17,7 +17,8 @@ type Product struct {
 	Image       string `json:"image"`
 	Barcode     string `json:"barcode"`
 	ListId      int    `json:"list_id"`
-	Stock       uint   `json:"stock",gorm:"type:UINT(10)"`
+	Stock       uint   `json:"stock" gorm:"type:UINT"`
+	AccountId   int    `json:"account_id" gorm:"default:0"`
 }
 
 type CreateDTO struct {
@@ -68,11 +69,11 @@ type Query struct {
 	List     int
 }
 
-func (r *Repository) Get(id int) (Product, *errors.CustomError) {
+func (r *Repository) Get(id int, accountId int) (Product, *errors.CustomError) {
 
 	p := &Product{}
 
-	r.db.Connection().First(p, "id = ?", id)
+	r.db.Connection().First(p, "id = ? and account_id = ?", id, accountId)
 
 	if (*p).Id == 0 {
 		return Product{}, errors.NewErrNotFound(i18n.NewMessage("product with id %d not found", id))
@@ -81,14 +82,15 @@ func (r *Repository) Get(id int) (Product, *errors.CustomError) {
 	return *p, nil
 }
 
-func (r *Repository) GetAll(query *Query) []Product {
+func (r *Repository) GetAll(query *Query, accountId int) []Product {
 
 	var products []Product
 
 	if query == nil {
-		r.db.Connection().Find(&products)
+		r.db.Connection().Where("account_id = ?", accountId).Find(&products)
 	} else {
 		queryBuilder := &Product{}
+		queryBuilder.AccountId = accountId
 
 		if query.List != 0 {
 			queryBuilder.ListId = query.List
@@ -99,9 +101,9 @@ func (r *Repository) GetAll(query *Query) []Product {
 	return products
 }
 
-func (r *Repository) Delete(id int) *errors.CustomError {
+func (r *Repository) Delete(id int, accountId int) *errors.CustomError {
 
-	model, err := r.Get(id)
+	model, err := r.Get(id, accountId)
 
 	if err != nil {
 		return err
@@ -112,7 +114,7 @@ func (r *Repository) Delete(id int) *errors.CustomError {
 	return nil
 }
 
-func (r *Repository) Create(dto CreateDTO) Product {
+func (r *Repository) Create(dto CreateDTO, accountId int) Product {
 
 	p := &Product{
 		Title:       dto.Title,
@@ -122,13 +124,21 @@ func (r *Repository) Create(dto CreateDTO) Product {
 		Barcode:     dto.Barcode,
 		ListId:      dto.ListId,
 		Stock:       0,
+		AccountId:   accountId,
 	}
 
 	r.db.Connection().Create(p)
 	return *p
 }
 
-func (r *Repository) Save(model Product) (Product, *errors.CustomError) {
+func (r *Repository) Save(model Product, accountId int) (Product, *errors.CustomError) {
+
+	// sanity check
+	_, err := r.Get(model.Id, accountId)
+
+	if err != nil {
+		return Product{}, err
+	}
 
 	r.db.Connection().Model(&Product{Id: model.Id}).Updates(model)
 
@@ -139,9 +149,9 @@ func (r *Repository) Save(model Product) (Product, *errors.CustomError) {
 	return model, nil
 }
 
-func (r *Repository) UpdateFromDTO(dto UpdateDTO) (Product, *errors.CustomError) {
+func (r *Repository) UpdateFromDTO(dto UpdateDTO, accountId int) (Product, *errors.CustomError) {
 
-	model, err := r.Get(dto.Id)
+	model, err := r.Get(dto.Id, accountId)
 
 	if err != nil {
 		return Product{}, err

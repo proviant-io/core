@@ -8,37 +8,38 @@ import (
 
 type ProductCategory struct {
 	gorm.Model
-	ProductId int `json:"product_id" gorm:"uniqueIndex:idx_member"`
+	ProductId  int `json:"product_id" gorm:"uniqueIndex:idx_member"`
 	CategoryId int `json:"category_id" gorm:"uniqueIndex:idx_member"`
+	AccountId  int `json:"account_id" gorm:"default:0"`
 }
 
 type Repository struct {
 	db db.DB
 }
 
-func (r *Repository) GetByProductId(id int) []ProductCategory {
+func (r *Repository) GetByProductId(id int, accountId int) []ProductCategory {
 
 	var models []ProductCategory
 
-	r.db.Connection().Where("product_id = ?", id).Find(&models)
+	r.db.Connection().Where("product_id = ? and account_id = ?", id, accountId).Find(&models)
 
 	return models
 }
 
-func (r *Repository) DeleteByProductId(id int){
-	r.db.Connection().Where("product_id = ?", id).Unscoped().Delete(&ProductCategory{})
+func (r *Repository) DeleteByProductId(id int, accountId int) {
+	r.db.Connection().Where("product_id = ? and account_id = ?", id, accountId).Unscoped().Delete(&ProductCategory{})
 }
 
-func (r *Repository) DeleteByCategory(id int){
-	r.db.Connection().Where("category_id = ?", id).Unscoped().Delete(&ProductCategory{})
+func (r *Repository) DeleteByCategory(id int, accountId int) {
+	r.db.Connection().Where("category_id = ? and account_id = ?", id, accountId).Unscoped().Delete(&ProductCategory{})
 }
 
-func (r *Repository) Link(productId int, categories []int) {
+func (r *Repository) Link(productId int, categories []int, accountId int) {
 
-	r.DeleteByProductId(productId)
+	r.DeleteByProductId(productId, accountId)
 
-	for _, category := range categories{
-		r.db.Connection().Create(&ProductCategory{ProductId: productId, CategoryId: category})
+	for _, category := range categories {
+		r.db.Connection().Create(&ProductCategory{ProductId: productId, CategoryId: category, AccountId: accountId})
 	}
 }
 

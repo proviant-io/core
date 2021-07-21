@@ -9,6 +9,7 @@ import (
 )
 
 func (s *Server) getList(w http.ResponseWriter, r *http.Request) {
+	accountId := s.accountId(r)
 	locale := s.getLocale(r)
 	vars := mux.Vars(r)
 	idString := vars["id"]
@@ -25,7 +26,7 @@ func (s *Server) getList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	model, customErr := s.listRepo.Get(id)
+	model, customErr := s.listRepo.Get(id, accountId)
 
 	if customErr != nil {
 		s.handleError(w, locale, *customErr)
@@ -41,7 +42,8 @@ func (s *Server) getList(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) getLists(w http.ResponseWriter, r *http.Request) {
-	models := s.listRepo.GetAll()
+	accountId := s.accountId(r)
+	models := s.listRepo.GetAll(accountId)
 
 	dtos := []list.DTO{}
 
@@ -58,6 +60,7 @@ func (s *Server) getLists(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) deleteList(w http.ResponseWriter, r *http.Request) {
+	accountId := s.accountId(r)
 	locale := s.getLocale(r)
 	vars := mux.Vars(r)
 	idString := vars["id"]
@@ -74,7 +77,7 @@ func (s *Server) deleteList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	customErr := s.relationService.DeleteList(id)
+	customErr := s.relationService.DeleteList(id, accountId)
 
 	if customErr != nil {
 		s.handleError(w, locale, *customErr)
@@ -89,6 +92,7 @@ func (s *Server) deleteList(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) createList(w http.ResponseWriter, r *http.Request) {
+	accountId := s.accountId(r)
 	locale := s.getLocale(r)
 	dto := list.DTO{}
 
@@ -106,7 +110,7 @@ func (s *Server) createList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	model := s.listRepo.Create(dto)
+	model := s.listRepo.Create(dto, accountId)
 
 	response := Response{
 		Status: ResponseCodeCreated,
@@ -117,6 +121,7 @@ func (s *Server) createList(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) updateList(w http.ResponseWriter, r *http.Request) {
+	accountId := s.accountId(r)
 	locale := s.getLocale(r)
 	vars := mux.Vars(r)
 	idString := vars["id"]
@@ -148,7 +153,7 @@ func (s *Server) updateList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	model, customErr := s.listRepo.Update(id, dto)
+	model, customErr := s.listRepo.Update(id, dto, accountId)
 
 	if customErr != nil {
 		s.handleError(w, locale, *customErr)

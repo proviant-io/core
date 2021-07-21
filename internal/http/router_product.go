@@ -9,6 +9,7 @@ import (
 )
 
 func (s *Server) getProduct(w http.ResponseWriter, r *http.Request) {
+	accountId := s.accountId(r)
 	locale := s.getLocale(r)
 	vars := mux.Vars(r)
 	idString := vars["id"]
@@ -25,7 +26,7 @@ func (s *Server) getProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	p, customErr := s.relationService.GetProduct(id)
+	p, customErr := s.relationService.GetProduct(id, accountId)
 
 	if customErr != nil {
 		s.handleError(w, locale, *customErr)
@@ -41,6 +42,7 @@ func (s *Server) getProduct(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) getProducts(w http.ResponseWriter, r *http.Request) {
+	accountId := s.accountId(r)
 	locale := s.getLocale(r)
 
 	var query *product.Query
@@ -80,7 +82,7 @@ func (s *Server) getProducts(w http.ResponseWriter, r *http.Request) {
 		query.Category = categoryFilter
 	}
 
-	dtos := s.relationService.GetAllProducts(query)
+	dtos := s.relationService.GetAllProducts(query, accountId)
 
 	response := Response{
 		Status: ResponseCodeOk,
@@ -91,6 +93,7 @@ func (s *Server) getProducts(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) deleteProduct(w http.ResponseWriter, r *http.Request){
+	accountId := s.accountId(r)
 	locale := s.getLocale(r)
 	vars := mux.Vars(r)
 	idString := vars["id"]
@@ -107,7 +110,7 @@ func (s *Server) deleteProduct(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	customErr := s.relationService.DeleteProduct(id)
+	customErr := s.relationService.DeleteProduct(id, accountId)
 
 	if customErr != nil {
 		s.handleError(w, locale, *customErr)
@@ -122,6 +125,7 @@ func (s *Server) deleteProduct(w http.ResponseWriter, r *http.Request){
 }
 
 func (s *Server) createProduct(w http.ResponseWriter, r *http.Request){
+	accountId := s.accountId(r)
 	locale := s.getLocale(r)
 	dto := product.CreateDTO{}
 
@@ -135,7 +139,7 @@ func (s *Server) createProduct(w http.ResponseWriter, r *http.Request){
 	dto.Title = utils.ClearString(dto.Title)
 	dto.Image = ""
 
-	productDto, customErr := s.relationService.CreateProduct(dto)
+	productDto, customErr := s.relationService.CreateProduct(dto, accountId)
 
 	if customErr != nil {
 		s.handleError(w, locale, *customErr)
@@ -151,6 +155,7 @@ func (s *Server) createProduct(w http.ResponseWriter, r *http.Request){
 }
 
 func (s *Server) updateProduct(w http.ResponseWriter, r *http.Request){
+	accountId := s.accountId(r)
 	locale := s.getLocale(r)
 	vars := mux.Vars(r)
 	idString := vars["id"]
@@ -178,7 +183,7 @@ func (s *Server) updateProduct(w http.ResponseWriter, r *http.Request){
 	dto.Id = id
 	dto.Title = utils.ClearString(dto.Title)
 
-	productDTO, customErr := s.relationService.UpdateProduct(dto)
+	productDTO, customErr := s.relationService.UpdateProduct(dto, accountId)
 
 	if customErr != nil {
 		s.handleError(w, locale, *customErr)
