@@ -26,9 +26,9 @@ type RelationService struct {
 	config                    config.Config
 }
 
-func (s *RelationService) GetProduct(id int) (product.DTO, *errors.CustomError) {
+func (s *RelationService) GetProduct(id int, accountId int) (product.DTO, *errors.CustomError) {
 
-	p, err := s.productRepository.Get(id)
+	p, err := s.productRepository.Get(id, accountId)
 
 	if err != nil {
 		return product.DTO{}, err
@@ -36,7 +36,7 @@ func (s *RelationService) GetProduct(id int) (product.DTO, *errors.CustomError) 
 
 	productDTO := product.ModelToDTO(p)
 
-	l, err := s.listRepository.Get(productDTO.ListId)
+	l, err := s.listRepository.Get(productDTO.ListId, accountId)
 
 	if err != nil {
 		return product.DTO{}, err
@@ -44,7 +44,7 @@ func (s *RelationService) GetProduct(id int) (product.DTO, *errors.CustomError) 
 
 	productDTO.List = list.ModelToDTO(l)
 
-	productCategories := s.productCategoryRepository.GetByProductId(id)
+	productCategories := s.productCategoryRepository.GetByProductId(id, accountId)
 
 	productDTO.Categories = []category.DTO{}
 
@@ -52,7 +52,7 @@ func (s *RelationService) GetProduct(id int) (product.DTO, *errors.CustomError) 
 		productDTO.CategoryIds = append(productDTO.CategoryIds, productCategory.CategoryId)
 	}
 
-	categories := s.categoryRepository.GetByIds(productDTO.CategoryIds)
+	categories := s.categoryRepository.GetByIds(productDTO.CategoryIds, accountId)
 
 	categoriesDTOs := []category.DTO{}
 
@@ -65,9 +65,9 @@ func (s *RelationService) GetProduct(id int) (product.DTO, *errors.CustomError) 
 	return productDTO, nil
 }
 
-func (s *RelationService) GetAllProducts(query *product.Query) []product.DTO {
+func (s *RelationService) GetAllProducts(query *product.Query, accountId int) []product.DTO {
 
-	models := s.productRepository.GetAll(query)
+	models := s.productRepository.GetAll(query, accountId)
 
 	dtos := []product.DTO{}
 
@@ -82,7 +82,7 @@ func (s *RelationService) GetAllProducts(query *product.Query) []product.DTO {
 		dtos[idx].CategoryIds = []int{}
 		dtos[idx].Categories = []interface{}{}
 
-		productCategories := s.productCategoryRepository.GetByProductId(dtos[idx].Id)
+		productCategories := s.productCategoryRepository.GetByProductId(dtos[idx].Id, accountId)
 
 		for _, productCategory := range productCategories {
 			dtos[idx].CategoryIds = append(dtos[idx].CategoryIds, productCategory.CategoryId)
@@ -102,9 +102,9 @@ func (s *RelationService) GetAllProducts(query *product.Query) []product.DTO {
 	return filteredDTOs
 }
 
-func (s *RelationService) CreateProduct(dto product.CreateDTO) (product.DTO, *errors.CustomError) {
+func (s *RelationService) CreateProduct(dto product.CreateDTO, accountId int) (product.DTO, *errors.CustomError) {
 
-	_, err := s.listRepository.Get(dto.ListId)
+	_, err := s.listRepository.Get(dto.ListId, accountId)
 
 	if err != nil {
 		return product.DTO{}, err
@@ -112,7 +112,7 @@ func (s *RelationService) CreateProduct(dto product.CreateDTO) (product.DTO, *er
 
 	if len(dto.CategoryIds) != 0 {
 		for _, categoryId := range dto.CategoryIds {
-			_, err := s.categoryRepository.Get(categoryId)
+			_, err := s.categoryRepository.Get(categoryId, accountId)
 
 			if err != nil {
 				return product.DTO{}, err
@@ -132,18 +132,18 @@ func (s *RelationService) CreateProduct(dto product.CreateDTO) (product.DTO, *er
 		dto.Image = imgPath
 	}
 
-	p := s.productRepository.Create(dto)
+	p := s.productRepository.Create(dto, accountId)
 
 	if len(dto.CategoryIds) != 0 {
-		s.productCategoryRepository.Link(p.Id, dto.CategoryIds)
+		s.productCategoryRepository.Link(p.Id, dto.CategoryIds, accountId)
 	}
 
-	return s.GetProduct(p.Id)
+	return s.GetProduct(p.Id, accountId)
 }
 
-func (s *RelationService) UpdateProduct(dto product.UpdateDTO) (product.DTO, *errors.CustomError) {
+func (s *RelationService) UpdateProduct(dto product.UpdateDTO, accountId int) (product.DTO, *errors.CustomError) {
 
-	_, err := s.listRepository.Get(dto.ListId)
+	_, err := s.listRepository.Get(dto.ListId, accountId)
 
 	if err != nil {
 		return product.DTO{}, err
@@ -151,7 +151,7 @@ func (s *RelationService) UpdateProduct(dto product.UpdateDTO) (product.DTO, *er
 
 	if len(dto.CategoryIds) != 0 {
 		for _, categoryId := range dto.CategoryIds {
-			_, err := s.categoryRepository.Get(categoryId)
+			_, err := s.categoryRepository.Get(categoryId, accountId)
 
 			if err != nil {
 				return product.DTO{}, err
@@ -159,7 +159,7 @@ func (s *RelationService) UpdateProduct(dto product.UpdateDTO) (product.DTO, *er
 		}
 	}
 
-	oldModel, err := s.productRepository.Get(dto.Id)
+	oldModel, err := s.productRepository.Get(dto.Id, accountId)
 
 	if err != nil {
 		return product.DTO{}, err
@@ -189,48 +189,48 @@ func (s *RelationService) UpdateProduct(dto product.UpdateDTO) (product.DTO, *er
 		}
 	}
 
-	p, err := s.productRepository.UpdateFromDTO(dto)
+	p, err := s.productRepository.UpdateFromDTO(dto, accountId)
 
 	if err != nil {
 		return product.DTO{}, err
 	}
 
 	// NOTE: here could be performance bottle neck
-	s.productCategoryRepository.DeleteByProductId(p.Id)
+	s.productCategoryRepository.DeleteByProductId(p.Id, accountId)
 
 	if len(dto.CategoryIds) != 0 {
-		s.productCategoryRepository.Link(p.Id, dto.CategoryIds)
+		s.productCategoryRepository.Link(p.Id, dto.CategoryIds, accountId)
 	}
 
-	return s.GetProduct(p.Id)
+	return s.GetProduct(p.Id, accountId)
 }
 
-func (s *RelationService) AddStock(dto stock.DTO) (stock.Stock, *errors.CustomError) {
+func (s *RelationService) AddStock(dto stock.DTO, accountId int) (stock.Stock, *errors.CustomError) {
 
-	p, err := s.productRepository.Get(dto.ProductId)
+	p, err := s.productRepository.Get(dto.ProductId, accountId)
 
 	if err != nil {
 		return stock.Stock{}, err
 	}
 
-	model := s.stockRepository.Add(dto)
+	model := s.stockRepository.Add(dto, accountId)
 
 	p.Stock += dto.Quantity
 
-	_, err = s.productRepository.Save(p)
+	_, err = s.productRepository.Save(p, accountId)
 
 	return model, err
 }
 
-func (s *RelationService) ConsumeStock(dto stock.ConsumeDTO) *errors.CustomError {
+func (s *RelationService) ConsumeStock(dto stock.ConsumeDTO, accountId int) *errors.CustomError {
 
-	p, err := s.productRepository.Get(dto.ProductId)
+	p, err := s.productRepository.Get(dto.ProductId, accountId)
 
 	if err != nil {
 		return err
 	}
 
-	s.stockRepository.Consume(dto)
+	s.stockRepository.Consume(dto, accountId)
 
 	if dto.Quantity >= p.Stock {
 		p.Stock = 0
@@ -238,26 +238,26 @@ func (s *RelationService) ConsumeStock(dto stock.ConsumeDTO) *errors.CustomError
 		p.Stock -= dto.Quantity
 	}
 
-	_, err = s.productRepository.Save(p)
+	_, err = s.productRepository.Save(p, accountId)
 
 	return nil
 }
 
-func (s *RelationService) DeleteStock(id int) *errors.CustomError {
+func (s *RelationService) DeleteStock(id int, accountId int) *errors.CustomError {
 
-	st, err := s.stockRepository.Get(id)
-
-	if err != nil {
-		return err
-	}
-
-	p, err := s.productRepository.Get(st.ProductId)
+	st, err := s.stockRepository.Get(id, accountId)
 
 	if err != nil {
 		return err
 	}
 
-	err = s.stockRepository.Delete(id)
+	p, err := s.productRepository.Get(st.ProductId, accountId)
+
+	if err != nil {
+		return err
+	}
+
+	err = s.stockRepository.Delete(id, accountId)
 
 	if err != nil {
 		return err
@@ -269,14 +269,14 @@ func (s *RelationService) DeleteStock(id int) *errors.CustomError {
 		p.Stock = 0
 	}
 
-	_, err = s.productRepository.Save(p)
+	_, err = s.productRepository.Save(p, accountId)
 
 	return err
 }
 
-func (s *RelationService) DeleteProduct(id int) *errors.CustomError {
+func (s *RelationService) DeleteProduct(id int, accountId int) *errors.CustomError {
 
-	oldModel, err := s.productRepository.Get(id)
+	oldModel, err := s.productRepository.Get(id, accountId)
 
 	if err != nil {
 		return err
@@ -289,35 +289,35 @@ func (s *RelationService) DeleteProduct(id int) *errors.CustomError {
 		fmt.Printf("cannot delete product image file: %s, %v", fileToRemove, pureErr)
 	}
 
-	s.stockRepository.DeleteByProductId(id)
+	s.stockRepository.DeleteByProductId(id, accountId)
 
-	s.productCategoryRepository.DeleteByProductId(id)
+	s.productCategoryRepository.DeleteByProductId(id, accountId)
 
-	err = s.productRepository.Delete(id)
+	err = s.productRepository.Delete(id, accountId)
 
 	return err
 }
 
-func (s *RelationService) DeleteCategory(id int) *errors.CustomError {
+func (s *RelationService) DeleteCategory(id int, accountId int) *errors.CustomError {
 
-	s.productCategoryRepository.DeleteByCategory(id)
+	s.productCategoryRepository.DeleteByCategory(id, accountId)
 
-	return s.categoryRepository.Delete(id)
+	return s.categoryRepository.Delete(id, accountId)
 }
 
-func (s *RelationService) DeleteList(id int) *errors.CustomError {
+func (s *RelationService) DeleteList(id int, accountId int) *errors.CustomError {
 
 	q := &product.Query{
 		List: id,
 	}
 
-	models := s.productRepository.GetAll(q)
+	models := s.productRepository.GetAll(q, accountId)
 
 	if len(models) > 0 {
 		return errors.NewErrBadRequest(i18n.NewMessage("You can't remove list with products. Clean products first."))
 	}
 
-	return s.listRepository.Delete(id)
+	return s.listRepository.Delete(id, accountId)
 }
 
 func NewRelationService(productRepository *product.Repository,

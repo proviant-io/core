@@ -2,7 +2,7 @@ version: '3'
 
 services:
   proviant:
-    container_name: "proviant-compose"
+    container_name: "proviant-core"
     image: brushknight/proviant:dev
     volumes:
     - ./config/web-mysql.yml:/app/default-config.yml
@@ -30,6 +30,20 @@ services:
     environment:
       MYSQL_DATABASE: "proviant"
       MYSQL_ROOT_PASSWORD: "proviant"
+
+  pma:
+    container_name: "proviant-pma"
+    image: phpmyadmin/phpmyadmin
+    links:
+      - mariadb:mariadb
+    environment:
+      PMA_HOST: mariadb
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: "proviant"
+    ports:
+      - 8082:80
+    restart: always
 
 volumes:
   mysql:

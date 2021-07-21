@@ -8,6 +8,7 @@ import (
 )
 
 func (s *Server) getStock(w http.ResponseWriter, r *http.Request) {
+	accountId := s.accountId(r)
 	locale := s.getLocale(r)
 	vars := mux.Vars(r)
 	idString := vars["id"]
@@ -23,14 +24,14 @@ func (s *Server) getStock(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, customErr := s.productRepo.Get(id)
+	_, customErr := s.productRepo.Get(id, accountId)
 
 	if customErr != nil {
 		s.handleError(w, locale, *customErr)
 		return
 	}
 
-	models := s.stockRepo.GetAllByProductId(id)
+	models := s.stockRepo.GetAllByProductId(id, accountId)
 
 	var dtos []stock.DTO
 
@@ -47,6 +48,7 @@ func (s *Server) getStock(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) addStock(w http.ResponseWriter, r *http.Request) {
+	accountId := s.accountId(r)
 	locale := s.getLocale(r)
 	vars := mux.Vars(r)
 	idString := vars["id"]
@@ -83,7 +85,7 @@ func (s *Server) addStock(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	model, customErr := s.relationService.AddStock(dto)
+	model, customErr := s.relationService.AddStock(dto, accountId)
 
 	if customErr != nil {
 		s.handleError(w, locale, *customErr)
@@ -99,6 +101,7 @@ func (s *Server) addStock(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) consumeStock(w http.ResponseWriter, r *http.Request) {
+	accountId := s.accountId(r)
 	locale := s.getLocale(r)
 	vars := mux.Vars(r)
 	idString := vars["id"]
@@ -135,7 +138,7 @@ func (s *Server) consumeStock(w http.ResponseWriter, r *http.Request) {
 
 	dto.ProductId = id
 
-	customErr := s.relationService.ConsumeStock(dto)
+	customErr := s.relationService.ConsumeStock(dto, accountId)
 
 	if customErr != nil {
 		s.handleError(w, locale, *customErr)
@@ -143,7 +146,7 @@ func (s *Server) consumeStock(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//stock left
-	models := s.stockRepo.GetAllByProductId(id)
+	models := s.stockRepo.GetAllByProductId(id, accountId)
 
 	var dtos []stock.DTO
 
@@ -160,6 +163,7 @@ func (s *Server) consumeStock(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) deleteStock(w http.ResponseWriter, r *http.Request){
+	accountId := s.accountId(r)
 	locale := s.getLocale(r)
 	vars := mux.Vars(r)
 	productIdString := vars["product_id"]
@@ -188,7 +192,7 @@ func (s *Server) deleteStock(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	customErr := s.relationService.DeleteStock(id)
+	customErr := s.relationService.DeleteStock(id, accountId)
 
 	if customErr != nil {
 		s.handleError(w, locale, *customErr)
@@ -196,7 +200,7 @@ func (s *Server) deleteStock(w http.ResponseWriter, r *http.Request){
 	}
 
 	//stock left
-	models := s.stockRepo.GetAllByProductId(productId)
+	models := s.stockRepo.GetAllByProductId(productId, accountId)
 
 	var dtos []stock.DTO
 

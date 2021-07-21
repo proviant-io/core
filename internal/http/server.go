@@ -74,6 +74,10 @@ func (s *Server) jsonResponse(w http.ResponseWriter, response Response) {
 	return
 }
 
+func (s *Server) accountId(r *http.Request) int {
+	return 0
+}
+
 func NewServer(productRepo *product.Repository,
 	listRepo *list.Repository,
 	categoryRepo *category.Repository,
@@ -130,11 +134,9 @@ func NewServer(productRepo *product.Repository,
 			router.PathPrefix("/content/").Handler(http.StripPrefix("/content/", http.FileServer(http.Dir(cfg.UserContent.Location))))
 		}
 
-
 		spa := spaHandler{staticPath: "public", indexPath: "index.html"}
 		router.PathPrefix("/").Handler(spa)
 	}
-
 
 	server.router = router
 

@@ -9,6 +9,7 @@ import (
 )
 
 func (s *Server) getCategory(w http.ResponseWriter, r *http.Request) {
+	accountId := s.accountId(r)
 	locale := s.getLocale(r)
 
 	vars := mux.Vars(r)
@@ -26,7 +27,7 @@ func (s *Server) getCategory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	model, customErr := s.categoryRepo.Get(id)
+	model, customErr := s.categoryRepo.Get(id, accountId)
 
 	if customErr != nil {
 		s.handleError(w, locale, *customErr)
@@ -42,7 +43,9 @@ func (s *Server) getCategory(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) getCategories(w http.ResponseWriter, r *http.Request) {
-	models := s.categoryRepo.GetAll()
+	accountId := s.accountId(r)
+
+	models := s.categoryRepo.GetAll(accountId)
 
 	dtos := []category.DTO{}
 
@@ -59,6 +62,8 @@ func (s *Server) getCategories(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) deleteCategory(w http.ResponseWriter, r *http.Request) {
+	accountId := s.accountId(r)
+
 	locale := s.getLocale(r)
 	vars := mux.Vars(r)
 	idString := vars["id"]
@@ -75,7 +80,7 @@ func (s *Server) deleteCategory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	customErr := s.relationService.DeleteCategory(id)
+	customErr := s.relationService.DeleteCategory(id, accountId)
 
 	if customErr != nil {
 		s.handleError(w, locale, *customErr)
@@ -90,6 +95,8 @@ func (s *Server) deleteCategory(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) createCategory(w http.ResponseWriter, r *http.Request) {
+	accountId := s.accountId(r)
+
 	locale := s.getLocale(r)
 	dto := category.DTO{}
 
@@ -107,7 +114,7 @@ func (s *Server) createCategory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	model := s.categoryRepo.Create(dto)
+	model := s.categoryRepo.Create(dto, accountId)
 
 	response := Response{
 		Status: ResponseCodeCreated,
@@ -118,6 +125,8 @@ func (s *Server) createCategory(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) updateCategory(w http.ResponseWriter, r *http.Request) {
+	accountId := s.accountId(r)
+
 	locale := s.getLocale(r)
 	vars := mux.Vars(r)
 	idString := vars["id"]
@@ -149,7 +158,7 @@ func (s *Server) updateCategory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	model, customErr := s.categoryRepo.Update(id, dto)
+	model, customErr := s.categoryRepo.Update(id, dto, accountId)
 
 	if customErr != nil {
 		s.handleError(w, locale, *customErr)
