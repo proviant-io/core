@@ -18,7 +18,6 @@ type List struct {
 type DTO struct {
 	Id        int    `json:"id"`
 	Title     string `json:"title"`
-	AccountId int    `json:"account_id"`
 }
 
 type Repository struct {
