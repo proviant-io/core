@@ -7,7 +7,7 @@ TAG := dev
 endif
 
 ifndef UI_VERSION
-UI_VERSION := 0.0.21
+UI_VERSION := 0.0.22
 endif
 
 ifndef VOLUMES_PREFIX
