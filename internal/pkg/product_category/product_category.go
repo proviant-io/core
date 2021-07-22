@@ -2,7 +2,7 @@ package product_category
 
 import (
 	"fmt"
-	"github.com/brushknight/proviant/internal/db"
+	"github.com/proviant-io/core/internal/db"
 	"gorm.io/gorm"
 )
 

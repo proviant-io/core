@@ -1,4 +1,4 @@
-module github.com/brushknight/proviant
+module github.com/proviant-io/core
 
 go 1.16
 

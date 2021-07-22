@@ -2,7 +2,7 @@ package errors
 
 import (
 	"fmt"
-	"github.com/brushknight/proviant/internal/i18n"
+	"github.com/proviant-io/core/internal/i18n"
 )
 
 type CustomError struct {

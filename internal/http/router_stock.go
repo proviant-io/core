@@ -1,7 +1,7 @@
 package http
 
 import (
-	"github.com/brushknight/proviant/internal/pkg/stock"
+	"github.com/proviant-io/core/internal/pkg/stock"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"

@@ -2,9 +2,9 @@ package stock
 
 import (
 	"fmt"
-	"github.com/brushknight/proviant/internal/db"
-	"github.com/brushknight/proviant/internal/errors"
-	"github.com/brushknight/proviant/internal/i18n"
+	"github.com/proviant-io/core/internal/db"
+	"github.com/proviant-io/core/internal/errors"
+	"github.com/proviant-io/core/internal/i18n"
 	"gorm.io/gorm"
 )
 

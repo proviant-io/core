@@ -1,8 +1,8 @@
 package http
 
 import (
-	"github.com/brushknight/proviant/internal/pkg/product"
-	"github.com/brushknight/proviant/internal/utils"
+	"github.com/proviant-io/core/internal/pkg/product"
+	"github.com/proviant-io/core/internal/utils"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
