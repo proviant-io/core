@@ -165,6 +165,9 @@ func (s *RelationService) UpdateProduct(dto product.UpdateDTO, accountId int) (p
 		return product.DTO{}, err
 	}
 
+	// stock should not be change via model update
+	dto.Stock = oldModel.Stock
+
 	// sanitize from custom urls
 	if oldModel.Image != dto.Image {
 		dto.Image = ""

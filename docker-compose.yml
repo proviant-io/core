@@ -27,6 +27,8 @@ services:
     restart: unless-stopped
     volumes:
       - mysql:/var/lib/mysql
+    ports:
+    - 3307:3306
     environment:
       MYSQL_DATABASE: "proviant"
       MYSQL_ROOT_PASSWORD: "proviant"

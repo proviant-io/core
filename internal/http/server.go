@@ -87,7 +87,7 @@ func (s *Server) accountId(r *http.Request) int {
 
 	if err != nil {
 		log.Println(err)
-		return 0
+		return -1
 	}
 
 	return accountId
