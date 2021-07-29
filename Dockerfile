@@ -7,7 +7,7 @@ ENV UI_VERSION=$UI_VERSION_ARG
 # install dependencies
 RUN apk update
 RUN apk upgrade
-RUN apk add --update go=1.16.5-r0 gcc=10.3.1_git20210424-r2 g++=10.3.1_git20210424-r2 make=4.3-r0 curl=7.77.0-r1
+RUN apk add --update go=1.16.5-r0 gcc=10.3.1_git20210424-r2 g++=10.3.1_git20210424-r2 make=4.3-r0 curl=7.78.0-r0
 # download go modules
 WORKDIR /app
 COPY go.mod go.sum ./
