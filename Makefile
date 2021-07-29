@@ -49,14 +49,14 @@ docker/build:
 	docker build --target app \
 		--build-arg CONFIG_VERSION_ARG="./config/web-sqlite.yml" \
 		--build-arg UI_VERSION_ARG=$(UI_VERSION) \
-		-t brushknight/proviant:$(TAG) \
-		-t brushknight/proviant:latest \
+		-t brushknight/proviant-core:$(TAG) \
+		-t brushknight/proviant-core:latest \
 		-f Dockerfile .
 
 .PHOMY: docker/publish
 docker/publish:
-	docker push brushknight/proviant:$(TAG)
-	docker push brushknight/proviant:latest
+	docker push brushknight/proviant-core:$(TAG)
+	docker push brushknight/proviant-core:latest
 
 .PHONY: docker/run
 docker/run: docker/build docker/prepare-folders
@@ -67,11 +67,11 @@ docker/run: docker/build docker/prepare-folders
 		-v $(VOLUMES_PREFIX)/runtime/user_content:/app/user_content/ \
 		-v $(PWD)/config/web-sqlite.yml:/app/default-config.yml \
 		-p8080:80 \
-		brushknight/proviant:$(TAG)
+		brushknight/proviant-core:$(TAG)
 
 .PHONY: docker/pull-latest
 docker/pull-latest:
-	docker pull brushknight/proviant:latest
+	docker pull brushknight/proviant-core:latest
 
 .PHONY: docker/run-latest
 docker/run-latest: docker/pull-latest docker/prepare-folders
@@ -81,7 +81,7 @@ docker/run-latest: docker/pull-latest docker/prepare-folders
 		-v $(VOLUMES_PREFIX)/runtime/user_content:/app/user_content/ \
 		-v $(PWD)/config/web-sqlite.yml:/app/default-config.yml \
 		-p8080:80 \
-		brushknight/proviant:latest
+		brushknight/proviant-core:latest
 
 # docker compose
 .PHONY: docker/compose
