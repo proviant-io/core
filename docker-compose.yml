@@ -5,7 +5,7 @@ services:
     container_name: "proviant-core"
     image: brushknight/proviant:dev
     volumes:
-    - ./config/web-mysql.yml:/app/default-config.yml
+    - ./config/api-mysql.yml:/app/default-config.yml
     - user_content:/app/user_content
     links:
       - mariadb:db
