@@ -5,7 +5,25 @@ on:
     branches:
       - '**'
 
+env:
+  DOCKER_HUB_ID: brushknight
+  DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
+
 jobs:
+  test-container:
+    name: Build container
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ env.DOCKER_HUB_ID }}
+          password: ${{ env.DOCKER_HUB_PASSWORD }}
+      - run: touch envfile
+      - run: make docker/build
+
   test-e2e:
     name: Run e2e tests
     runs-on: ubuntu-20.04
