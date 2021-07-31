@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/proviant-io/core/internal/config"
 	"github.com/proviant-io/core/internal/db"
+	"github.com/proviant-io/core/internal/di"
 	"github.com/proviant-io/core/internal/http"
 	"github.com/proviant-io/core/internal/i18n"
 	"github.com/proviant-io/core/internal/pkg/category"
@@ -16,6 +17,10 @@ import (
 	"github.com/spf13/viper"
 	"log"
 	"os"
+)
+
+var (
+	Version = "dev"
 )
 
 func main() {
@@ -100,11 +105,17 @@ func main() {
 		panic(err)
 	}
 
+	i, err := di.NewDI(d, cfg, Version)
+
+	if err != nil {
+		panic(err)
+	}
+
 	relationService := service.NewRelationService(productRepo, listRepo, categoryRepo, stockRepo, productCategoryRepo, imageSaver, *cfg)
 
 	l := i18n.NewFileLocalizer()
 
-	server := http.NewServer(productRepo, listRepo, categoryRepo, productCategoryRepo, stockRepo, relationService, l, *cfg)
+	server := http.NewServer(productRepo, listRepo, categoryRepo, productCategoryRepo, stockRepo, relationService, l, i)
 
 	hostPort := fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port)
 

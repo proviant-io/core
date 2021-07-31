@@ -4,6 +4,8 @@ FROM alpine:3.14 AS environment
 LABEL maintainer="Grigorii Merkushev <brushknight@gmail.com>"
 ARG UI_VERSION_ARG=0.0.18
 ENV UI_VERSION=$UI_VERSION_ARG
+ARG TAG_ARG='dev'
+ENV TAG=$TAG_ARG
 # install dependencies
 RUN apk update
 RUN apk upgrade

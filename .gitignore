@@ -2,6 +2,6 @@
 mariadb
 *.db
 public
-db
+/db
 runtime
 envfile

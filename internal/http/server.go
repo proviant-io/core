@@ -2,7 +2,9 @@ package http
 
 import (
 	"encoding/json"
+	"github.com/gorilla/mux"
 	"github.com/proviant-io/core/internal/config"
+	"github.com/proviant-io/core/internal/di"
 	"github.com/proviant-io/core/internal/errors"
 	"github.com/proviant-io/core/internal/i18n"
 	"github.com/proviant-io/core/internal/pkg/category"
@@ -11,7 +13,6 @@ import (
 	"github.com/proviant-io/core/internal/pkg/product_category"
 	"github.com/proviant-io/core/internal/pkg/service"
 	"github.com/proviant-io/core/internal/pkg/stock"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"strconv"
@@ -27,6 +28,7 @@ type Server struct {
 	router              *mux.Router
 	l                   i18n.Localizer
 	cfg                 config.Config
+	di                  *di.DI
 }
 
 func (s *Server) Run(hostPort string) error {
@@ -100,7 +102,7 @@ func NewServer(productRepo *product.Repository,
 	stockRepo *stock.Repository,
 	relationService *service.RelationService,
 	l i18n.Localizer,
-	cfg config.Config) *Server {
+	i *di.DI) *Server {
 
 	server := &Server{
 		productRepo:         productRepo,
@@ -110,7 +112,7 @@ func NewServer(productRepo *product.Repository,
 		stockRepo:           stockRepo,
 		relationService:     relationService,
 		l:                   l,
-		cfg:                 cfg,
+		di:                  i,
 	}
 
 	router := mux.NewRouter()
@@ -141,12 +143,13 @@ func NewServer(productRepo *product.Repository,
 	apiV1Router.HandleFunc("/product/{id}/consume/", server.consumeStock).Methods("POST")
 	apiV1Router.HandleFunc("/product/{product_id}/stock/{id}/", server.deleteStock).Methods("DELETE")
 	apiV1Router.HandleFunc("/i18n/missing/", server.getMissingTranslations).Methods("GET")
+	apiV1Router.HandleFunc("/version/", server.getVersion).Methods("GET")
 
-	if cfg.Mode == config.ModeWeb {
+	if i.Cfg.Mode == config.ModeWeb {
 		router.PathPrefix("/static").Handler(http.FileServer(http.Dir("./public/")))
 
-		if cfg.UserContent.Mode == config.UserContentModeLocal {
-			router.PathPrefix("/content/").Handler(http.StripPrefix("/content/", http.FileServer(http.Dir(cfg.UserContent.Location))))
+		if i.Cfg.UserContent.Mode == config.UserContentModeLocal {
+			router.PathPrefix("/content/").Handler(http.StripPrefix("/content/", http.FileServer(http.Dir(i.Cfg.UserContent.Location))))
 		}
 
 		spa := spaHandler{staticPath: "public", indexPath: "index.html"}

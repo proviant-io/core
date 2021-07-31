@@ -17,7 +17,7 @@ endif
 # Compile
 .PHONY: compile
 compile:
-	CGO_ENABLED=1 go build -o app ./cmd
+	CGO_ENABLED=1 go build -ldflags="-X 'main.Version=$(TAG)'" -o app ./cmd
 
 # Testing
 .PHONY: test/2e2/docker-build
@@ -49,6 +49,7 @@ docker/build:
 	docker build --target app \
 		--build-arg CONFIG_VERSION_ARG="./config/web-sqlite.yml" \
 		--build-arg UI_VERSION_ARG=$(UI_VERSION) \
+		--build-arg TAG_ARG=$(TAG) \
 		-t brushknight/proviant-core:$(TAG) \
 		-t brushknight/proviant-core:latest \
 		-f Dockerfile .
