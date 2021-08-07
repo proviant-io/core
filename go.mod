@@ -3,6 +3,7 @@ module github.com/proviant-io/core
 go 1.16
 
 require (
+	cloud.google.com/go/storage v1.10.0
 	github.com/Microsoft/go-winio v0.5.0 // indirect
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869
 	github.com/containerd/containerd v1.5.2 // indirect

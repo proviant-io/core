@@ -3,10 +3,10 @@ package service
 import (
 	"fmt"
 	"github.com/proviant-io/core/internal/config"
+	"github.com/proviant-io/core/internal/di"
 	"github.com/proviant-io/core/internal/errors"
 	"github.com/proviant-io/core/internal/i18n"
 	"github.com/proviant-io/core/internal/pkg/category"
-	"github.com/proviant-io/core/internal/pkg/image"
 	"github.com/proviant-io/core/internal/pkg/list"
 	"github.com/proviant-io/core/internal/pkg/product"
 	"github.com/proviant-io/core/internal/pkg/product_category"
@@ -22,7 +22,7 @@ type RelationService struct {
 	categoryRepository        *category.Repository
 	stockRepository           *stock.Repository
 	productCategoryRepository *product_category.Repository
-	imageSaver                image.Saver
+	di                        *di.DI
 	config                    config.Config
 }
 
@@ -121,7 +121,7 @@ func (s *RelationService) CreateProduct(dto product.CreateDTO, accountId int) (p
 	}
 
 	if dto.ImageBase64 != "" {
-		imgPath, pureErr := s.imageSaver.SaveBase64(dto.ImageBase64)
+		imgPath, pureErr := s.di.ImageSaver.SaveBase64(dto.ImageBase64)
 		if pureErr != nil {
 			return product.DTO{}, errors.NewInternalServer(i18n.NewMessage(pureErr.Error()))
 		}
@@ -174,7 +174,7 @@ func (s *RelationService) UpdateProduct(dto product.UpdateDTO, accountId int) (p
 	}
 
 	if dto.ImageBase64 != "" {
-		imgPath, pureErr := s.imageSaver.SaveBase64(dto.ImageBase64)
+		imgPath, pureErr := s.di.ImageSaver.SaveBase64(dto.ImageBase64)
 		if pureErr != nil {
 			return product.DTO{}, errors.NewInternalServer(i18n.NewMessage(pureErr.Error()))
 		}
@@ -186,7 +186,7 @@ func (s *RelationService) UpdateProduct(dto product.UpdateDTO, accountId int) (p
 
 		fileToRemove := strings.Replace(oldModel.Image, "/content", "", 1)
 
-		pureErr = s.imageSaver.DeleteFile(fileToRemove)
+		pureErr = s.di.ImageSaver.DeleteFile(fileToRemove)
 		if pureErr != nil {
 			fmt.Printf("cannot delete product image file: %s, %v", fileToRemove, pureErr)
 		}
@@ -287,7 +287,7 @@ func (s *RelationService) DeleteProduct(id int, accountId int) *errors.CustomErr
 
 	fileToRemove := strings.Replace(oldModel.Image, "/content", "", 1)
 
-	pureErr := s.imageSaver.DeleteFile(fileToRemove)
+	pureErr := s.di.ImageSaver.DeleteFile(fileToRemove)
 	if pureErr != nil {
 		fmt.Printf("cannot delete product image file: %s, %v", fileToRemove, pureErr)
 	}
@@ -328,7 +328,7 @@ func NewRelationService(productRepository *product.Repository,
 	categoryRepository *category.Repository,
 	stockRepository *stock.Repository,
 	productCategoryRepository *product_category.Repository,
-	imageSaver image.Saver,
+	i *di.DI,
 	config config.Config,
 ) *RelationService {
 	return &RelationService{
@@ -337,7 +337,7 @@ func NewRelationService(productRepository *product.Repository,
 		categoryRepository:        categoryRepository,
 		stockRepository:           stockRepository,
 		productCategoryRepository: productCategoryRepository,
-		imageSaver:                imageSaver,
+		di:                        i,
 		config:                    config,
 	}
 }

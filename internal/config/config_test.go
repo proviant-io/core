@@ -20,6 +20,11 @@ server:
 user_content:
   mode: local
   location: /app/user_content/
+api:
+  gcs:
+    json_credential_path: "/app/gcs-creds.json"
+    bucket_name: "bucket-name"
+    project_id: "project-id"
 `
 
 	reader := strings.NewReader(content)
@@ -41,6 +46,13 @@ user_content:
 		UserContent: UserContent{
 			Mode:     "local",
 			Location: "/app/user_content/",
+		},
+		API: API{
+			GCS: GCS{
+				BucketName:         "bucket-name",
+				ProjectId:          "project-id",
+				JsonCredentialPath: "/app/gcs-creds.json",
+			},
 		},
 	}
 

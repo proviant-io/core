@@ -1,0 +1,15 @@
+db:
+  driver: mysql
+  dsn: root:proviant@tcp(db:3306)/proviant?multiStatements=true&parseTime=true
+mode: web
+server:
+  host: 0.0.0.0
+  port: 80
+user_content:
+  mode: gcs
+  location: 1/
+api:
+  gcs:
+    json_credential_path: "/app/gcs-secret.json"
+    bucket_name: "proviant_user_content"
+    project_id: "proviant-io"

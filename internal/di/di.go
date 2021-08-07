@@ -1,13 +1,19 @@
 package di
 
 import (
+	"cloud.google.com/go/storage"
+	"context"
+	"fmt"
 	"github.com/proviant-io/core/internal/config"
 	"github.com/proviant-io/core/internal/db"
+	"github.com/proviant-io/core/internal/pkg/image"
+	"os"
 )
 
 type DI struct {
-	Cfg      *config.Config
-	Version string
+	Cfg        *config.Config
+	Version    string
+	ImageSaver image.Saver
 }
 
 func NewDI(d db.DB, cfg *config.Config, version string) (*DI, error) {
@@ -16,6 +22,30 @@ func NewDI(d db.DB, cfg *config.Config, version string) (*DI, error) {
 
 	pool.Cfg = cfg
 	pool.Version = version
+
+	switch cfg.UserContent.Mode {
+	case config.UserContentModeLocal:
+		pool.ImageSaver = image.NewLocalSaver(cfg.UserContent.Location)
+	case config.UserContentModeGCS:
+
+		if cfg.API.GCS.JsonCredentialPath == ""{
+			panic("credentials for GCS required")
+		}
+
+		err := os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", cfg.API.GCS.JsonCredentialPath)
+		if err != nil {
+			panic(err)
+		}
+
+		client, err := storage.NewClient(context.Background())
+		if err != nil {
+			panic(err)
+		}
+		pool.ImageSaver = image.NewGcsSaver(client, cfg.API.GCS.BucketName, cfg.API.GCS.ProjectId, cfg.UserContent.Location)
+
+	default:
+		panic(fmt.Sprintf("unsupported user content saver: %s", cfg.UserContent.Mode))
+	}
 
 	return pool, nil
 }
