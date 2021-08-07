@@ -1,13 +1,13 @@
 package image
 
 import (
+	"bytes"
 	"encoding/base64"
 	"fmt"
 	"github.com/google/uuid"
 	"image"
 	"image/jpeg"
 	"image/png"
-	"io"
 	"strings"
 )
 
@@ -19,7 +19,7 @@ type Image struct {
 type Saver interface {
 	SaveBase64(base64 string) (string, error)
 	DeleteFile(fileName string) error
-	GetImage(filename string) (io.Reader, error)
+	GetImage(filename string) (*bytes.Buffer, error)
 }
 
 func generateFileName(mimeType string) string {

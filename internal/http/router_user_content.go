@@ -18,7 +18,7 @@ func (s *Server) getImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	f, err := s.di.ImageSaver.GetImage(imageFileName)
+	fileBuffer, err := s.di.ImageSaver.GetImage(imageFileName)
 
 	if err != nil{
 		s.handleError(w, s.getLocale(r), *errors.NewInternalServer(i18n.NewMessage("Cannot fetch file, : %s", err.Error())))
@@ -27,7 +27,7 @@ func (s *Server) getImage(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "image/png")
 	w.WriteHeader(200)
-	_, err = io.Copy(w, f)
+	_, err = io.Copy(w, fileBuffer)
 	if err != nil {
 		log.Println(err)
 	}

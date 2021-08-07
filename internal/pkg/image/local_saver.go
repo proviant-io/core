@@ -1,10 +1,10 @@
 package image
 
 import (
+	"bytes"
 	"fmt"
 	"image/jpeg"
 	"image/png"
-	"io"
 	"os"
 	"path"
 )
@@ -36,7 +36,7 @@ func (ls *LocalSaver) SaveBase64(base64 string) (string, error) {
 	return ls.persist(*img)
 }
 
-func (ls *LocalSaver) GetImage(filename string) (io.Reader, error){
+func (ls *LocalSaver) GetImage(filename string) (*bytes.Buffer, error){
 
 	return nil, nil
 }

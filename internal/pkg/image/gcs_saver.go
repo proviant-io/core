@@ -1,13 +1,13 @@
 package image
 
 import (
+	"bytes"
 	"cloud.google.com/go/storage"
 	"context"
 	"fmt"
 	"image/jpeg"
 	"image/png"
 	"io"
-	"log"
 	"time"
 )
 
@@ -49,7 +49,7 @@ func (gs *GcsSaver) SaveBase64(base64 string) (string, error) {
 	return filename, nil
 }
 
-func (gs *GcsSaver) GetImage(filePath string) (io.Reader, error){
+func (gs *GcsSaver) GetImage(filePath string) (*bytes.Buffer, error){
 
 	return gs.gcsBucketClient.getFile(filePath)
 }
@@ -66,15 +66,28 @@ type GcsBucketClient struct {
 	location   string
 }
 
-func (c *GcsBucketClient) getFile(fileName string) (io.Reader, error) {
+func (c *GcsBucketClient) getFile(fileName string) (*bytes.Buffer, error) {
 	ctx := context.Background()
+
 
 	ctx, cancel := context.WithTimeout(ctx, time.Second*50)
 	defer cancel()
 
-	log.Printf(c.location + fileName)
+	r, err := c.cl.Bucket(c.bucketName).Object(c.location + fileName).NewReader(ctx)
 
-	return c.cl.Bucket(c.bucketName).Object(c.location + fileName).NewReader(ctx)
+	if err != nil{
+		return nil, err
+	}
+
+
+	buf := bytes.NewBuffer(nil)
+	_, err = io.Copy(buf, r)
+
+	if err != nil{
+		return nil, err
+	}
+
+	return buf, nil
 }
 
 func (c *GcsBucketClient) uploadFile(img *Image, object string) error {
@@ -83,10 +96,7 @@ func (c *GcsBucketClient) uploadFile(img *Image, object string) error {
 	ctx, cancel := context.WithTimeout(ctx, time.Second*50)
 	defer cancel()
 
-	// Upload an object with storage.Writer.
 	wc := c.cl.Bucket(c.bucketName).Object(c.location + object).NewWriter(ctx)
-
-	log.Printf("file: %s\n", object)
 
 	switch img.mimeType {
 	case "png":
