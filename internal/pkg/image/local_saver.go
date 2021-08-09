@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"image/jpeg"
 	"image/png"
+	"io"
 	"os"
 	"path"
 )
@@ -36,9 +37,21 @@ func (ls *LocalSaver) SaveBase64(base64 string) (string, error) {
 	return ls.persist(*img)
 }
 
-func (ls *LocalSaver) GetImage(filename string) (*bytes.Buffer, error){
+func (ls *LocalSaver) GetImage(fileName string) (*bytes.Buffer, error) {
+	fullPath := path.Join(ls.location, fileName)
 
-	return nil, nil
+	f, err := os.Open(fullPath)
+	if err != nil {
+		return nil, err
+	}
+	buf := bytes.NewBuffer(nil)
+	_, err = io.Copy(buf, f)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return buf, nil
 }
 
 func (ls *LocalSaver) DeleteFile(fileName string) error {

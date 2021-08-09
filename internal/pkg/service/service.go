@@ -12,6 +12,7 @@ import (
 	"github.com/proviant-io/core/internal/pkg/product_category"
 	"github.com/proviant-io/core/internal/pkg/stock"
 	"github.com/proviant-io/core/internal/utils"
+	"log"
 	"path"
 	"strings"
 )
@@ -128,7 +129,7 @@ func (s *RelationService) CreateProduct(dto product.CreateDTO, accountId int) (p
 
 		// convert imgPath into server accessable one
 		imgPath = strings.Replace(imgPath, s.config.UserContent.Location, "", 1)
-		imgPath = path.Join("/content", imgPath)
+		imgPath = path.Join("/uc/img", imgPath)
 		dto.Image = imgPath
 	}
 
@@ -181,14 +182,14 @@ func (s *RelationService) UpdateProduct(dto product.UpdateDTO, accountId int) (p
 
 		// convert imgPath into server accessable
 		imgPath = strings.Replace(imgPath, s.config.UserContent.Location, "", 1)
-		imgPath = path.Join("/content", imgPath)
+		imgPath = path.Join("/uc/img", imgPath)
 		dto.Image = imgPath
 
-		fileToRemove := strings.Replace(oldModel.Image, "/content", "", 1)
+		fileToRemove := strings.Replace(oldModel.Image, "/uc/img", "", 1)
 
 		pureErr = s.di.ImageSaver.DeleteFile(fileToRemove)
 		if pureErr != nil {
-			fmt.Printf("cannot delete product image file: %s, %v", fileToRemove, pureErr)
+			log.Printf("cannot delete product image file: %s, %v\n", fileToRemove, pureErr)
 		}
 	}
 

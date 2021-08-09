@@ -11,5 +11,5 @@ user_content:
 api:
   gcs:
     json_credential_path: "/app/gcs-secret.json"
-    bucket_name: "proviant_user_content"
+    bucket_name: "uc_images"
     project_id: "proviant-io"

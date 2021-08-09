@@ -8,6 +8,7 @@ import (
 	"image/jpeg"
 	"image/png"
 	"io"
+	"path"
 	"time"
 )
 
@@ -46,17 +47,15 @@ func (gs *GcsSaver) SaveBase64(base64 string) (string, error) {
 
 	// generate full filepath
 
-	return filename, nil
+	return path.Join(gs.gcsBucketClient.location, filename), nil
 }
 
-func (gs *GcsSaver) GetImage(filePath string) (*bytes.Buffer, error){
-
+func (gs *GcsSaver) GetImage(filePath string) (*bytes.Buffer, error) {
 	return gs.gcsBucketClient.getFile(filePath)
 }
 
 func (gs *GcsSaver) DeleteFile(fileName string) error {
-
-	return nil
+	return gs.gcsBucketClient.deleteFile(fileName)
 }
 
 type GcsBucketClient struct {
@@ -66,37 +65,46 @@ type GcsBucketClient struct {
 	location   string
 }
 
-func (c *GcsBucketClient) getFile(fileName string) (*bytes.Buffer, error) {
+func (c *GcsBucketClient) deleteFile(fileName string) error {
 	ctx := context.Background()
-
 
 	ctx, cancel := context.WithTimeout(ctx, time.Second*50)
 	defer cancel()
 
-	r, err := c.cl.Bucket(c.bucketName).Object(c.location + fileName).NewReader(ctx)
+	err := c.cl.Bucket(c.bucketName).Object(path.Join(c.location, fileName)).Delete(ctx)
 
-	if err != nil{
+	return err
+}
+
+func (c *GcsBucketClient) getFile(fileName string) (*bytes.Buffer, error) {
+	ctx := context.Background()
+
+	ctx, cancel := context.WithTimeout(ctx, time.Second*50)
+	defer cancel()
+
+	r, err := c.cl.Bucket(c.bucketName).Object(path.Join(c.location, fileName)).NewReader(ctx)
+
+	if err != nil {
 		return nil, err
 	}
-
 
 	buf := bytes.NewBuffer(nil)
 	_, err = io.Copy(buf, r)
 
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 
 	return buf, nil
 }
 
-func (c *GcsBucketClient) uploadFile(img *Image, object string) error {
+func (c *GcsBucketClient) uploadFile(img *Image, fileName string) error {
 	ctx := context.Background()
 
 	ctx, cancel := context.WithTimeout(ctx, time.Second*50)
 	defer cancel()
 
-	wc := c.cl.Bucket(c.bucketName).Object(c.location + object).NewWriter(ctx)
+	wc := c.cl.Bucket(c.bucketName).Object(path.Join(c.location, fileName)).NewWriter(ctx)
 
 	switch img.mimeType {
 	case "png":
