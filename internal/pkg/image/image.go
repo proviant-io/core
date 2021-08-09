@@ -19,7 +19,7 @@ type Image struct {
 type Saver interface {
 	SaveBase64(base64 string) (string, error)
 	DeleteFile(fileName string) error
-	GetImage(filename string) (*bytes.Buffer, error)
+	GetImage(filename string) (*bytes.Buffer, string, error)
 }
 
 func generateFileName(mimeType string) string {

@@ -9,6 +9,7 @@ import (
 	"image/png"
 	"io"
 	"path"
+	"path/filepath"
 	"time"
 )
 
@@ -50,7 +51,7 @@ func (gs *GcsSaver) SaveBase64(base64 string) (string, error) {
 	return path.Join(gs.gcsBucketClient.location, filename), nil
 }
 
-func (gs *GcsSaver) GetImage(filePath string) (*bytes.Buffer, error) {
+func (gs *GcsSaver) GetImage(filePath string) (*bytes.Buffer, string, error) {
 	return gs.gcsBucketClient.getFile(filePath)
 }
 
@@ -76,7 +77,7 @@ func (c *GcsBucketClient) deleteFile(fileName string) error {
 	return err
 }
 
-func (c *GcsBucketClient) getFile(fileName string) (*bytes.Buffer, error) {
+func (c *GcsBucketClient) getFile(fileName string) (*bytes.Buffer, string, error) {
 	ctx := context.Background()
 
 	ctx, cancel := context.WithTimeout(ctx, time.Second*50)
@@ -85,17 +86,19 @@ func (c *GcsBucketClient) getFile(fileName string) (*bytes.Buffer, error) {
 	r, err := c.cl.Bucket(c.bucketName).Object(path.Join(c.location, fileName)).NewReader(ctx)
 
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	buf := bytes.NewBuffer(nil)
 	_, err = io.Copy(buf, r)
 
 	if err != nil {
-		return nil, err
+		return nil,"", err
 	}
 
-	return buf, nil
+	mime := fmt.Sprintf("image/%s", filepath.Ext(fileName)[1:])
+
+	return buf, mime, nil
 }
 
 func (c *GcsBucketClient) uploadFile(img *Image, fileName string) error {

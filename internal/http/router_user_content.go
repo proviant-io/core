@@ -18,14 +18,14 @@ func (s *Server) getImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fileBuffer, err := s.di.ImageSaver.GetImage(imageFileName)
+	fileBuffer, mime, err := s.di.ImageSaver.GetImage(imageFileName)
 
 	if err != nil{
 		s.handleError(w, s.getLocale(r), *errors.NewInternalServer(i18n.NewMessage("Cannot fetch file, : %s", err.Error())))
 		return
 	}
 
-	w.Header().Set("Content-Type", "image/png")
+	w.Header().Set("Content-Type", mime)
 	w.WriteHeader(200)
 	_, err = io.Copy(w, fileBuffer)
 	if err != nil {

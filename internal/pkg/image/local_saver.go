@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"path"
+	"path/filepath"
 )
 
 func NewLocalSaver(location string) Saver {
@@ -37,21 +38,23 @@ func (ls *LocalSaver) SaveBase64(base64 string) (string, error) {
 	return ls.persist(*img)
 }
 
-func (ls *LocalSaver) GetImage(fileName string) (*bytes.Buffer, error) {
+func (ls *LocalSaver) GetImage(fileName string) (*bytes.Buffer, string, error) {
 	fullPath := path.Join(ls.location, fileName)
 
 	f, err := os.Open(fullPath)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	buf := bytes.NewBuffer(nil)
 	_, err = io.Copy(buf, f)
 
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
-	return buf, nil
+	mime := fmt.Sprintf("image/%s", filepath.Ext(fileName)[1:])
+
+	return buf, mime, nil
 }
 
 func (ls *LocalSaver) DeleteFile(fileName string) error {
