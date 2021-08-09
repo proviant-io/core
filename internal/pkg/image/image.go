@@ -1,19 +1,15 @@
 package image
 
 import (
+	"bytes"
 	"encoding/base64"
 	"fmt"
 	"github.com/google/uuid"
 	"image"
 	"image/jpeg"
 	"image/png"
-	"os"
-	"path"
 	"strings"
 )
-
-// generate uniq name for image
-// save image to storage
 
 type Image struct {
 	img      image.Image
@@ -23,82 +19,13 @@ type Image struct {
 type Saver interface {
 	SaveBase64(base64 string) (string, error)
 	DeleteFile(fileName string) error
+	GetImage(filename string) (*bytes.Buffer, string, error)
 }
 
-func NewLocalSaver(location string) Saver {
-	return &LocalSaver{
-		location: location,
-	}
-}
-
-type LocalSaver struct {
-	location string
-}
-
-func (ls *LocalSaver) SaveBase64(base64 string) (string, error) {
-
-	err := isBase64ImageValidSize(base64)
-
-	if err != nil {
-		return "", err
-	}
-
-	img, err := decodeFromBase64(base64)
-
-	if err != nil {
-		return "", fmt.Errorf("failed to parse image: %s", err.Error())
-	}
-
-	return ls.persist(*img)
-}
-
-func (ls *LocalSaver) DeleteFile(fileName string) error{
-	fullPath := path.Join(ls.location, fileName)
-
-	return os.Remove(fullPath)
-}
-
-func (ls *LocalSaver) generateFileName(mimeType string) string {
+func generateFileName(mimeType string) string {
 	fileName := uuid.New().String()
 
-	return path.Join(ls.location, fmt.Sprintf("%s.%s", fileName, mimeType))
-}
-
-func (ls *LocalSaver) persist(img Image) (string, error) {
-
-	if _, err := os.Stat(ls.location); os.IsNotExist(err) {
-		err := os.Mkdir(ls.location, 0644)
-		if err != nil {
-			return "", err
-		}
-	}
-
-	fileName := ls.generateFileName(img.mimeType)
-
-	f, err := os.Create(fileName)
-	if err != nil {
-		return "", err
-	}
-	defer f.Close()
-
-	switch img.mimeType {
-	case "png":
-		err = png.Encode(f, img.img)
-		if err != nil {
-			return "", err
-		}
-	case "jpeg":
-		err = jpeg.Encode(f, img.img, &jpeg.Options{
-			Quality: 100,
-		})
-		if err != nil {
-			return "", err
-		}
-	default:
-		return "", fmt.Errorf("unsuported file type %s", img.mimeType)
-	}
-
-	return fileName, nil
+	return fmt.Sprintf("%s.%s", fileName, mimeType)
 }
 
 func decodeFromBase64(b64 string) (*Image, error) {

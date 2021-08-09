@@ -145,6 +145,9 @@ func NewServer(productRepo *product.Repository,
 	apiV1Router.HandleFunc("/i18n/missing/", server.getMissingTranslations).Methods("GET")
 	apiV1Router.HandleFunc("/version/", server.getVersion).Methods("GET")
 
+	userContentRouter := router.PathPrefix("/uc/").Subrouter()
+	userContentRouter.HandleFunc("/img/{fileName}", server.getImage).Methods("GET")
+
 	if i.Cfg.Mode == config.ModeWeb {
 		router.PathPrefix("/static").Handler(http.FileServer(http.Dir("./public/")))
 

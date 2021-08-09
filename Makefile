@@ -23,7 +23,7 @@ compile:
 .PHONY: test/2e2/docker-build
 test/2e2/docker-build:
 	docker build --target app \
-		--build-arg CONFIG_VERSION_ARG="./config/api-sqlite.yml" \
+		--build-arg CONFIG_VERSION_ARG="./examples/config/api-sqlite.yml" \
 		--build-arg UI_VERSION_ARG=$(UI_VERSION) \
 		-t brushknight/proviant:e2e \
 		-f Dockerfile .
@@ -47,7 +47,7 @@ download/ui:
 .PHONY: docker/build
 docker/build:
 	docker build --target app \
-		--build-arg CONFIG_VERSION_ARG="./config/web-sqlite.yml" \
+		--build-arg CONFIG_VERSION_ARG="./examples/config/web-sqlite.yml" \
 		--build-arg UI_VERSION_ARG=$(UI_VERSION) \
 		--build-arg TAG_ARG=$(TAG) \
 		-t brushknight/proviant-core:$(TAG) \

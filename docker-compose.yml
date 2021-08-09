@@ -3,9 +3,10 @@ version: '3'
 services:
   proviant:
     container_name: "proviant-core"
-    image: brushknight/proviant:dev
+    image: brushknight/proviant-core:dev
     volumes:
-    - ./config/api-mysql.yml:/app/default-config.yml
+    - ./examples/config/web-mysql.yml:/app/default-config.yml
+    #- ./gcs-secret.json:/app/gcs-secret.json
     - user_content:/app/user_content
     links:
       - mariadb:db
@@ -52,12 +53,12 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: $VOLUMES_PREFIX/runtime/mysql
+      device: $VOLUMES_PREFIX/mysql
       o: bind
 
   user_content:
     driver: local
     driver_opts:
       type: none
-      device: $VOLUMES_PREFIX/runtime/user_content
+      device: $VOLUMES_PREFIX/user_content
       o: bind

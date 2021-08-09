@@ -15,6 +15,16 @@ type UserContent struct {
 	Location string `yaml:"location"`
 }
 
+type API struct {
+	GCS GCS
+}
+
+type GCS struct {
+	JsonCredentialPath string `yaml:"json_credential_path"`
+	BucketName         string `yaml:"bucket_name"`
+	ProjectId          string `yaml:"project_id"`
+}
+
 type Server struct {
 	Port int    `yaml:"port"`
 	Host string `yaml:"host"`
@@ -25,6 +35,7 @@ type Config struct {
 	Mode        string      `yaml:"mode"`
 	Server      Server      `yaml:"server"`
 	UserContent UserContent `yaml:"user_content"`
+	API         API         `yaml:"api"`
 }
 
 const DbDriverSqlite = "sqlite"
@@ -35,6 +46,7 @@ const ModeApi = "api"
 
 const UserContentModeLocal = "local"
 const UserContentModeS3 = "s3"
+const UserContentModeGCS = "gcs"
 
 func NewConfig(r io.Reader) (*Config, error) {
 

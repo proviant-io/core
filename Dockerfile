@@ -9,7 +9,7 @@ ENV TAG=$TAG_ARG
 # install dependencies
 RUN apk update
 RUN apk upgrade
-RUN apk add --update go=1.16.5-r0 gcc=10.3.1_git20210424-r2 g++=10.3.1_git20210424-r2 make=4.3-r0 curl=7.78.0-r0
+RUN apk add --update go=1.16.7-r0 gcc=10.3.1_git20210424-r2 g++=10.3.1_git20210424-r2 make=4.3-r0 curl=7.78.0-r0
 # download go modules
 WORKDIR /app
 COPY go.mod go.sum ./
@@ -32,7 +32,7 @@ RUN make download/ui
 # copy compiled assets & config
 FROM alpine:latest AS app
 LABEL maintainer="Grigorii Merkushev <brushknight@gmail.com>"
-ARG CONFIG_VERSION_ARG="./config/web-sqlite.yml"
+ARG CONFIG_VERSION_ARG="./examples/config/web-sqlite.yml"
 ENV CONFIG_VERSION=$CONFIG_VERSION_ARG
 WORKDIR /app
 # copy executable
