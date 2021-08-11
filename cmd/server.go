@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/proviant-io/core/internal/apm"
 	"github.com/proviant-io/core/internal/config"
 	"github.com/proviant-io/core/internal/db"
 	"github.com/proviant-io/core/internal/di"
@@ -48,6 +49,8 @@ func main() {
 	}
 
 	log.Println(cfg)
+
+	realApm := apm.NewApm(cfg.APM)
 
 	var d db.DB
 
@@ -96,7 +99,7 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	i, err := di.NewDI(d, cfg, Version)
+	i, err := di.NewDI(d, cfg, realApm, Version)
 
 	if err != nil {
 		log.Fatalln(err)

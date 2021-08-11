@@ -36,6 +36,13 @@ type Config struct {
 	Server      Server      `yaml:"server"`
 	UserContent UserContent `yaml:"user_content"`
 	API         API         `yaml:"api"`
+	APM         APM         `yaml:"apm"`
+}
+
+type APM struct {
+	Vendor          string `yaml:"vendor"`
+	LicenseKey      string `yaml:"license_key"`
+	ApplicationName string `yaml:"application_name"`
 }
 
 const DbDriverSqlite = "sqlite"

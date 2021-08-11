@@ -5,7 +5,8 @@ services:
     container_name: "proviant-core"
     image: brushknight/proviant-core:dev
     volumes:
-    - ./examples/config/web-mysql.yml:/app/default-config.yml
+    #- ./examples/config/web-mysql.yml:/app/default-config.yml
+    - ./config.yml:/app/default-config.yml
     #- ./gcs-secret.json:/app/gcs-secret.json
     - user_content:/app/user_content
     links:

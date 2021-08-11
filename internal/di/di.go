@@ -4,6 +4,7 @@ import (
 	"cloud.google.com/go/storage"
 	"context"
 	"fmt"
+	"github.com/proviant-io/core/internal/apm"
 	"github.com/proviant-io/core/internal/config"
 	"github.com/proviant-io/core/internal/db"
 	"github.com/proviant-io/core/internal/pkg/image"
@@ -14,21 +15,23 @@ type DI struct {
 	Cfg        *config.Config
 	Version    string
 	ImageSaver image.Saver
+	Apm        apm.Apm
 }
 
-func NewDI(d db.DB, cfg *config.Config, version string) (*DI, error) {
+func NewDI(d db.DB, cfg *config.Config, apm apm.Apm, version string) (*DI, error) {
 
 	pool := &DI{}
 
 	pool.Cfg = cfg
 	pool.Version = version
+	pool.Apm = apm
 
 	switch cfg.UserContent.Mode {
 	case config.UserContentModeLocal:
 		pool.ImageSaver = image.NewLocalSaver(cfg.UserContent.Location)
 	case config.UserContentModeGCS:
 
-		if cfg.API.GCS.JsonCredentialPath == ""{
+		if cfg.API.GCS.JsonCredentialPath == "" {
 			return nil, fmt.Errorf("credentials for GCS required")
 		}
 

@@ -25,6 +25,10 @@ api:
     json_credential_path: "/app/gcs-creds.json"
     bucket_name: "bucket-name"
     project_id: "project-id"
+apm:
+  vendor: "newrelic"
+  license_key: "1234"
+  application_name: "proviant/core"
 `
 
 	reader := strings.NewReader(content)
@@ -53,6 +57,11 @@ api:
 				ProjectId:          "project-id",
 				JsonCredentialPath: "/app/gcs-creds.json",
 			},
+		},
+		APM: APM{
+			vendor:          "newrelic",
+			licenseKey:      "1234",
+			applicationName: "proviant/core",
 		},
 	}
 
