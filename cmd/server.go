@@ -27,7 +27,7 @@ func main() {
 	err := viper.BindEnv("config")
 
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 
 	configPath := viper.GetString("config")
@@ -38,13 +38,13 @@ func main() {
 
 	f, err := os.Open(configPath)
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 	defer f.Close()
 
 	cfg, err := config.NewConfig(f)
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 
 	log.Println(cfg)
@@ -55,51 +55,51 @@ func main() {
 	case config.DbDriverSqlite:
 		d, err = db.NewSQLite(cfg.Db.Dsn)
 		if err != nil {
-			panic(err)
+			log.Fatalln(err)
 		}
 	case config.DbDriverMysql:
 		d, err = db.NewMySQL(cfg.Db.Dsn)
 		if err != nil {
-			panic(err)
+			log.Fatalln(err)
 		}
 	default:
-		panic(fmt.Sprintf("unsupported db driver: %s", cfg.Db.Driver))
+		log.Fatalln(fmt.Sprintf("unsupported db driver: %s", cfg.Db.Driver))
 	}
 
 	productRepo, err := product.Setup(d)
 
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 
 	stockRepo, err := stock.Setup(d)
 
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 
 	categoryRepo, err := category.Setup(d)
 
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 
 	listRepo, err := list.Setup(d)
 
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 
 	productCategoryRepo, err := product_category.Setup(d)
 
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 
 	i, err := di.NewDI(d, cfg, Version)
 
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 
 	relationService := service.NewRelationService(productRepo, listRepo, categoryRepo, stockRepo, productCategoryRepo, i, *cfg)
@@ -115,6 +115,6 @@ func main() {
 	err = server.Run(hostPort)
 
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 }

@@ -29,22 +29,22 @@ func NewDI(d db.DB, cfg *config.Config, version string) (*DI, error) {
 	case config.UserContentModeGCS:
 
 		if cfg.API.GCS.JsonCredentialPath == ""{
-			panic("credentials for GCS required")
+			return nil, fmt.Errorf("credentials for GCS required")
 		}
 
 		err := os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", cfg.API.GCS.JsonCredentialPath)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 
 		client, err := storage.NewClient(context.Background())
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 		pool.ImageSaver = image.NewGcsSaver(client, cfg.API.GCS.BucketName, cfg.API.GCS.ProjectId, cfg.UserContent.Location)
 
 	default:
-		panic(fmt.Sprintf("unsupported user content saver: %s", cfg.UserContent.Mode))
+		return nil, fmt.Errorf("unsupported user content saver: %s", cfg.UserContent.Mode)
 	}
 
 	return pool, nil
