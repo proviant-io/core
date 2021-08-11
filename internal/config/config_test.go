@@ -59,9 +59,9 @@ apm:
 			},
 		},
 		APM: APM{
-			vendor:          "newrelic",
-			licenseKey:      "1234",
-			applicationName: "proviant/core",
+			Vendor:          "newrelic",
+			LicenseKey:      "1234",
+			ApplicationName: "proviant/core",
 		},
 	}
 
