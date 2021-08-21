@@ -64,10 +64,10 @@ docker/run: docker/build docker/prepare-folders
 	docker rm -f proviant
 	docker run --rm -t \
 		--name "proviant" \
-		-v $(VOLUMES_PREFIX)/runtime/sqlite:/app/db/ \
-		-v $(VOLUMES_PREFIX)/runtime/user_content:/app/user_content/ \
-		-v $(PWD)/config/web-sqlite.yml:/app/default-config.yml \
-		-p8080:80 \
+		-v $(VOLUMES_PREFIX)/sqlite:/app/db/ \
+		-v $(VOLUMES_PREFIX)/user_content:/app/user_content/ \
+		-v $(PWD)/examples/config/web-sqlite.yml:/app/default-config.yml \
+		-p8100:80 \
 		brushknight/proviant-core:$(TAG)
 
 .PHONY: docker/pull-latest
@@ -78,9 +78,9 @@ docker/pull-latest:
 docker/run-latest: docker/pull-latest docker/prepare-folders
 	docker run --rm -t \
 		--name "proviant" \
-		-v $(VOLUMES_PREFIX)/runtime/sqlite:/app/db/ \
-		-v $(VOLUMES_PREFIX)/runtime/user_content:/app/user_content/ \
-		-v $(PWD)/config/web-sqlite.yml:/app/default-config.yml \
+		-v $(VOLUMES_PREFIX)/sqlite:/app/db/ \
+		-v $(VOLUMES_PREFIX)/user_content:/app/user_content/ \
+		-v $(PWD)/examples/config/web-sqlite.yml:/app/default-config.yml \
 		-p8080:80 \
 		brushknight/proviant-core:latest
 
@@ -91,6 +91,6 @@ docker/compose: docker/build docker/prepare-folders
 
 .PHONY: docker/prepare-folders
 docker/prepare-folders:
-	mkdir -p $(VOLUMES_PREFIX)/runtime/mysql
-	mkdir -p $(VOLUMES_PREFIX)/runtime/user_content
+	mkdir -p $(VOLUMES_PREFIX)/mysql
+	mkdir -p $(VOLUMES_PREFIX)/user_content
 

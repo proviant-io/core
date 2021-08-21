@@ -142,6 +142,10 @@ func NewServer(productRepo *product.Repository,
 	apiV1Router.HandleFunc(server.di.Apm.WrapHandleFunc("/product/{id}/add/", server.addStock)).Methods("POST")
 	apiV1Router.HandleFunc(server.di.Apm.WrapHandleFunc("/product/{id}/consume/", server.consumeStock)).Methods("POST")
 	apiV1Router.HandleFunc(server.di.Apm.WrapHandleFunc("/product/{product_id}/stock/{id}/", server.deleteStock)).Methods("DELETE")
+	// shopping list
+	apiV1Router.HandleFunc(server.di.Apm.WrapHandleFunc("/shopping_list/", server.getShoppingLists)).Methods("GET")
+
+	// chore
 	apiV1Router.HandleFunc(server.di.Apm.WrapHandleFunc("/i18n/missing/", server.getMissingTranslations)).Methods("GET")
 	apiV1Router.HandleFunc(server.di.Apm.WrapHandleFunc("/version/", server.getVersion)).Methods("GET")
 

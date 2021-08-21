@@ -1,4 +1,4 @@
-package list
+package shopping
 
 import (
 	"fmt"
@@ -15,29 +15,33 @@ type List struct {
 	AccountId int    `json:"account_id" gorm:"default:0;index"`
 }
 
-type DTO struct {
+func (List) TableName() string {
+	return "shopping_lists"
+}
+
+type ListDTO struct {
 	Id        int    `json:"id"`
 	Title     string `json:"title"`
 }
 
-type Repository struct {
+type ListRepository struct {
 	db db.DB
 }
 
-func (r *Repository) Get(id int, accountId int) (List, *errors.CustomError) {
+func (r *ListRepository) Get(id int, accountId int) (List, *errors.CustomError) {
 
 	model := &List{}
 
 	r.db.Connection().First(model, "id = ? and account_id = ?", id, accountId)
 
 	if (*model).Id == 0 {
-		return List{}, errors.NewErrNotFound(i18n.NewMessage("list with id %d not found", id))
+		return List{}, errors.NewErrNotFound(i18n.NewMessage("shopping list with id %d not found", id))
 	}
 
 	return *model, nil
 }
 
-func (r *Repository) GetAll(accountId int) []List {
+func (r *ListRepository) GetAll(accountId int) []List {
 
 	var models []List
 	r.db.Connection().Where("account_id = ?", accountId).Find(&models)
@@ -45,7 +49,7 @@ func (r *Repository) GetAll(accountId int) []List {
 	return models
 }
 
-func (r *Repository) Delete(id int, accountId int) *errors.CustomError {
+func (r *ListRepository) Delete(id int, accountId int) *errors.CustomError {
 
 	model, err := r.Get(id, accountId)
 
@@ -57,7 +61,7 @@ func (r *Repository) Delete(id int, accountId int) *errors.CustomError {
 	return nil
 }
 
-func (r *Repository) Create(dto DTO, accountId int) List {
+func (r *ListRepository) Create(dto ListDTO, accountId int) List {
 
 	model := List{
 		Title: dto.Title,
@@ -68,7 +72,7 @@ func (r *Repository) Create(dto DTO, accountId int) List {
 	return model
 }
 
-func (r *Repository) Update(id int, dto DTO, accountId int) (List, *errors.CustomError) {
+func (r *ListRepository) Update(id int, dto ListDTO, accountId int) (List, *errors.CustomError) {
 
 	model, err := r.Get(id, accountId)
 
@@ -82,25 +86,25 @@ func (r *Repository) Update(id int, dto DTO, accountId int) (List, *errors.Custo
 	return model, nil
 }
 
-func ModelToDTO(m List) DTO {
-	return DTO{
+func ListToDTO(m List) ListDTO {
+	return ListDTO{
 		Id:    m.Id,
 		Title: m.Title,
 	}
 }
 
-func (r *Repository) Migrate() error {
+func (r *ListRepository) Migrate() error {
 	// Migrate the schema
 	err := r.db.Connection().AutoMigrate(&List{})
 	if err != nil {
-		return fmt.Errorf("migration of Product table failed: %v", err)
+		return fmt.Errorf("migration of ShoppingList table failed: %v", err)
 	}
 	return nil
 }
 
-func Setup(d db.DB) (*Repository, error) {
+func ListSetup(d db.DB) (*ListRepository, error) {
 
-	repo := &Repository{}
+	repo := &ListRepository{}
 
 	repo.db = d
 
@@ -110,5 +114,4 @@ func Setup(d db.DB) (*Repository, error) {
 	}
 
 	return repo, nil
-
 }

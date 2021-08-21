@@ -8,14 +8,17 @@ import (
 	"github.com/proviant-io/core/internal/config"
 	"github.com/proviant-io/core/internal/db"
 	"github.com/proviant-io/core/internal/pkg/image"
+	"github.com/proviant-io/core/internal/pkg/shopping"
 	"os"
 )
 
 type DI struct {
-	Cfg        *config.Config
-	Version    string
-	ImageSaver image.Saver
-	Apm        apm.Apm
+	Cfg          *config.Config
+	Version      string
+	ImageSaver   image.Saver
+	Apm          apm.Apm
+	ShoppingList *shopping.ListRepository
+	ShoppingListItem *shopping.ItemRepository
 }
 
 func NewDI(d db.DB, cfg *config.Config, apm apm.Apm, version string) (*DI, error) {
@@ -25,6 +28,22 @@ func NewDI(d db.DB, cfg *config.Config, apm apm.Apm, version string) (*DI, error
 	pool.Cfg = cfg
 	pool.Version = version
 	pool.Apm = apm
+
+	shoppingListRepo, err := shopping.ListSetup(d)
+
+	if err != nil {
+		return nil, err
+	}
+
+	pool.ShoppingList = shoppingListRepo
+
+	shoppingListItemRepo, err := shopping.ItemSetup(d)
+
+	if err != nil {
+		return nil, err
+	}
+
+	pool.ShoppingListItem = shoppingListItemRepo
 
 	switch cfg.UserContent.Mode {
 	case config.UserContentModeLocal:
