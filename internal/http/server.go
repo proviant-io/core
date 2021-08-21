@@ -144,6 +144,12 @@ func NewServer(productRepo *product.Repository,
 	apiV1Router.HandleFunc(server.di.Apm.WrapHandleFunc("/product/{product_id}/stock/{id}/", server.deleteStock)).Methods("DELETE")
 	// shopping list
 	apiV1Router.HandleFunc(server.di.Apm.WrapHandleFunc("/shopping_list/", server.getShoppingLists)).Methods("GET")
+	apiV1Router.HandleFunc(server.di.Apm.WrapHandleFunc("/shopping_list/{id}/", server.getShoppingList)).Methods("GET")
+	apiV1Router.HandleFunc(server.di.Apm.WrapHandleFunc("/shopping_list/{id}/", server.addShoppingListItem)).Methods("POST")
+	apiV1Router.HandleFunc(server.di.Apm.WrapHandleFunc("/shopping_list/{list_id}/{id}/", server.updateShoppingListItem)).Methods("PUT")
+	apiV1Router.HandleFunc(server.di.Apm.WrapHandleFunc("/shopping_list/{list_id}/{id}/", server.deleteShoppingListItem)).Methods("DELETE")
+	apiV1Router.HandleFunc(server.di.Apm.WrapHandleFunc("/shopping_list/{list_id}/{id}/check/", server.checkShoppingListItem)).Methods("PUT")
+	apiV1Router.HandleFunc(server.di.Apm.WrapHandleFunc("/shopping_list/{list_id}/{id}/uncheck/", server.uncheckShoppingListItem)).Methods("PUT")
 
 	// chore
 	apiV1Router.HandleFunc(server.di.Apm.WrapHandleFunc("/i18n/missing/", server.getMissingTranslations)).Methods("GET")

@@ -20,8 +20,14 @@ func (List) TableName() string {
 }
 
 type ListDTO struct {
-	Id        int    `json:"id"`
-	Title     string `json:"title"`
+	Id    int    `json:"id"`
+	Title string `json:"title"`
+}
+
+type ListFilledDTO struct {
+	Id    int       `json:"id"`
+	Title string    `json:"title"`
+	Items []ItemDTO `json:"items"`
 }
 
 type ListRepository struct {
@@ -64,7 +70,7 @@ func (r *ListRepository) Delete(id int, accountId int) *errors.CustomError {
 func (r *ListRepository) Create(dto ListDTO, accountId int) List {
 
 	model := List{
-		Title: dto.Title,
+		Title:     dto.Title,
 		AccountId: accountId,
 	}
 
