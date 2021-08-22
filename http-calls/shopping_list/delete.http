@@ -1,0 +1,2 @@
+DELETE http://localhost:8100/api/v1/shopping_list/1/1/
+User-Locale: en

@@ -10,6 +10,7 @@ import (
 	"github.com/proviant-io/core/internal/pkg/list"
 	"github.com/proviant-io/core/internal/pkg/product"
 	"github.com/proviant-io/core/internal/pkg/product_category"
+	"github.com/proviant-io/core/internal/pkg/shopping"
 	"github.com/proviant-io/core/internal/pkg/stock"
 	"github.com/proviant-io/core/internal/utils"
 	"log"
@@ -323,6 +324,85 @@ func (s *RelationService) DeleteList(id int, accountId int) *errors.CustomError 
 
 	return s.listRepository.Delete(id, accountId)
 }
+
+func (s *RelationService) GetShoppingList(id, accountId int) (shopping.ListFilledDTO, *errors.CustomError) {
+
+	listModel, err := s.di.ShoppingList.Get(id, accountId)
+
+	if err != nil {
+		return shopping.ListFilledDTO{}, err
+	}
+
+	items := s.di.ShoppingListItem.GetAllByList(listModel.Id, accountId)
+
+	itemsDTO := []shopping.ItemDTO{}
+
+	for _, item := range items {
+		itemsDTO = append(itemsDTO, shopping.ItemToDTO(item))
+	}
+
+	dto := shopping.ListFilledDTO{
+		Id:    listModel.Id,
+		Title: listModel.Title,
+		Items: itemsDTO,
+	}
+
+	return dto, nil
+}
+
+func (s *RelationService) AddShoppingListItem(id int, dto shopping.ItemDTO, accountId int) (shopping.ItemDTO, *errors.CustomError) {
+
+	listModel, err := s.di.ShoppingList.Get(id, accountId)
+
+	if err != nil {
+		return shopping.ItemDTO{}, err
+	}
+
+	dto.ListId = listModel.Id
+
+	item := s.di.ShoppingListItem.Create(dto, accountId)
+
+	return shopping.ItemToDTO(item), nil
+}
+
+func (s *RelationService) UpdateShoppingListItem(id int, dto shopping.ItemDTO, accountId int) (shopping.ItemDTO, *errors.CustomError) {
+
+	listModel, err := s.di.ShoppingList.Get(id, accountId)
+
+	if err != nil {
+		return shopping.ItemDTO{}, err
+	}
+
+	dto.ListId = listModel.Id
+
+	item, err := s.di.ShoppingListItem.Update(dto.Id, dto, accountId)
+
+	if err != nil {
+		return shopping.ItemDTO{}, err
+	}
+
+	return shopping.ItemToDTO(item), nil
+}
+
+
+func (s *RelationService) UpdateCheckedShoppingListItem( id int, checked bool, accountId int) (shopping.ItemDTO, *errors.CustomError) {
+
+	var item shopping.Item
+	var err *errors.CustomError
+
+	if checked {
+		item, err = s.di.ShoppingListItem.Check(id, accountId)
+	}else {
+		item, err = s.di.ShoppingListItem.Uncheck(id, accountId)
+	}
+
+	if err != nil {
+		return shopping.ItemDTO{}, err
+	}
+
+	return shopping.ItemToDTO(item), nil
+}
+
 
 func NewRelationService(productRepository *product.Repository,
 	listRepository *list.Repository,

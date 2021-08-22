@@ -18,7 +18,7 @@ type Product struct {
 	Barcode     string `json:"barcode"`
 	ListId      int    `json:"list_id"`
 	Stock       uint   `json:"stock" gorm:"type:UINT"`
-	AccountId   int    `json:"account_id" gorm:"default:0"`
+	AccountId   int    `json:"account_id" gorm:"default:0;index"`
 }
 
 type CreateDTO struct {

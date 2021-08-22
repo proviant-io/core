@@ -1,0 +1,7 @@
+### get one
+GET http://localhost:8100/api/v1/shopping_list/1/
+User-Locale: en
+
+### get all
+GET http://localhost:8100/api/v1/shopping_list/
+User-Locale: en

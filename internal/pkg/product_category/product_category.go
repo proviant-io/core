@@ -10,7 +10,7 @@ type ProductCategory struct {
 	gorm.Model
 	ProductId  int `json:"product_id" gorm:"uniqueIndex:idx_member"`
 	CategoryId int `json:"category_id" gorm:"uniqueIndex:idx_member"`
-	AccountId  int `json:"account_id" gorm:"default:0"`
+	AccountId  int `json:"account_id" gorm:"default:0;index"`
 }
 
 type Repository struct {

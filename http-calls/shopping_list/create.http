@@ -1,0 +1,4 @@
+POST http://localhost:8100/api/v1/shopping_list/1/
+Content-Type: application/json
+
+{"title": "Coffee Nespresso | COCOA KISS", "quantity": 4}

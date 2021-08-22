@@ -12,7 +12,7 @@ type Category struct {
 	gorm.Model
 	Id        int    `json:"id" gorm:"primaryKey;autoIncrement;"`
 	Title     string `json:"title"`
-	AccountId int    `json:"account_id" gorm:"default:0"`
+	AccountId int    `json:"account_id" gorm:"default:0;index"`
 }
 
 type DTO struct {

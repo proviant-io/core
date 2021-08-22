@@ -14,7 +14,7 @@ type Stock struct {
 	ProductId int  `json:"product_id"`
 	Quantity  uint `json:"quantity"`
 	Expire    int  `json:"expire"`
-	AccountId int  `json:"account_id" gorm:"default:0"`
+	AccountId int  `json:"account_id" gorm:"default:0;index"`
 }
 
 type DTO struct {

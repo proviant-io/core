@@ -1,0 +1,13 @@
+PUT http://localhost:8100/api/v1/shopping_list/1/1/
+Content-Type: application/json
+
+{"title": "Coffee Nespresso | COCOA KISS", "quantity": 10}
+
+### check
+PUT http://localhost:8100/api/v1/shopping_list/1/1/check/
+Content-Type: application/json
+
+
+### uncheck
+PUT http://localhost:8100/api/v1/shopping_list/1/1/uncheck/
+Content-Type: application/json
