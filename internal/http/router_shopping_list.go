@@ -103,6 +103,11 @@ func (s *Server) addShoppingListItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if dto.Quantity == 0 {
+		s.handleBadRequest(w, locale, "quantity should not be 0")
+		return
+	}
+
 	data, customErr := s.relationService.AddShoppingListItem(listId, dto, accountId)
 
 	if customErr != nil {
@@ -167,6 +172,11 @@ func (s *Server) updateShoppingListItem(w http.ResponseWriter, r *http.Request) 
 		s.handleBadRequest(w, locale, "title should not be empty")
 		return
 	}
+	
+	if dto.Quantity == 0 {
+		s.handleBadRequest(w, locale, "quantity should not be 0")
+		return
+	}
 
 	data, customErr := s.relationService.UpdateShoppingListItem(listId, dto, accountId)
 
@@ -219,7 +229,7 @@ func (s *Server) checkShoppingListItem(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) uncheckShoppingListItem(w http.ResponseWriter, r *http.Request) {
-	s.updateCheckedShoppingListItem(w, r, true)
+	s.updateCheckedShoppingListItem(w, r, false)
 }
 
 func (s *Server) updateCheckedShoppingListItem(w http.ResponseWriter, r *http.Request, checked bool) {

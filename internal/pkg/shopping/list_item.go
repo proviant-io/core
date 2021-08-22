@@ -102,6 +102,11 @@ func (r *ItemRepository) Update(id int, dto ItemDTO, accountId int) (Item, *erro
 	model.Checked = dto.Checked
 
 	r.db.Connection().Model(&Item{Id: id}).Updates(&model)
+
+	if !model.Checked {
+		r.db.Connection().Model(&model).Select("Checked").Updates(map[string]interface{}{"checked": false})
+	}
+
 	return model, nil
 }
 
@@ -115,7 +120,7 @@ func (r *ItemRepository) updateChecked(id int, checked bool, accountId int) (Ite
 
 	model.Checked = checked
 
-	r.db.Connection().Model(&Item{Id: id}).Updates(&model)
+	r.db.Connection().Model(&model).Select("Checked").Updates(map[string]interface{}{"checked": model.Checked})
 	return model, nil
 }
 
