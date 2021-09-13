@@ -5,17 +5,21 @@ import (
 	"github.com/proviant-io/core/internal/db"
 	"github.com/proviant-io/core/internal/errors"
 	"github.com/proviant-io/core/internal/i18n"
+	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
+	"time"
 )
 
 type Item struct {
 	gorm.Model
-	Id        int    `json:"id" gorm:"primaryKey;autoIncrement;"`
-	ListId    int    `json:"list_id" gorm:"index"`
-	Title     string `json:"title"`
-	Quantity  int    `json:"quantity"`
-	Checked   bool   `json:"checked"`
-	AccountId int    `json:"account_id" gorm:"default:0;index"`
+	Id        int             `json:"id" gorm:"primaryKey;autoIncrement;"`
+	ListId    int             `json:"list_id" gorm:"index"`
+	Title     string          `json:"title"`
+	Quantity  int             `json:"quantity"`
+	Checked   bool            `json:"checked"`
+	CheckedAt time.Time       `json:"checked_at"`
+	Price     decimal.Decimal `json:"price" gorm:"type:decimal(20,2);"`
+	AccountId int             `json:"account_id" gorm:"default:0;index"`
 }
 
 func (Item) TableName() string {
@@ -23,11 +27,13 @@ func (Item) TableName() string {
 }
 
 type ItemDTO struct {
-	Id       int    `json:"id"`
-	ListId   int    `json:"list_id" gorm:"index"`
-	Title    string `json:"title"`
-	Quantity int    `json:"quantity"`
-	Checked  bool   `json:"checked"`
+	Id        int             `json:"id"`
+	ListId    int             `json:"list_id" gorm:"index"`
+	Title     string          `json:"title"`
+	Quantity  int             `json:"quantity"`
+	Checked   bool            `json:"checked"`
+	CheckedAt time.Time       `json:"checked_at"`
+	Price     decimal.Decimal `json:"price"`
 }
 
 type ItemRepository struct {
@@ -83,6 +89,7 @@ func (r *ItemRepository) Create(dto ItemDTO, accountId int) Item {
 		ListId:    dto.ListId,
 		Quantity:  dto.Quantity,
 		Checked:   false,
+		Price:     dto.Price,
 	}
 
 	r.db.Connection().Create(&model)
@@ -99,7 +106,15 @@ func (r *ItemRepository) Update(id int, dto ItemDTO, accountId int) (Item, *erro
 
 	model.Title = dto.Title
 	model.Quantity = dto.Quantity
-	model.Checked = dto.Checked
+	model.Price = dto.Price
+	if dto.Checked {
+		model.Checked = true
+		model.CheckedAt = time.Now()
+	} else {
+		model.Checked = false
+		// should be cleaning
+		model.CheckedAt = time.Now()
+	}
 
 	r.db.Connection().Model(&Item{Id: id}).Updates(&model)
 
@@ -121,6 +136,7 @@ func (r *ItemRepository) updateChecked(id int, checked bool, accountId int) (Ite
 	model.Checked = checked
 
 	r.db.Connection().Model(&model).Select("Checked").Updates(map[string]interface{}{"checked": model.Checked})
+	r.db.Connection().Model(&model).Select("CheckedAt").Updates(map[string]interface{}{"checked_at": time.Now()})
 	return model, nil
 }
 
@@ -134,11 +150,13 @@ func (r *ItemRepository) Uncheck(id int, accountId int) (Item, *errors.CustomErr
 
 func ItemToDTO(m Item) ItemDTO {
 	return ItemDTO{
-		Id:       m.Id,
-		Title:    m.Title,
-		ListId:   m.ListId,
-		Quantity: m.Quantity,
-		Checked:  m.Checked,
+		Id:        m.Id,
+		Title:     m.Title,
+		ListId:    m.ListId,
+		Quantity:  m.Quantity,
+		Checked:   m.Checked,
+		CheckedAt: m.CheckedAt,
+		Price:     m.Price,
 	}
 }
 
