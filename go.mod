@@ -14,6 +14,7 @@ require (
 	github.com/moby/term v0.0.0-20210619224110-3f7ff695adc6 // indirect
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/newrelic/go-agent/v3 v3.14.1
+	github.com/shopspring/decimal v1.2.0
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/spf13/viper v1.8.1
 	github.com/stretchr/testify v1.7.0
