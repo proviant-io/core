@@ -1,6 +1,7 @@
 package shopping
 
 import (
+	"database/sql"
 	"fmt"
 	"github.com/proviant-io/core/internal/db"
 	"github.com/proviant-io/core/internal/errors"
@@ -17,7 +18,7 @@ type Item struct {
 	Title     string          `json:"title"`
 	Quantity  int             `json:"quantity"`
 	Checked   bool            `json:"checked"`
-	CheckedAt time.Time       `json:"checked_at"`
+	CheckedAt sql.NullTime    `json:"checked_at"`
 	Price     decimal.Decimal `json:"price" gorm:"type:decimal(20,2);"`
 	AccountId int             `json:"account_id" gorm:"default:0;index"`
 }
@@ -32,7 +33,7 @@ type ItemDTO struct {
 	Title     string          `json:"title"`
 	Quantity  int             `json:"quantity"`
 	Checked   bool            `json:"checked"`
-	CheckedAt time.Time       `json:"checked_at"`
+	CheckedAt sql.NullTime    `json:"checked_at"`
 	Price     decimal.Decimal `json:"price"`
 }
 
@@ -89,6 +90,7 @@ func (r *ItemRepository) Create(dto ItemDTO, accountId int) Item {
 		ListId:    dto.ListId,
 		Quantity:  dto.Quantity,
 		Checked:   false,
+		CheckedAt: sql.NullTime{},
 		Price:     dto.Price,
 	}
 
@@ -109,17 +111,21 @@ func (r *ItemRepository) Update(id int, dto ItemDTO, accountId int) (Item, *erro
 	model.Price = dto.Price
 	if dto.Checked {
 		model.Checked = true
-		model.CheckedAt = time.Now()
+		model.CheckedAt = sql.NullTime{
+			time.Now(),
+			true,
+		}
 	} else {
 		model.Checked = false
 		// should be cleaning
-		model.CheckedAt = time.Now()
+		model.CheckedAt = sql.NullTime{}
 	}
 
 	r.db.Connection().Model(&Item{Id: id}).Updates(&model)
 
 	if !model.Checked {
 		r.db.Connection().Model(&model).Select("Checked").Updates(map[string]interface{}{"checked": false})
+		r.db.Connection().Model(&model).Select("CheckedAt").Updates(map[string]interface{}{"checked_at": nil})
 	}
 
 	return model, nil
@@ -136,7 +142,16 @@ func (r *ItemRepository) updateChecked(id int, checked bool, accountId int) (Ite
 	model.Checked = checked
 
 	r.db.Connection().Model(&model).Select("Checked").Updates(map[string]interface{}{"checked": model.Checked})
-	r.db.Connection().Model(&model).Select("CheckedAt").Updates(map[string]interface{}{"checked_at": time.Now()})
+
+	if checked {
+		r.db.Connection().Model(&model).Select("CheckedAt").Updates(map[string]interface{}{"checked_at": sql.NullTime{
+			time.Now(),
+			true,
+		}})
+	}else{
+		r.db.Connection().Model(&model).Select("CheckedAt").Updates(map[string]interface{}{"checked_at": nil})
+	}
+
 	return model, nil
 }
 
