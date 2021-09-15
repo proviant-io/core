@@ -5,59 +5,64 @@ import (
 	"github.com/proviant-io/core/internal/db"
 	"github.com/proviant-io/core/internal/errors"
 	"github.com/proviant-io/core/internal/i18n"
+	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 )
 
 type Product struct {
 	gorm.Model
-	Id          int    `json:"id" gorm:"primaryKey;autoIncrement;"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Link        string `json:"link"`
-	Image       string `json:"image"`
-	Barcode     string `json:"barcode"`
-	ListId      int    `json:"list_id"`
-	Stock       uint   `json:"stock" gorm:"type:UINT"`
-	AccountId   int    `json:"account_id" gorm:"default:0;index"`
+	Id          int             `json:"id" gorm:"primaryKey;autoIncrement;"`
+	Title       string          `json:"title"`
+	Description string          `json:"description"`
+	Link        string          `json:"link"`
+	Image       string          `json:"image"`
+	Barcode     string          `json:"barcode"`
+	ListId      int             `json:"list_id"`
+	Stock       uint            `json:"stock" gorm:"type:UINT"`
+	Price       decimal.Decimal `json:"price" gorm:"type:decimal(20,2);"`
+	AccountId   int             `json:"account_id" gorm:"default:0;index"`
 }
 
 type CreateDTO struct {
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Link        string `json:"link"`
-	Image       string `json:"image"`
-	ImageBase64 string `json:"image_base64"`
-	Barcode     string `json:"barcode"`
-	CategoryIds []int  `json:"category_ids"`
-	ListId      int    `json:"list_id"`
-	Stock       uint   `json:"stock"`
+	Title       string          `json:"title"`
+	Description string          `json:"description"`
+	Link        string          `json:"link"`
+	Image       string          `json:"image"`
+	ImageBase64 string          `json:"image_base64"`
+	Barcode     string          `json:"barcode"`
+	CategoryIds []int           `json:"category_ids"`
+	ListId      int             `json:"list_id"`
+	Stock       uint            `json:"stock"`
+	Price       decimal.Decimal `json:"price"`
 }
 
 type UpdateDTO struct {
-	Id          int    `json:"id"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Link        string `json:"link"`
-	Image       string `json:"image"`
-	ImageBase64 string `json:"image_base64"`
-	Barcode     string `json:"barcode"`
-	CategoryIds []int  `json:"category_ids"`
-	ListId      int    `json:"list_id"`
-	Stock       uint   `json:"stock"`
+	Id          int             `json:"id"`
+	Title       string          `json:"title"`
+	Description string          `json:"description"`
+	Link        string          `json:"link"`
+	Image       string          `json:"image"`
+	ImageBase64 string          `json:"image_base64"`
+	Barcode     string          `json:"barcode"`
+	CategoryIds []int           `json:"category_ids"`
+	ListId      int             `json:"list_id"`
+	Stock       uint            `json:"stock"`
+	Price       decimal.Decimal `json:"price"`
 }
 
 type DTO struct {
-	Id          int         `json:"id"`
-	Title       string      `json:"title"`
-	Description string      `json:"description"`
-	Link        string      `json:"link"`
-	Image       string      `json:"image"`
-	Barcode     string      `json:"barcode"`
-	CategoryIds []int       `json:"category_ids"`
-	Categories  interface{} `json:"categories"`
-	ListId      int         `json:"list_id"`
-	List        interface{} `json:"list"`
-	Stock       uint        `json:"stock"`
+	Id          int             `json:"id"`
+	Title       string          `json:"title"`
+	Description string          `json:"description"`
+	Link        string          `json:"link"`
+	Image       string          `json:"image"`
+	Barcode     string          `json:"barcode"`
+	CategoryIds []int           `json:"category_ids"`
+	Categories  interface{}     `json:"categories"`
+	ListId      int             `json:"list_id"`
+	List        interface{}     `json:"list"`
+	Stock       uint            `json:"stock"`
+	Price       decimal.Decimal `json:"price"`
 }
 
 type Repository struct {
@@ -125,6 +130,7 @@ func (r *Repository) Create(dto CreateDTO, accountId int) Product {
 		ListId:      dto.ListId,
 		Stock:       0,
 		AccountId:   accountId,
+		Price:       dto.Price,
 	}
 
 	r.db.Connection().Create(p)
@@ -164,6 +170,7 @@ func (r *Repository) UpdateFromDTO(dto UpdateDTO, accountId int) (Product, *erro
 	model.Barcode = dto.Barcode
 	model.ListId = dto.ListId
 	model.Stock = dto.Stock
+	model.Price = dto.Price
 
 	r.db.Connection().Model(&Product{Id: dto.Id}).Updates(model)
 
@@ -184,6 +191,7 @@ func ModelToDTO(m Product) DTO {
 		Barcode:     m.Barcode,
 		ListId:      m.ListId,
 		Stock:       m.Stock,
+		Price:       m.Price,
 	}
 }
 

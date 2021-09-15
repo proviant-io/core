@@ -7,7 +7,7 @@ TAG := dev
 endif
 
 ifndef UI_VERSION
-UI_VERSION := 0.0.39
+UI_VERSION := 0.0.41
 endif
 
 ifndef VOLUMES_PREFIX
@@ -25,7 +25,7 @@ test/2e2/docker-build:
 	docker build --target app \
 		--build-arg CONFIG_VERSION_ARG="./examples/config/api-sqlite.yml" \
 		--build-arg UI_VERSION_ARG=$(UI_VERSION) \
-		-t brushknight/proviant:e2e \
+		-t brushknight/proviant-core:e2e \
 		-f Dockerfile .
 
 .PHONY: test/e2e

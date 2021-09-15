@@ -2,6 +2,11 @@ package e2e
 
 import (
 	"fmt"
+	"github.com/proviant-io/core/internal/http"
+	"github.com/proviant-io/core/internal/pkg/category"
+	"github.com/proviant-io/core/internal/pkg/list"
+	"github.com/proviant-io/core/internal/pkg/product"
+	"github.com/shopspring/decimal"
 	"gotest.tools/assert"
 	"testing"
 	"time"
@@ -17,64 +22,199 @@ func TestApiProduct(t *testing.T) {
 
 	fmt.Print("product: check db empty")
 	actual := getRequest(generateApiUrl("/api/v1/product/"))
-	expected := `{"status":200,"data":[],"error":""}`
-	assert.Equal(t, expected, actual)
+	expected := http.Response{
+		Status: 200,
+		Data:   []interface{}{},
+		Error:  "",
+	}
+	assert.Equal(t, toJson(t, expected), actual)
 	fmt.Println(" OK")
 
 	fmt.Print("product: create list")
 	actual = postRequest(generateApiUrl("/api/v1/list/"), []byte(`{"title": "Fridge"}`))
-	expected = `{"status":201,"data":{"id":1,"title":"Fridge"},"error":""}`
-	assert.Equal(t, expected, actual)
+	expected = http.Response{
+		Status: 201,
+		Data:   list.DTO{
+			Id:    1,
+			Title: "Fridge",
+		},
+		Error:  "",
+	}
+	assert.Equal(t, toJson(t, expected), actual)
 	fmt.Println(" OK")
 
 	fmt.Print("product: create category")
 	actual = postRequest(generateApiUrl("/api/v1/category/"), []byte(`{"title": "Drinks"}`))
-	expected = `{"status":201,"data":{"id":1,"title":"Drinks"},"error":""}`
-	assert.Equal(t, expected, actual)
+	expected = http.Response{
+		Status: 201,
+		Data:   category.DTO{
+			Id:    1,
+			Title: "Drinks",
+		},
+		Error:  "",
+	}
+	assert.Equal(t, toJson(t, expected), actual)
 	fmt.Println(" OK")
 
 	fmt.Print("product: create")
 	actual = postRequest(generateApiUrl("/api/v1/product/"),
 		[]byte(`{"title":"Milk Shake", "description":  "Milk Shake", "link":  "https://test.com/test", "barcode":  "1234567890Z", "list_id": 1, "category_ids":  [1]}`))
-	expected = `{"status":201,"data":{"id":1,"title":"Milk Shake","description":"Milk Shake","link":"https://test.com/test","image":"","barcode":"1234567890Z","category_ids":[1],"categories":[{"id":1,"title":"Drinks"}],"list_id":1,"list":{"id":1,"title":"Fridge"},"stock":0},"error":""}`
-	assert.Equal(t, expected, actual)
+	expected = http.Response{
+		Status: 201,
+		Data:   product.DTO{
+			Id:          1,
+			Title:       "Milk Shake",
+			Description: "Milk Shake",
+			Link:        "https://test.com/test",
+			Image:       "",
+			Barcode:     "1234567890Z",
+			CategoryIds: []int{1},
+			Categories:  []category.DTO{{
+				Id: 1,
+				Title: "Drinks",
+			}},
+			ListId:      1,
+			List:        list.DTO{
+				Id:    1,
+				Title: "Fridge",
+			},
+			Stock:       0,
+			Price:       decimal.New(0,0),
+		},
+		Error:  "",
+	}
+	assert.Equal(t, toJson(t, expected), actual)
 	fmt.Println(" OK")
 
 	fmt.Print("product: get")
 	actual = getRequest(generateApiUrl("/api/v1/product/1/"))
-	expected = `{"status":200,"data":{"id":1,"title":"Milk Shake","description":"Milk Shake","link":"https://test.com/test","image":"","barcode":"1234567890Z","category_ids":[1],"categories":[{"id":1,"title":"Drinks"}],"list_id":1,"list":{"id":1,"title":"Fridge"},"stock":0},"error":""}`
-	assert.Equal(t, expected, actual)
+	expected = http.Response{
+		Status: 200,
+		Data:   product.DTO{
+			Id:          1,
+			Title:       "Milk Shake",
+			Description: "Milk Shake",
+			Link:        "https://test.com/test",
+			Image:       "",
+			Barcode:     "1234567890Z",
+			CategoryIds: []int{1},
+			Categories:  []category.DTO{{
+				Id: 1,
+				Title: "Drinks",
+			}},
+			ListId:      1,
+			List:        list.DTO{
+				Id:    1,
+				Title: "Fridge",
+			},
+			Stock:       0,
+			Price:       decimal.New(0,0),
+		},
+		Error:  "",
+	}
+	assert.Equal(t, toJson(t, expected), actual)
 	fmt.Println(" OK")
 
 	fmt.Print("product: update")
 	actual = putRequest(generateApiUrl("/api/v1/product/1/"),
 		[]byte(`{"title":"Milk Shake 2", "description":  "Milk Shake 2", "link":  "https://test.com/test", "barcode":  "1234567890Z", "list_id": 1, "category_ids":  [1]}`))
-	expected = `{"status":200,"data":{"id":1,"title":"Milk Shake 2","description":"Milk Shake 2","link":"https://test.com/test","image":"","barcode":"1234567890Z","category_ids":[1],"categories":[{"id":1,"title":"Drinks"}],"list_id":1,"list":{"id":1,"title":"Fridge"},"stock":0},"error":""}`
-	assert.Equal(t, expected, actual)
+	expected = http.Response{
+		Status: 200,
+		Data:   product.DTO{
+			Id:          1,
+			Title:       "Milk Shake 2",
+			Description: "Milk Shake 2",
+			Link:        "https://test.com/test",
+			Image:       "",
+			Barcode:     "1234567890Z",
+			CategoryIds: []int{1},
+			Categories:  []category.DTO{{
+				Id: 1,
+				Title: "Drinks",
+			}},
+			ListId:      1,
+			List:        list.DTO{
+				Id:    1,
+				Title: "Fridge",
+			},
+			Stock:       0,
+			Price:       decimal.New(0,0),
+		},
+		Error:  "",
+	}
+	assert.Equal(t, toJson(t, expected), actual)
 	fmt.Println(" OK")
 
 	fmt.Print("product: get updated")
 	actual = getRequest(generateApiUrl("/api/v1/product/1/"))
-	expected = `{"status":200,"data":{"id":1,"title":"Milk Shake 2","description":"Milk Shake 2","link":"https://test.com/test","image":"","barcode":"1234567890Z","category_ids":[1],"categories":[{"id":1,"title":"Drinks"}],"list_id":1,"list":{"id":1,"title":"Fridge"},"stock":0},"error":""}`
-	assert.Equal(t, expected, actual)
+	expected = http.Response{
+		Status: 200,
+		Data:   product.DTO{
+			Id:          1,
+			Title:       "Milk Shake 2",
+			Description: "Milk Shake 2",
+			Link:        "https://test.com/test",
+			Image:       "",
+			Barcode:     "1234567890Z",
+			CategoryIds: []int{1},
+			Categories:  []category.DTO{{
+				Id: 1,
+				Title: "Drinks",
+			}},
+			ListId:      1,
+			List:        list.DTO{
+				Id:    1,
+				Title: "Fridge",
+			},
+			Stock:       0,
+			Price:       decimal.New(0,0),
+		},
+		Error:  "",
+	}
+	assert.Equal(t, toJson(t, expected), actual)
 	fmt.Println(" OK")
 
 	fmt.Print("product: get all")
 	actual = getRequest(generateApiUrl("/api/v1/product/"))
-	expected = `{"status":200,"data":[{"id":1,"title":"Milk Shake 2","description":"Milk Shake 2","link":"https://test.com/test","image":"","barcode":"1234567890Z","category_ids":[1],"categories":[],"list_id":1,"list":null,"stock":0}],"error":""}`
-	assert.Equal(t, expected, actual)
+	expected = http.Response{
+		Status: 200,
+		Data:   []product.DTO{{
+			Id:          1,
+			Title:       "Milk Shake 2",
+			Description: "Milk Shake 2",
+			Link:        "https://test.com/test",
+			Image:       "",
+			Barcode:     "1234567890Z",
+			CategoryIds: []int{1},
+			Categories:  []category.DTO{},
+			ListId:      1,
+			List:        nil,
+			Stock:       0,
+			Price:       decimal.New(0,0),
+		}},
+		Error:  "",
+	}
+	assert.Equal(t, toJson(t, expected), actual)
 	fmt.Println(" OK")
 
 	fmt.Print("product: delete")
 	actual = deleteRequest(generateApiUrl("/api/v1/product/1/"))
-	expected = `{"status":200,"data":null,"error":""}`
-	assert.Equal(t, expected, actual)
+	expected = http.Response{
+		Status: 200,
+		Data:   nil,
+		Error:  "",
+	}
+	assert.Equal(t, toJson(t, expected), actual)
 	fmt.Println(" OK")
 
 	fmt.Print("product: deleted not found")
 	actual = getRequest(generateApiUrl("/api/v1/product/1/"))
-	expected = `{"status":404,"data":null,"error":"product with id 1 not found"}`
-	assert.Equal(t, expected, actual)
+	expected = http.Response{
+		Status: 404,
+		Data:   nil,
+		Error:  "product with id 1 not found",
+	}
+	assert.Equal(t, toJson(t, expected), actual)
 	fmt.Println(" OK")
 }
 
@@ -87,51 +227,134 @@ func TestApiProductFilter(t *testing.T){
 
 	fmt.Print("product: check db empty")
 	actual := getRequest(generateApiUrl("/api/v1/product/"))
-	expected := `{"status":200,"data":[],"error":""}`
-	assert.Equal(t, expected, actual)
+	expected := http.Response{
+		Status: 200,
+		Data:   []interface{}{},
+		Error:  "",
+	}
+	assert.Equal(t, toJson(t, expected), actual)
 	fmt.Println(" OK")
 
 	fmt.Print("product: create list")
 	actual = postRequest(generateApiUrl("/api/v1/list/"), []byte(`{"title": "Fridge"}`))
-	expected = `{"status":201,"data":{"id":1,"title":"Fridge"},"error":""}`
-	assert.Equal(t, expected, actual)
+	expected = http.Response{
+		Status: 201,
+		Data:   list.DTO{
+			Id:    1,
+			Title: "Fridge",
+		},
+		Error:  "",
+	}
+	assert.Equal(t, toJson(t, expected), actual)
 	fmt.Println(" OK")
 
 	fmt.Print("product: create category")
 	actual = postRequest(generateApiUrl("/api/v1/category/"), []byte(`{"title": "Drinks"}`))
-	expected = `{"status":201,"data":{"id":1,"title":"Drinks"},"error":""}`
-	assert.Equal(t, expected, actual)
+	expected = http.Response{
+		Status: 201,
+		Data:   category.DTO{
+			Id:    1,
+			Title: "Drinks",
+		},
+		Error:  "",
+	}
+	assert.Equal(t, toJson(t, expected), actual)
 	fmt.Println(" OK")
 
 	fmt.Print("product: create")
 	actual = postRequest(generateApiUrl("/api/v1/product/"),
 		[]byte(`{"title":"Milk Shake", "description":  "Milk Shake", "link":  "https://test.com/test", "barcode":  "1234567890Z", "list_id": 1, "category_ids":  [1]}`))
-	expected = `{"status":201,"data":{"id":1,"title":"Milk Shake","description":"Milk Shake","link":"https://test.com/test","image":"","barcode":"1234567890Z","category_ids":[1],"categories":[{"id":1,"title":"Drinks"}],"list_id":1,"list":{"id":1,"title":"Fridge"},"stock":0},"error":""}`
-	assert.Equal(t, expected, actual)
+	expected = http.Response{
+		Status: 201,
+		Data:   product.DTO{
+			Id:          1,
+			Title:       "Milk Shake",
+			Description: "Milk Shake",
+			Link:        "https://test.com/test",
+			Image:       "",
+			Barcode:     "1234567890Z",
+			CategoryIds: []int{1},
+			Categories:  []category.DTO{{
+				Id: 1,
+				Title: "Drinks",
+			}},
+			ListId:      1,
+			List:        list.DTO{
+				Id:    1,
+				Title: "Fridge",
+			},
+			Stock:       0,
+			Price:       decimal.New(0,0),
+		},
+		Error:  "",
+	}
+	assert.Equal(t, toJson(t, expected), actual)
 	fmt.Println(" OK")
 
 	fmt.Print("product: get by ?list=1")
 	actual = getRequest(generateApiUrl("/api/v1/product/?list=1"))
-	expected = `{"status":200,"data":[{"id":1,"title":"Milk Shake","description":"Milk Shake","link":"https://test.com/test","image":"","barcode":"1234567890Z","category_ids":[1],"categories":[],"list_id":1,"list":null,"stock":0}],"error":""}`
-	assert.Equal(t, expected, actual)
+	expected = http.Response{
+		Status: 200,
+		Data:   []product.DTO{{
+			Id:          1,
+			Title:       "Milk Shake",
+			Description: "Milk Shake",
+			Link:        "https://test.com/test",
+			Image:       "",
+			Barcode:     "1234567890Z",
+			CategoryIds: []int{1},
+			Categories:  []category.DTO{},
+			ListId:      1,
+			List:        nil,
+			Stock:       0,
+			Price:       decimal.New(0,0),
+		}},
+		Error:  "",
+	}
+	assert.Equal(t, toJson(t, expected), actual)
 	fmt.Println(" OK")
 
 	fmt.Print("product: get by ?list=2")
 	actual = getRequest(generateApiUrl("/api/v1/product/?list=2"))
-	expected = `{"status":200,"data":[],"error":""}`
-	assert.Equal(t, expected, actual)
+	expected = http.Response{
+		Status: 200,
+		Data:   []interface{}{},
+		Error:  "",
+	}
+	assert.Equal(t, toJson(t, expected), actual)
 	fmt.Println(" OK")
 
 	fmt.Print("product: get by ?category=1")
 	actual = getRequest(generateApiUrl("/api/v1/product/?category=1"))
-	expected = `{"status":200,"data":[{"id":1,"title":"Milk Shake","description":"Milk Shake","link":"https://test.com/test","image":"","barcode":"1234567890Z","category_ids":[1],"categories":[],"list_id":1,"list":null,"stock":0}],"error":""}`
-	assert.Equal(t, expected, actual)
+	expected = http.Response{
+		Status: 200,
+		Data:   []product.DTO{{
+			Id:          1,
+			Title:       "Milk Shake",
+			Description: "Milk Shake",
+			Link:        "https://test.com/test",
+			Image:       "",
+			Barcode:     "1234567890Z",
+			CategoryIds: []int{1},
+			Categories:  []category.DTO{},
+			ListId:      1,
+			List:        nil,
+			Stock:       0,
+			Price:       decimal.New(0,0),
+		}},
+		Error:  "",
+	}
+	assert.Equal(t, toJson(t, expected), actual)
 	fmt.Println(" OK")
 
-	fmt.Print("product: get by ?category=2")
-	actual = getRequest(generateApiUrl("/api/v1/product/?category=2"))
-	expected = `{"status":200,"data":[],"error":""}`
-	assert.Equal(t, expected, actual)
+	fmt.Print("product: get by ?list=2")
+	actual = getRequest(generateApiUrl("/api/v1/product/?list=2"))
+	expected = http.Response{
+		Status: 200,
+		Data:   []interface{}{},
+		Error:  "",
+	}
+	assert.Equal(t, toJson(t, expected), actual)
 	fmt.Println(" OK")
 }
 

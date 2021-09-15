@@ -9,6 +9,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
+	internalHttp "github.com/proviant-io/core/internal/http"
 	"gotest.tools/assert"
 	"io"
 	"io/ioutil"
@@ -24,7 +25,13 @@ const (
 	DELETE = "delete"
 )
 
-func url(t string, params ...interface{}) string{
+func toJson(t *testing.T, obj internalHttp.Response) string {
+	expectedJson, err := json.Marshal(obj)
+	assert.NilError(t, err)
+	return string(expectedJson)
+}
+
+func url(t string, params ...interface{}) string {
 	return fmt.Sprintf(t, params...)
 }
 
@@ -126,7 +133,7 @@ func putRequest(url string, json []byte) string {
 }
 
 func runContainer(t *testing.T) string {
-	id, err := createNewContainer("brushknight/proviant:e2e")
+	id, err := createNewContainer("brushknight/proviant-core:e2e")
 	if err != nil {
 		fmt.Errorf(err.Error())
 		t.Fail()
