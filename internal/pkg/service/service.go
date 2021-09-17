@@ -360,6 +360,13 @@ func (s *RelationService) AddShoppingListItem(id int, dto shopping.ItemDTO, acco
 
 	dto.ListId = listModel.Id
 
+	if dto.ProductId > 0 {
+		_, err := s.GetProduct(dto.ProductId, accountId)
+		if err != nil {
+			return shopping.ItemDTO{}, err
+		}
+	}
+
 	item := s.di.ShoppingListItem.Create(dto, accountId)
 
 	return shopping.ItemToDTO(item), nil
@@ -375,6 +382,13 @@ func (s *RelationService) UpdateShoppingListItem(id int, dto shopping.ItemDTO, a
 
 	dto.ListId = listModel.Id
 
+	if dto.ProductId > 0 {
+		_, err := s.GetProduct(dto.ProductId, accountId)
+		if err != nil {
+			return shopping.ItemDTO{}, err
+		}
+	}
+
 	item, err := s.di.ShoppingListItem.Update(dto.Id, dto, accountId)
 
 	if err != nil {
@@ -384,15 +398,14 @@ func (s *RelationService) UpdateShoppingListItem(id int, dto shopping.ItemDTO, a
 	return shopping.ItemToDTO(item), nil
 }
 
-
-func (s *RelationService) UpdateCheckedShoppingListItem( id int, checked bool, accountId int) (shopping.ItemDTO, *errors.CustomError) {
+func (s *RelationService) UpdateCheckedShoppingListItem(id int, checked bool, accountId int) (shopping.ItemDTO, *errors.CustomError) {
 
 	var item shopping.Item
 	var err *errors.CustomError
 
 	if checked {
 		item, err = s.di.ShoppingListItem.Check(id, accountId)
-	}else {
+	} else {
 		item, err = s.di.ShoppingListItem.Uncheck(id, accountId)
 	}
 
@@ -402,7 +415,6 @@ func (s *RelationService) UpdateCheckedShoppingListItem( id int, checked bool, a
 
 	return shopping.ItemToDTO(item), nil
 }
-
 
 func NewRelationService(productRepository *product.Repository,
 	listRepository *list.Repository,

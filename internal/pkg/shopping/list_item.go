@@ -21,6 +21,7 @@ type Item struct {
 	CheckedAt sql.NullTime    `json:"checked_at"`
 	Price     decimal.Decimal `json:"price" gorm:"type:decimal(20,2);"`
 	AccountId int             `json:"account_id" gorm:"default:0;index"`
+	ProductId int             `json:"product_id" gorm:"default:0;index"`
 }
 
 func (Item) TableName() string {
@@ -35,6 +36,7 @@ type ItemDTO struct {
 	Checked   bool            `json:"checked"`
 	CheckedAt sql.NullTime    `json:"checked_at"`
 	Price     decimal.Decimal `json:"price"`
+	ProductId int             `json:"product_id"`
 }
 
 type ItemRepository struct {
@@ -92,6 +94,7 @@ func (r *ItemRepository) Create(dto ItemDTO, accountId int) Item {
 		Checked:   false,
 		CheckedAt: sql.NullTime{},
 		Price:     dto.Price,
+		ProductId: dto.ProductId,
 	}
 
 	r.db.Connection().Create(&model)
@@ -109,6 +112,7 @@ func (r *ItemRepository) Update(id int, dto ItemDTO, accountId int) (Item, *erro
 	model.Title = dto.Title
 	model.Quantity = dto.Quantity
 	model.Price = dto.Price
+	model.ProductId = dto.ProductId
 	if dto.Checked {
 		model.Checked = true
 		model.CheckedAt = sql.NullTime{
@@ -148,7 +152,7 @@ func (r *ItemRepository) updateChecked(id int, checked bool, accountId int) (Ite
 			time.Now(),
 			true,
 		}})
-	}else{
+	} else {
 		r.db.Connection().Model(&model).Select("CheckedAt").Updates(map[string]interface{}{"checked_at": nil})
 	}
 
@@ -172,6 +176,7 @@ func ItemToDTO(m Item) ItemDTO {
 		Checked:   m.Checked,
 		CheckedAt: m.CheckedAt,
 		Price:     m.Price,
+		ProductId: m.ProductId,
 	}
 }
 
