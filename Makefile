@@ -20,8 +20,8 @@ compile:
 	CGO_ENABLED=1 go build -ldflags="-X 'main.Version=$(TAG)'" -o app ./cmd
 
 # Testing
-.PHONY: test/2e2/docker-build
-test/2e2/docker-build:
+.PHONY: test/e2e/docker-build
+test/e2e/docker-build:
 	docker build --target app \
 		--build-arg CONFIG_VERSION_ARG="./examples/config/api-sqlite.yml" \
 		--build-arg UI_VERSION_ARG=$(UI_VERSION) \
@@ -29,7 +29,7 @@ test/2e2/docker-build:
 		-f Dockerfile .
 
 .PHONY: test/e2e
-test/e2e: test/2e2/docker-build
+test/e2e: test/e2e/docker-build
 	docker rm -f proviant-e2e
 	go test -v ./test/e2e/
 
