@@ -7,6 +7,7 @@ import (
 	"github.com/proviant-io/core/internal/apm"
 	"github.com/proviant-io/core/internal/config"
 	"github.com/proviant-io/core/internal/db"
+	"github.com/proviant-io/core/internal/pkg/consumption"
 	"github.com/proviant-io/core/internal/pkg/image"
 	"github.com/proviant-io/core/internal/pkg/shopping"
 	"os"
@@ -19,6 +20,7 @@ type DI struct {
 	Apm          apm.Apm
 	ShoppingList *shopping.ListRepository
 	ShoppingListItem *shopping.ItemRepository
+	ConsumptionLog *consumption.LogRepository
 }
 
 func NewDI(d db.DB, cfg *config.Config, apm apm.Apm, version string) (*DI, error) {
@@ -44,6 +46,14 @@ func NewDI(d db.DB, cfg *config.Config, apm apm.Apm, version string) (*DI, error
 	}
 
 	pool.ShoppingListItem = shoppingListItemRepo
+
+	consumptionLogRepo, err := consumption.LogSetup(d)
+
+	if err != nil {
+		return nil, err
+	}
+
+	pool.ConsumptionLog = consumptionLogRepo
 
 	switch cfg.UserContent.Mode {
 	case config.UserContentModeLocal:
