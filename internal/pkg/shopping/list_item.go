@@ -43,6 +43,8 @@ type ItemRepository struct {
 	db db.DB
 }
 
+const CheckedShowHours = 12
+
 func (r *ItemRepository) Get(id int, accountId int) (Item, *errors.CustomError) {
 
 	model := &Item{}
@@ -67,8 +69,9 @@ func (r *ItemRepository) GetAll(accountId int) []Item {
 func (r *ItemRepository) GetAllByList(listId int, accountId int) []Item {
 
 	var models []Item
-	r.db.Connection().Where("list_id = ? and account_id = ?", listId, accountId).Find(&models)
+	query := fmt.Sprintf("list_id = ? and account_id = ? and (checked_at is null or UNIX_TIMESTAMP(checked_at) > (UNIX_TIMESTAMP() - 3600*%d))", CheckedShowHours)
 
+	r.db.Connection().Where(query, listId, accountId).Find(&models)
 	return models
 }
 

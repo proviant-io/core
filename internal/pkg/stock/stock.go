@@ -73,19 +73,23 @@ func (r *Repository) Delete(id int, accountId int) *errors.CustomError {
 	return nil
 }
 
-func (r *Repository) Consume(dto ConsumeDTO, accountId int) {
+func (r *Repository) Consume(dto ConsumeDTO, accountId int) uint {
 	// do something smart here
 
 	quantityLeftToConsume := dto.Quantity
+
+	var consumed uint = 0
 
 	models := r.GetAllByProductId(dto.ProductId, accountId)
 
 	for _, model := range models {
 		if model.Quantity <= quantityLeftToConsume {
 			quantityLeftToConsume -= model.Quantity
+			consumed += model.Quantity
 			r.Delete(model.Id, accountId)
 		} else {
 			model.Quantity -= quantityLeftToConsume
+			consumed += quantityLeftToConsume
 			r.Update(model.Id, DTO{
 				ProductId: model.ProductId,
 				Quantity:  model.Quantity,
@@ -98,6 +102,8 @@ func (r *Repository) Consume(dto ConsumeDTO, accountId int) {
 			break
 		}
 	}
+
+	return consumed
 }
 
 func (r *Repository) Add(dto DTO, accountId int) Stock {

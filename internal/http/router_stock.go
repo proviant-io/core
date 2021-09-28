@@ -1,8 +1,9 @@
 package http
 
 import (
-	"github.com/proviant-io/core/internal/pkg/stock"
 	"github.com/gorilla/mux"
+	"github.com/proviant-io/core/internal/pkg/consumption"
+	"github.com/proviant-io/core/internal/pkg/stock"
 	"net/http"
 	"strconv"
 )
@@ -102,6 +103,7 @@ func (s *Server) addStock(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) consumeStock(w http.ResponseWriter, r *http.Request) {
 	accountId := s.accountId(r)
+	userId := s.accountId(r)
 	locale := s.getLocale(r)
 	vars := mux.Vars(r)
 	idString := vars["id"]
@@ -138,7 +140,7 @@ func (s *Server) consumeStock(w http.ResponseWriter, r *http.Request) {
 
 	dto.ProductId = id
 
-	customErr := s.relationService.ConsumeStock(dto, accountId)
+	customErr, consumedDTO := s.relationService.ConsumeStock(dto, accountId, userId)
 
 	if customErr != nil {
 		s.handleError(w, locale, *customErr)
@@ -148,21 +150,27 @@ func (s *Server) consumeStock(w http.ResponseWriter, r *http.Request) {
 	//stock left
 	models := s.stockRepo.GetAllByProductId(id, accountId)
 
-	var dtos []stock.DTO
+	var data struct {
+		Stock           []stock.DTO     `json:"stock"`
+		ConsumedLogItem consumption.DTO `json:"consumed_log_item"`
+	}
+
+	data.Stock = []stock.DTO{}
+	data.ConsumedLogItem = consumedDTO
 
 	for _, model := range models {
-		dtos = append(dtos, stock.ModelToDTO(model))
+		data.Stock = append(data.Stock, stock.ModelToDTO(model))
 	}
 
 	response := Response{
 		Status: ResponseCodeOk,
-		Data: dtos,
+		Data:   data,
 	}
 
 	s.jsonResponse(w, response)
 }
 
-func (s *Server) deleteStock(w http.ResponseWriter, r *http.Request){
+func (s *Server) deleteStock(w http.ResponseWriter, r *http.Request) {
 	accountId := s.accountId(r)
 	locale := s.getLocale(r)
 	vars := mux.Vars(r)
@@ -210,7 +218,7 @@ func (s *Server) deleteStock(w http.ResponseWriter, r *http.Request){
 
 	response := Response{
 		Status: ResponseCodeOk,
-		Data: dtos,
+		Data:   dtos,
 	}
 
 	s.jsonResponse(w, response)

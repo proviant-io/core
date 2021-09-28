@@ -7,6 +7,7 @@ import (
 	"github.com/proviant-io/core/internal/errors"
 	"github.com/proviant-io/core/internal/i18n"
 	"github.com/proviant-io/core/internal/pkg/category"
+	"github.com/proviant-io/core/internal/pkg/consumption"
 	"github.com/proviant-io/core/internal/pkg/list"
 	"github.com/proviant-io/core/internal/pkg/product"
 	"github.com/proviant-io/core/internal/pkg/product_category"
@@ -227,15 +228,20 @@ func (s *RelationService) AddStock(dto stock.DTO, accountId int) (stock.Stock, *
 	return model, err
 }
 
-func (s *RelationService) ConsumeStock(dto stock.ConsumeDTO, accountId int) *errors.CustomError {
+func (s *RelationService) ConsumeStock(dto stock.ConsumeDTO, accountId int, userId int) (*errors.CustomError, consumption.DTO) {
 
 	p, err := s.productRepository.Get(dto.ProductId, accountId)
 
 	if err != nil {
-		return err
+		return err, consumption.DTO{}
 	}
 
-	s.stockRepository.Consume(dto, accountId)
+	consumed := s.stockRepository.Consume(dto, accountId)
+
+	consumedLog := s.di.ConsumptionLog.Create(consumption.ConsumeDTO{
+		ProductId: dto.ProductId,
+		Quantity:  consumed,
+	}, accountId, userId)
 
 	if dto.Quantity >= p.Stock {
 		p.Stock = 0
@@ -245,7 +251,7 @@ func (s *RelationService) ConsumeStock(dto stock.ConsumeDTO, accountId int) *err
 
 	_, err = s.productRepository.Save(p, accountId)
 
-	return nil
+	return nil, consumption.ModelToDTO(consumedLog)
 }
 
 func (s *RelationService) DeleteStock(id int, accountId int) *errors.CustomError {
@@ -411,6 +417,18 @@ func (s *RelationService) UpdateCheckedShoppingListItem(id int, checked bool, ac
 
 	if err != nil {
 		return shopping.ItemDTO{}, err
+	}
+
+	if checked && item.ProductId > 0 {
+		_, err = s.AddStock(stock.DTO{
+			ProductId: item.ProductId,
+			Quantity:  uint(item.Quantity),
+			Expire:    0,
+		}, accountId)
+
+		if err != nil {
+			// TODO log errors here
+		}
 	}
 
 	return shopping.ItemToDTO(item), nil

@@ -95,6 +95,24 @@ func (s *Server) accountId(r *http.Request) int {
 	return accountId
 }
 
+func (s *Server) userId(r *http.Request) int {
+
+	accountHeader := r.Header.Get("UserId")
+
+	if accountHeader == "" {
+		return 0
+	}
+
+	accountId, err := strconv.Atoi(accountHeader)
+
+	if err != nil {
+		log.Println(err)
+		return -1
+	}
+
+	return accountId
+}
+
 func NewServer(productRepo *product.Repository,
 	listRepo *list.Repository,
 	categoryRepo *category.Repository,
@@ -150,6 +168,10 @@ func NewServer(productRepo *product.Repository,
 	apiV1Router.HandleFunc(server.di.Apm.WrapHandleFunc("/shopping_list/{list_id}/{id}/", server.deleteShoppingListItem)).Methods("DELETE")
 	apiV1Router.HandleFunc(server.di.Apm.WrapHandleFunc("/shopping_list/{list_id}/{id}/check/", server.checkShoppingListItem)).Methods("PUT")
 	apiV1Router.HandleFunc(server.di.Apm.WrapHandleFunc("/shopping_list/{list_id}/{id}/uncheck/", server.uncheckShoppingListItem)).Methods("PUT")
+	// stock consumption log
+	apiV1Router.HandleFunc(server.di.Apm.WrapHandleFunc("/product/{id}/consumption_log/", server.getConsumptionLog)).Methods("GET")
+
+
 
 	// chore
 	apiV1Router.HandleFunc(server.di.Apm.WrapHandleFunc("/i18n/missing/", server.getMissingTranslations)).Methods("GET")
