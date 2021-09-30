@@ -238,11 +238,6 @@ func (s *RelationService) ConsumeStock(dto stock.ConsumeDTO, accountId int, user
 
 	consumed := s.stockRepository.Consume(dto, accountId)
 
-	consumedLog := s.di.ConsumptionLog.Create(consumption.ConsumeDTO{
-		ProductId: dto.ProductId,
-		Quantity:  consumed,
-	}, accountId, userId)
-
 	if dto.Quantity >= p.Stock {
 		p.Stock = 0
 	} else {
@@ -251,6 +246,14 @@ func (s *RelationService) ConsumeStock(dto stock.ConsumeDTO, accountId int, user
 
 	_, err = s.productRepository.Save(p, accountId)
 
+	if consumed == 0 {
+		return errors.NewErrBadRequest(i18n.NewMessage("no stock left to consume")), consumption.DTO{}
+	}
+
+	consumedLog := s.di.ConsumptionLog.Create(consumption.ConsumeDTO{
+		ProductId: dto.ProductId,
+		Quantity:  consumed,
+	}, accountId, userId)
 	return nil, consumption.ModelToDTO(consumedLog)
 }
 
@@ -301,6 +304,8 @@ func (s *RelationService) DeleteProduct(id int, accountId int) *errors.CustomErr
 	}
 
 	s.stockRepository.DeleteByProductId(id, accountId)
+
+	s.di.ConsumptionLog.DeleteByProductId(id, accountId)
 
 	s.productCategoryRepository.DeleteByProductId(id, accountId)
 

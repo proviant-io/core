@@ -73,6 +73,10 @@ func (r *LogRepository) Delete(id int, accountId int) *errors.CustomError {
 	return nil
 }
 
+func (r *LogRepository) DeleteByProductId(id int, accountId int) {
+	r.db.Connection().Where("product_id = ? and account_id = ?", id, accountId).Unscoped().Delete(&Log{})
+}
+
 func (r *LogRepository) Create(dto ConsumeDTO, accountId int, userId int) Log {
 
 	model := Log{

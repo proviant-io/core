@@ -53,12 +53,8 @@ func (r *Repository) GetAllByProductId(id int, accountId int) []Stock {
 	return s
 }
 
-func (r *Repository) DeleteByProductId(id int, accountId int) []Stock {
-
-	var s []Stock
-	r.db.Connection().Where("product_id = ? and account_id = ?", id, accountId).Order("expire ASC").Unscoped().Delete(&Stock{})
-
-	return s
+func (r *Repository) DeleteByProductId(id int, accountId int) {
+	r.db.Connection().Where("product_id = ? and account_id = ?", id, accountId).Unscoped().Delete(&Stock{})
 }
 
 func (r *Repository) Delete(id int, accountId int) *errors.CustomError {
