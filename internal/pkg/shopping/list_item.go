@@ -29,12 +29,13 @@ func (Item) TableName() string {
 }
 
 type ItemDTO struct {
-	Id        int             `json:"id"`
 	ListId    int             `json:"list_id" gorm:"index"`
+	Id        int             `json:"id"`
 	Title     string          `json:"title"`
 	Quantity  int             `json:"quantity"`
 	Checked   bool            `json:"checked"`
-	CheckedAt sql.NullTime    `json:"checked_at"`
+	CheckedAt int             `json:"checked_at"`
+	UpdatedAt int             `json:"updated_at"`
 	Price     decimal.Decimal `json:"price"`
 	ProductId int             `json:"product_id"`
 }
@@ -171,13 +172,18 @@ func (r *ItemRepository) Uncheck(id int, accountId int) (Item, *errors.CustomErr
 }
 
 func ItemToDTO(m Item) ItemDTO {
+
+	var updatedAt = sql.NullTime{}
+	updatedAt.Scan(m.UpdatedAt)
+
 	return ItemDTO{
 		Id:        m.Id,
 		Title:     m.Title,
 		ListId:    m.ListId,
 		Quantity:  m.Quantity,
 		Checked:   m.Checked,
-		CheckedAt: m.CheckedAt,
+		CheckedAt: int(m.CheckedAt.Time.Unix()),
+		UpdatedAt: int(updatedAt.Time.Unix()),
 		Price:     m.Price,
 		ProductId: m.ProductId,
 	}
