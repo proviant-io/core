@@ -18,6 +18,7 @@ type Item struct {
 	Title     string          `json:"title"`
 	Quantity  int             `json:"quantity"`
 	Checked   bool            `json:"checked"`
+	DueDate   int             `json:"due_date" gorm:"default:0"`
 	CheckedAt sql.NullTime    `json:"checked_at"`
 	Price     decimal.Decimal `json:"price" gorm:"type:decimal(20,2);"`
 	AccountId int             `json:"account_id" gorm:"default:0;index"`
@@ -34,6 +35,7 @@ type ItemDTO struct {
 	Title     string          `json:"title"`
 	Quantity  int             `json:"quantity"`
 	Checked   bool            `json:"checked"`
+	DueDate   int             `json:"due_date"`
 	CheckedAt int             `json:"checked_at"`
 	UpdatedAt int             `json:"updated_at"`
 	Price     decimal.Decimal `json:"price"`
@@ -95,6 +97,7 @@ func (r *ItemRepository) Create(dto ItemDTO, accountId int) Item {
 		AccountId: accountId,
 		ListId:    dto.ListId,
 		Quantity:  dto.Quantity,
+		DueDate:   dto.DueDate,
 		Checked:   false,
 		CheckedAt: sql.NullTime{},
 		Price:     dto.Price,
@@ -115,6 +118,7 @@ func (r *ItemRepository) Update(id int, dto ItemDTO, accountId int) (Item, *erro
 
 	model.Title = dto.Title
 	model.Quantity = dto.Quantity
+	model.DueDate = dto.DueDate
 	model.Price = dto.Price
 	model.ProductId = dto.ProductId
 	if dto.Checked {
@@ -181,6 +185,7 @@ func ItemToDTO(m Item) ItemDTO {
 		Title:     m.Title,
 		ListId:    m.ListId,
 		Quantity:  m.Quantity,
+		DueDate:   m.DueDate,
 		Checked:   m.Checked,
 		CheckedAt: int(m.CheckedAt.Time.Unix()),
 		UpdatedAt: int(updatedAt.Time.Unix()),
@@ -192,6 +197,7 @@ func ItemToDTO(m Item) ItemDTO {
 func (r *ItemRepository) Migrate() error {
 	// Migrate the schema
 	err := r.db.Connection().AutoMigrate(&Item{})
+	fmt.Println("Migrate: shopping.ItemRepository")
 	if err != nil {
 		return fmt.Errorf("migration of ShoppingList table failed: %v", err)
 	}
