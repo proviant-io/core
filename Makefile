@@ -62,12 +62,13 @@ docker/publish:
 .PHONY: docker/run
 docker/run: docker/build docker/prepare-folders
 	docker rm -f proviant
+	docker rm -f proviant-core
 	docker run --rm -t \
-		--name "proviant" \
+		--name "proviant-core" \
 		-v $(VOLUMES_PREFIX)/sqlite:/app/db/ \
 		-v $(VOLUMES_PREFIX)/user_content:/app/user_content/ \
 		-v $(PWD)/examples/config/web-sqlite.yml:/app/default-config.yml \
-		-p8100:80 \
+		-p8080:80 \
 		brushknight/proviant-core:$(TAG)
 
 .PHONY: docker/pull-latest

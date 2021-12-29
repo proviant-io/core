@@ -9,7 +9,7 @@ ENV TAG=$TAG_ARG
 # install dependencies
 RUN apk update
 RUN apk upgrade
-RUN apk add --update go=1.16.8-r0 gcc=10.3.1_git20210424-r2 g++=10.3.1_git20210424-r2 make=4.3-r0 curl
+RUN apk add --update go=1.16.10-r0 gcc=10.3.1_git20210424-r2 g++=10.3.1_git20210424-r2 make=4.3-r0 curl
 # download go modules
 WORKDIR /app
 COPY go.mod go.sum ./
