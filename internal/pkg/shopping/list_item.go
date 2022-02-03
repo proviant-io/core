@@ -16,6 +16,7 @@ type Item struct {
 	Id        int             `json:"id" gorm:"primaryKey;autoIncrement;"`
 	ListId    int             `json:"list_id" gorm:"index"`
 	Title     string          `json:"title"`
+	Comment   string          `json:"comment"`
 	Quantity  int             `json:"quantity"`
 	Checked   bool            `json:"checked"`
 	DueDate   int             `json:"due_date" gorm:"default:0"`
@@ -33,6 +34,7 @@ type ItemDTO struct {
 	ListId    int             `json:"list_id" gorm:"index"`
 	Id        int             `json:"id"`
 	Title     string          `json:"title"`
+	Comment   string          `json:"comment"`
 	Quantity  int             `json:"quantity"`
 	Checked   bool            `json:"checked"`
 	DueDate   int             `json:"due_date"`
@@ -94,6 +96,7 @@ func (r *ItemRepository) Create(dto ItemDTO, accountId int) Item {
 
 	model := Item{
 		Title:     dto.Title,
+		Comment:   dto.Comment,
 		AccountId: accountId,
 		ListId:    dto.ListId,
 		Quantity:  dto.Quantity,
@@ -117,6 +120,7 @@ func (r *ItemRepository) Update(id int, dto ItemDTO, accountId int) (Item, *erro
 	}
 
 	model.Title = dto.Title
+	model.Comment = dto.Comment
 	model.Quantity = dto.Quantity
 	model.DueDate = dto.DueDate
 	model.Price = dto.Price
@@ -183,6 +187,7 @@ func ItemToDTO(m Item) ItemDTO {
 	return ItemDTO{
 		Id:        m.Id,
 		Title:     m.Title,
+		Comment:   m.Comment,
 		ListId:    m.ListId,
 		Quantity:  m.Quantity,
 		DueDate:   m.DueDate,
